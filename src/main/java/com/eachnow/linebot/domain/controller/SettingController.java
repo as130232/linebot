@@ -16,7 +16,7 @@ public class SettingController {
      * 取得排程開關狀態
      */
     @GetMapping(value = "/test")
-    public Result getCron() {
+    public Result test() {
         Result<String> result = new Result<>();
         result.setData("test by charles:" + new Date());
         return result;
