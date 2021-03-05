@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 @RestController
 @RequestMapping("/setting")
 public class SettingController {
@@ -16,7 +18,7 @@ public class SettingController {
     @GetMapping(value = "/test")
     public Result getCron() {
         Result<String> result = new Result<>();
-        result.setData("test by charles");
+        result.setData("test by charles:" + new Date());
         return result;
     }
 }
