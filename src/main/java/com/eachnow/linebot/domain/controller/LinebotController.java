@@ -8,8 +8,8 @@ import java.util.Date;
 @RestController
 public class LinebotController {
 
-    @PostMapping(value = "/callback")
-    public void callback(@RequestBody Object object) {
-        System.out.println("object:" + object);
-    }
+//    @PostMapping(value = "/callback")
+//    public void callback(@RequestBody Object object) {
+//        System.out.println("object:" + object);
+//    }
 }
