@@ -42,7 +42,7 @@ public class CrawlerService {
         driver.findElement(By.xpath("//button[@value=\"yes\"]")).click();   //進入表特版
     }
 
-    @PostConstruct
+//    @PostConstruct
     private void crawler() {
         init();
         int pageSize = 2;
@@ -52,7 +52,7 @@ public class CrawlerService {
             driver.findElement(By.xpath("//*[contains(text(),\"上頁\")]")).click();    //進入上頁，刷取新的素材
         }
         driver.quit();
-        System.out.println(listPicture);
+
     }
 
     private void crawlerOnPage() {
@@ -121,8 +121,9 @@ public class CrawlerService {
             }
         }
         driver.quit();
-
         System.out.println(allPictureLinks);
+
+
     }
 
 }
