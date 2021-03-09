@@ -33,7 +33,7 @@ public class BeautyCrawlerService {
     public BeautyCrawlerService() {
     }
 
-    @PostConstruct
+//    @PostConstruct
     private void init() {
         crawler(3);
     }
