@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler;
 
 import com.eachnow.linebot.domain.service.handler.impl.BeautyHandler;
+import com.eachnow.linebot.domain.service.handler.impl.DefaultHandler;
 import com.eachnow.linebot.domain.service.handler.impl.EatWhatHandler;
 import com.eachnow.linebot.domain.service.handler.impl.WeatherHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -23,12 +24,16 @@ public class CommandHandlerFactory {
     @Autowired
     private EatWhatHandler eatWhatHandler;
 
+
+    @Autowired
+    private DefaultHandler defaultHandler;
+
     public CommandHandlerFactory(Map<String, Class<? extends CommandHandler>> handlerMap) {
         this.handlerMap = handlerMap;
     }
 
     public CommandHandler getCommandHandler(String command) {
-        CommandHandler result = null;   //default CommandHandler;
+        CommandHandler result = defaultHandler;   //default CommandHandler;
         Class<? extends CommandHandler> commandHandlerClass = handlerMap.get(command);
         if (handlerMap == null) {
             log.warn("Can not get the Constructor of CommandHandler, command:{}", command);

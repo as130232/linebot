@@ -24,7 +24,7 @@ public class LinebotController {
 
     @PostMapping(value = "/messagePush")
     public void messagePush(@RequestParam(value = "type") String type, @RequestParam(value = "text") String text) throws Exception {
-        String to = "";
+        String to = "Uf52a57f7e6ba861c05be8837bfbcf0c6";
         messageSender.send(to, type, text);
     }
 }

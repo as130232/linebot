@@ -21,7 +21,10 @@ public class HandlerConfig {
 
         Set<Class<? extends CommandHandler>> listCommandHandler = reflections.getSubTypesOf(CommandHandler.class);
         for (Class<? extends CommandHandler> commandHandlerClass : listCommandHandler) {
-            String[] commands = commandHandlerClass.getAnnotation(Command.class).value();
+            Command commandArr = commandHandlerClass.getAnnotation(Command.class);
+            if (commandArr == null)
+                continue;
+            String[] commands = commandArr.value();
             for (String command : commands) {
                 handlerMap.put(command, commandHandlerClass);
 //                handlerMap.put(command, (Constructor<? extends CommandHandler>) commandHandlerClass.getDeclaredConstructors()[0]);
