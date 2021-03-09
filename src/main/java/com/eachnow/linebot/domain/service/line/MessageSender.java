@@ -37,14 +37,17 @@ public class MessageSender {
         messages.add(MessagePO.builder().type(type).text(text).build());
         PushMessagePO pushMessagePO = PushMessagePO.builder().to(to).messages(messages).build();
         this.send(pushMessagePO);
-        log.info("發送訊息，成功。to:{}, type:{}, text:{}", to, type, text);
     }
 
     public void send(PushMessagePO pushMessagePO) throws Exception {
-        HttpEntity<String> entity = new HttpEntity<>(JsonUtils.toJsonString(pushMessagePO), getHttpHeaders());
-        ResponseEntity<String> response = restTemplate.exchange("https://api.line.me/v2/bot/message/push",
-                HttpMethod.POST, entity, String.class);
-        log.info("發送訊息，成功。pushMessagePO:{}", pushMessagePO);
+        try{
+            HttpEntity<String> entity = new HttpEntity<>(JsonUtils.toJsonString(pushMessagePO), getHttpHeaders());
+            ResponseEntity<String> response = restTemplate.exchange("https://api.line.me/v2/bot/message/push",
+                    HttpMethod.POST, entity, String.class);
+            log.info("發送訊息，成功。pushMessagePO:{}", pushMessagePO);
+        }catch (Exception e){
+            log.error("發送訊息，失敗! pushMessagePO:{}, error msg:{}", pushMessagePO, e.getMessage());
+        }
     }
 
 }
