@@ -36,7 +36,7 @@ public class CommandHandlerFactory {
         CommandHandler result = defaultHandler;   //default CommandHandler;
         Class<? extends CommandHandler> commandHandlerClass = handlerMap.get(command);
         if (handlerMap == null) {
-            log.warn("Can not get the Constructor of CommandHandler, command:{}", command);
+            log.warn("Can not get the Class of CommandHandler, command:{}", command);
             return result;
         }
         try {

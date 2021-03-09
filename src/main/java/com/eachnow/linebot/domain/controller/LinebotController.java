@@ -17,11 +17,6 @@ public class LinebotController {
         this.messageSender = messageSender;
     }
 
-//    @PostMapping(value = "/callback")
-//    public void callback(@RequestBody Object object) {
-//        System.out.println("object:" + object);
-//    }
-
     @PostMapping(value = "/messagePush")
     public void messagePush(@RequestParam(value = "type") String type, @RequestParam(value = "text") String text) throws Exception {
         String to = "Uf52a57f7e6ba861c05be8837bfbcf0c6";

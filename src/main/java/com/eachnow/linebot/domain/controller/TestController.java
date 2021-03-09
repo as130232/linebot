@@ -10,21 +10,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/setting")
-public class SettingController {
+@RequestMapping("/test")
+public class TestController {
     private MessageHandler messageHandler;
     private BeautyCrawlerService beautyCrawlerService;
     @Autowired
-    public SettingController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService) {
+    public TestController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService) {
         this.messageHandler = messageHandler;
         this.beautyCrawlerService = beautyCrawlerService;
     }
 
-    /**
-     * 取得排程開關狀態
-     */
-    @GetMapping(value = "/test")
-    public Result test(@RequestParam(value = "text") String text) {
+    @GetMapping(value = "/command")
+    public Result testCommand(@RequestParam(value = "text") String text) {
         Result<String> result = new Result<>();
         result.setData("test by charles:" + messageHandler.executeCommand(text));
         return result;
