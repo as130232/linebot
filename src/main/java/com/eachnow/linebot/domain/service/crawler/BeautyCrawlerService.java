@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,7 +32,7 @@ public class BeautyCrawlerService {
     public BeautyCrawlerService() {
     }
 
-//    @PostConstruct
+    //    @PostConstruct
     private void init() {
         crawler(3);
     }
@@ -52,6 +51,7 @@ public class BeautyCrawlerService {
 
     private void bulidDriver() {
         System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
+        log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
         options.setHeadless(true);  //增加效能
         driver = new ChromeDriver(options);
