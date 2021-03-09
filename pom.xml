@@ -62,6 +62,12 @@
             <version>0.9.11</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.squareup.okio</groupId>
+            <artifactId>okio</artifactId>
+            <version>2.10.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>
