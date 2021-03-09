@@ -12,4 +12,5 @@ public class LinebotController {
 //    public void callback(@RequestBody Object object) {
 //        System.out.println("object:" + object);
 //    }
+
 }

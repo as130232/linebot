@@ -3,37 +3,26 @@ package com.eachnow.linebot.domain.service;
 import com.eachnow.linebot.common.po.SimpleContentPO;
 import com.eachnow.linebot.common.po.SimplePushPO;
 import com.eachnow.linebot.common.util.JsonUtils;
-import com.eachnow.linebot.config.LineConfig;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @Slf4j
 @Component
 public class LineNotifier {
     private RestTemplate restTemplate;
-    private LineConfig lineConfig;
 
     @Autowired
-    public LineNotifier(RestTemplate restTemplate,
-                        LineConfig lineConfig) {
+    public LineNotifier(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
-        this.lineConfig = lineConfig;
     }
 
     public void send(String text) throws Exception {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + lineConfig.getChannelToken());
 
 //        Map<String, String> parameter = new HashMap<>();
 //        parameter.put("to", "");
