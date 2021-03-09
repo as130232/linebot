@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -32,7 +33,7 @@ public class BeautyCrawlerService {
     public BeautyCrawlerService() {
     }
 
-    //    @PostConstruct
+//    @PostConstruct
     private void init() {
         crawler(3);
     }
@@ -53,7 +54,8 @@ public class BeautyCrawlerService {
         System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
         log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
-        options.setHeadless(true);  //增加效能
+        options.setHeadless(true);  //無視窗模式，增加效能
+        options.addArguments("--no-sandbox");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         String url = "https://www.ptt.cc/bbs/Beauty/index.html";
