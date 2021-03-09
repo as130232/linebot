@@ -21,7 +21,6 @@ public class CrawlerController {
     @GetMapping(value = "/beauty")
     public Result crawlerBeauty(@RequestParam(value = "pageSize", defaultValue = "2") Integer pageSize) {
         beautyCrawlerService.crawler(pageSize);
-        Result<Void> result = new Result<>();
-        return result;
+        return Result.getDefaultResponse();
     }
 }

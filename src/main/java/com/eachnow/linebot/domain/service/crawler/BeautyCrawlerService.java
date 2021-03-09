@@ -7,13 +7,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -28,26 +30,34 @@ public class BeautyCrawlerService {
     private WebDriver driver;
     private final Integer MAX_SIZE = 500;
     private List<String> listPicture = new ArrayList<>(MAX_SIZE);
+    private final ThreadPoolExecutor beautyCrawlerExecutor;
 
     @Autowired
-    public BeautyCrawlerService() {
+    public BeautyCrawlerService(@Qualifier("beauty-crawler-executor") ThreadPoolExecutor beautyCrawlerExecutor) {
+        this.beautyCrawlerExecutor = beautyCrawlerExecutor;
     }
 
-//    @PostConstruct
+    //    @PostConstruct
     private void init() {
         crawler(3);
     }
 
     public void crawler(int pageSize) {
-        log.info("準備，爬取表特版，pageSize:{}", pageSize);
-        bulidDriver();
-        driver.navigate().refresh();
-        for (int i = 0; i < pageSize; i++) {
-            crawlerOnPage();    //爬取該頁素材
-            driver.findElement(By.xpath("//*[contains(text(),\"上頁\")]")).click();    //進入上頁，刷取新的素材
-        }
-        driver.quit();
-        log.info("爬取表特版，完成。");
+        CompletableFuture.runAsync(() -> {
+            log.info("準備，爬取表特版，pageSize:{}", pageSize);
+            bulidDriver();
+            driver.navigate().refresh();
+            for (int i = 0; i < pageSize; i++) {
+                crawlerOnPage();    //爬取該頁素材
+                driver.findElement(By.xpath("//*[contains(text(),\"上頁\")]")).click();    //進入上頁，刷取新的素材
+            }
+            driver.quit();
+            log.info("爬取表特版，完成。");
+        }, beautyCrawlerExecutor).exceptionally(e -> {
+                    log.error("爬取表特版，失敗! error msg:{}", e.getMessage(), e);
+                    return null;
+                }
+        );
     }
 
     private void bulidDriver() {

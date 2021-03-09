@@ -1,8 +1,10 @@
 package com.eachnow.linebot.common.po;
 
+import com.google.common.collect.Maps;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * RESTFUL return type
@@ -45,6 +47,12 @@ public class Result<T> implements Serializable {
     public Result(T data) {
         super();
         this.data = data;
+    }
+
+    public static Result<Map> getDefaultResponse() {
+        Result<Map> result = new Result<>();
+        result.setData(Maps.newHashMap());
+        return result;
     }
 }
 

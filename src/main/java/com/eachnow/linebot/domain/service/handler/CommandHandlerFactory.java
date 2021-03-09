@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler;
 
 import com.eachnow.linebot.domain.service.handler.impl.BeautyHandler;
+import com.eachnow.linebot.domain.service.handler.impl.EatWhatHandler;
 import com.eachnow.linebot.domain.service.handler.impl.WeatherHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class CommandHandlerFactory {
     private BeautyHandler beautyHandler;
     @Autowired
     private WeatherHandler weatherHandler;
+    @Autowired
+    private EatWhatHandler eatWhatHandler;
 
     public CommandHandlerFactory(Map<String, Class<? extends CommandHandler>> handlerMap) {
         this.handlerMap = handlerMap;
@@ -36,6 +39,8 @@ public class CommandHandlerFactory {
                 return beautyHandler;
             } else if (WeatherHandler.class.equals(commandHandlerClass)) {
                 return weatherHandler;
+            } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
+                return eatWhatHandler;
             }
 //            result = applicationContext.getBean(commandHandlerClass);
 //            result = commandHandlerClass.newInstance();

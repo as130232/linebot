@@ -1,15 +1,13 @@
 package com.eachnow.linebot.domain.controller;
 
 import com.eachnow.linebot.common.po.Result;
-import com.eachnow.linebot.domain.service.MessageHandler;
+import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Date;
 
 @RestController
 @RequestMapping("/setting")

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class SimpleContentPO {
+public class MessagePO {
     private String type;
     private String text;
 }

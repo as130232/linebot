@@ -25,7 +25,6 @@ public class BeautyHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
-        log.info("隨機抽");
         URI uri = URI.create(beautyCrawlerService.randomPicture());
         return new ImageMessage(uri, uri);
     }
