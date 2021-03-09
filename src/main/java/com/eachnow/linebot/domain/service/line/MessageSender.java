@@ -25,16 +25,26 @@ public class MessageSender {
         this.lineConfig = lineConfig;
     }
 
-    public void send(String to, String type, String text) throws Exception {
+    private HttpHeaders getHttpHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + lineConfig.getChannelToken());
+        return headers;
+    }
+
+    public void send(String to, String type, String text) throws Exception {
         List<MessagePO> messages = new ArrayList<>();
         messages.add(MessagePO.builder().type(type).text(text).build());
         PushMessagePO pushMessagePO = PushMessagePO.builder().to(to).messages(messages).build();
-        HttpEntity<String> entity = new HttpEntity<>(JsonUtils.toJsonString(pushMessagePO), headers);
-        ResponseEntity<String> response = restTemplate.exchange("https://api.line.me/v2/bot/message/push",
-                HttpMethod.POST, entity, String.class);
+        this.send(pushMessagePO);
         log.info("發送訊息，成功。to:{}, type:{}, text:{}", to, type, text);
     }
+
+    public void send(PushMessagePO pushMessagePO) throws Exception {
+        HttpEntity<String> entity = new HttpEntity<>(JsonUtils.toJsonString(pushMessagePO), getHttpHeaders());
+        ResponseEntity<String> response = restTemplate.exchange("https://api.line.me/v2/bot/message/push",
+                HttpMethod.POST, entity, String.class);
+        log.info("發送訊息，成功。pushMessagePO:{}", pushMessagePO);
+    }
+
 }
