@@ -55,11 +55,13 @@ public class BeautyCrawlerService {
         log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
         options.setHeadless(true);  //無視窗模式，增加效能
-        options.addArguments("--no-sandbox");
+//        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
         String url = "https://www.ptt.cc/bbs/Beauty/index.html";
         driver.get(url);
+        log.info("連線url:{}", url);
         driver.findElement(By.xpath("//button[@value=\"yes\"]")).click();   //進入表特版
     }
 
