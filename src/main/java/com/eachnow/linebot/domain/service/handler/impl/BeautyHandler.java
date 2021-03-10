@@ -5,6 +5,7 @@ import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
 import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,9 +26,13 @@ public class BeautyHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
-        URI uri = URI.create(beautyCrawlerService.randomPicture());
+        if (listPicture.size() == 0) {
+            beautyCrawlerService.crawler(1);
+            return new TextMessage("重新取得圖片資源中，請稍後。");
+        }
         if (parameters.contains("refresh"))
             beautyCrawlerService.init();
+        URI uri = URI.create(beautyCrawlerService.randomPicture());
         return new ImageMessage(uri, uri);
     }
 

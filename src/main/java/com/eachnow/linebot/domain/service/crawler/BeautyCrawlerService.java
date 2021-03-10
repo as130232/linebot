@@ -28,7 +28,7 @@ public class BeautyCrawlerService {
     @Value("${CHROMEDRIVER_PATH:D:\\chromedriver\\chromedriver.exe}")
     private String CHROMEDRIVER_PATH;
     private WebDriver driver;
-    private final Integer MAX_SIZE = 500;
+    public final Integer MAX_SIZE = 500;
     public List<String> listPicture = new ArrayList<>(MAX_SIZE);
     private final ThreadPoolExecutor beautyCrawlerExecutor;
 
@@ -114,8 +114,6 @@ public class BeautyCrawlerService {
     }
 
     public String randomPicture() {
-        if (listPicture.size() == 0)
-            crawler(1);
         int item = new Random().nextInt(listPicture.size());
         return listPicture.get(item);
     }

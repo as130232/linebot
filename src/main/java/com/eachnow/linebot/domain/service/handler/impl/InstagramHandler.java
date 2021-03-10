@@ -36,6 +36,7 @@ public class InstagramHandler implements CommandHandler {
         User user = getAccountInfo(account);
         String content = String.format("貼文：%d, 粉絲：%d\n%s", user.getEdgeOwnerToTimelineMedia().getCount(),
                 user.getEdgeFollowedBy().getCount(), user.getBiography());
+        log.info("444");
         if (content.length() > 60) {
             content = content.substring(0, 57) + "...";
         }
@@ -61,7 +62,6 @@ public class InstagramHandler implements CommandHandler {
         }
 
         String html = document.toString();
-
         int index = html.indexOf("\"entry_data\":");
         String json = html.substring(index + "\"entry_data\":".length(), html.indexOf(",\"hostname\"", index));
 
@@ -69,6 +69,7 @@ public class InstagramHandler implements CommandHandler {
         JsonNode node;
         try {
             node = mapper.readTree(json);
+            log.info("111");
         } catch (IOException e) {
             log.error("error msg:{}", e.getMessage());
             return null;
@@ -77,6 +78,7 @@ public class InstagramHandler implements CommandHandler {
         Iterator<JsonNode> iterator = node.get("ProfilePage").elements();
         if (iterator.hasNext()) {
             JsonNode graphqlNode = iterator.next().get("graphql");
+            log.info("222");
             if (graphqlNode == null) {
                 log.warn("Parse \"graphql\" error");
                 return null;
@@ -84,6 +86,7 @@ public class InstagramHandler implements CommandHandler {
             Graphql graphql;
             try {
                 graphql = mapper.readValue(graphqlNode.toString(), Graphql.class);
+                log.info("333");
             } catch (IOException e) {
                 log.error("error msg:{}", e.getMessage());
                 return null;
