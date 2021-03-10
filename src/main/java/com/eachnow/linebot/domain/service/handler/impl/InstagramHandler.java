@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -27,11 +26,6 @@ import java.util.Iterator;
 @Command({"ig"})
 public class InstagramHandler implements CommandHandler {
     private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/";
-
-    @PostConstruct
-    private void test() {
-        execute("IG doctorkowj");
-    }
 
     @Override
     public Message execute(String parameters) {

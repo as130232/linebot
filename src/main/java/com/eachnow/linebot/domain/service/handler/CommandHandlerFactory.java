@@ -44,7 +44,7 @@ public class CommandHandlerFactory {
             if (BeautyHandler.class.equals(commandHandlerClass)) {
                 return beautyHandler;
             } else if (InstagramHandler.class.equals(commandHandlerClass)) {
-                return eatWhatHandler;
+                return instagramHandler;
             } else if (WeatherHandler.class.equals(commandHandlerClass)) {
                 return weatherHandler;
             } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
