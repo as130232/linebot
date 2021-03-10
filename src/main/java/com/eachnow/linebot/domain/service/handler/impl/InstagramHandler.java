@@ -39,6 +39,7 @@ public class InstagramHandler implements CommandHandler {
         if (content.length() > 60) {
             content = content.substring(0, 57) + "...";
         }
+        log.info("用戶user info:{}", user);
         String title = StringUtils.isBlank(user.getFullName()) ? user.getUsername() : user.getFullName();
         URI uri = URI.create(INSTAGRAM_BASE_URI + account);
         ButtonsTemplate template = new ButtonsTemplate(URI.create(user.getProfilePicUrlHd()), title, content,
