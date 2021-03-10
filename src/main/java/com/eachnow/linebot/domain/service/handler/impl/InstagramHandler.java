@@ -76,6 +76,7 @@ public class InstagramHandler implements CommandHandler {
         }
 
         Iterator<JsonNode> iterator = node.get("ProfilePage").elements();
+        log.info("iterator:{}", iterator);
         if (iterator.hasNext()) {
             JsonNode graphqlNode = iterator.next().get("graphql");
             log.info("222");
