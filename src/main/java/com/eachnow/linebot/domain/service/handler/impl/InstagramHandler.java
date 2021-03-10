@@ -17,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import java.util.Iterator;
 @Command({"ig"})
 public class InstagramHandler implements CommandHandler {
     private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/{account}/?a=1";
+
 //    @PostConstruct
 //    private void test() {
 //        String text = "IG doctorkowj";
@@ -41,7 +43,6 @@ public class InstagramHandler implements CommandHandler {
         User user = getAccountInfo(account);
         if (user == null)
             return null;
-        log.info("用戶user info:{}", user);
         String content = String.format("貼文：%d, 粉絲：%d\n%s", user.getEdgeOwnerToTimelineMedia().getCount(),
                 user.getEdgeFollowedBy().getCount(), user.getBiography());
         if (content.length() > 60) {
@@ -60,7 +61,7 @@ public class InstagramHandler implements CommandHandler {
         Document document;
         try {
             document = Jsoup.connect(INSTAGRAM_BASE_URI.replace("{account}", account)).get();
-            log.info("連線成功。document:{}", document);
+            log.info("連線成功。");
         } catch (IOException e) {
             log.error("error msg:{}", e.getMessage());
             return null;
