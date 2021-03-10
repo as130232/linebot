@@ -32,6 +32,7 @@ public class CommandHandlerFactory {
     }
 
     public CommandHandler getCommandHandler(String command) {
+        log.info("command:{}", command);
         CommandHandler result = defaultHandler;
         if (command == null || "".equals(command))
             return result;
