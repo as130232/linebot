@@ -22,7 +22,8 @@ public class CommandHandlerFactory {
     private WeatherHandler weatherHandler;
     @Autowired
     private EatWhatHandler eatWhatHandler;
-
+    @Autowired
+    private HelloHandler helloHandler;
 
     @Autowired
     private DefaultHandler defaultHandler;
@@ -50,6 +51,8 @@ public class CommandHandlerFactory {
                 return weatherHandler;
             } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
                 return eatWhatHandler;
+            } else if (HelloHandler.class.equals(commandHandlerClass)) {
+                return helloHandler;
             }
 //            result = applicationContext.getBean(commandHandlerClass);
 //            result = commandHandlerClass.newInstance();
