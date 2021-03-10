@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -26,8 +25,7 @@ import java.util.Iterator;
 @Slf4j
 @Command({"ig"})
 public class InstagramHandler implements CommandHandler {
-    private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/";
-
+    private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/{account}/?a=1";
 //    @PostConstruct
 //    private void test() {
 //        String text = "IG doctorkowj";
@@ -58,17 +56,15 @@ public class InstagramHandler implements CommandHandler {
         return new TemplateMessage(user.getFullName() + " " + user.getBiography(), template);
     }
 
-
     private User getAccountInfo(String account) {
         Document document;
         try {
-            document = Jsoup.connect(INSTAGRAM_BASE_URI + account).get();
-            log.info("連線成功。");
+            document = Jsoup.connect(INSTAGRAM_BASE_URI.replace("{account}", account)).get();
+            log.info("連線成功。document:{}", document);
         } catch (IOException e) {
             log.error("error msg:{}", e.getMessage());
             return null;
         }
-
         String html = document.toString();
         int index = html.indexOf("\"entry_data\":");
         String json = html.substring(index + "\"entry_data\":".length(), html.indexOf(",\"hostname\"", index));
@@ -81,12 +77,9 @@ public class InstagramHandler implements CommandHandler {
             log.error("error msg:{}", e.getMessage());
             return null;
         }
-        log.info("node:{}", node);
         Iterator<JsonNode> iterator = node.get("ProfilePage").elements();
-        log.info("iterator:{}", iterator);
         if (iterator.hasNext()) {
             JsonNode graphqlNode = iterator.next().get("graphql");
-            log.info("222");
             if (graphqlNode == null) {
                 log.warn("Parse \"graphql\" error");
                 return null;
@@ -94,7 +87,6 @@ public class InstagramHandler implements CommandHandler {
             Graphql graphql;
             try {
                 graphql = mapper.readValue(graphqlNode.toString(), Graphql.class);
-                log.info("333");
             } catch (IOException e) {
                 log.error("error msg:{}", e.getMessage());
                 return null;
