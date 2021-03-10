@@ -28,12 +28,11 @@ import java.util.Iterator;
 public class InstagramHandler implements CommandHandler {
     private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/";
 
-    @PostConstruct
-    private void test(){
-        String text = "IG doctorkowj";
-        execute(text);
-    }
-
+//    @PostConstruct
+//    private void test() {
+//        String text = "IG doctorkowj";
+//        execute(text);
+//    }
 
     @Override
     public Message execute(String parameters) {
@@ -42,13 +41,14 @@ public class InstagramHandler implements CommandHandler {
             return null;
         String account = paramArr[1];
         User user = getAccountInfo(account);
+        if (user == null)
+            return null;
+        log.info("用戶user info:{}", user);
         String content = String.format("貼文：%d, 粉絲：%d\n%s", user.getEdgeOwnerToTimelineMedia().getCount(),
                 user.getEdgeFollowedBy().getCount(), user.getBiography());
-        log.info("444");
         if (content.length() > 60) {
             content = content.substring(0, 57) + "...";
         }
-        log.info("用戶user info:{}", user);
         String title = StringUtils.isBlank(user.getFullName()) ? user.getUsername() : user.getFullName();
         URI uri = URI.create(INSTAGRAM_BASE_URI + account);
         ButtonsTemplate template = new ButtonsTemplate(URI.create(user.getProfilePicUrlHd()), title, content,
@@ -72,12 +72,11 @@ public class InstagramHandler implements CommandHandler {
         String html = document.toString();
         int index = html.indexOf("\"entry_data\":");
         String json = html.substring(index + "\"entry_data\":".length(), html.indexOf(",\"hostname\"", index));
-
+        log.info("json:{}", json);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode node;
         try {
             node = mapper.readTree(json);
-            log.info("111");
         } catch (IOException e) {
             log.error("error msg:{}", e.getMessage());
             return null;
