@@ -85,7 +85,9 @@ public class BeautyCrawlerService {
             if (webElement.findElements(By.cssSelector("a[href]")).size() > 0) {
                 WebElement articleElement = webElement.findElement(By.cssSelector("a[href]"));
                 String link = articleElement.getAttribute("href");
-                if (articleElement.getAttribute("text").contains("[公告]") || articleElement.getAttribute("text").contains("[帥哥]"))  //過濾連結
+                //過濾連結
+                if (articleElement.getAttribute("text").contains("[公告]") || articleElement.getAttribute("text").contains("[帥哥]")
+                    || articleElement.getAttribute("text").contains("肉特") )
                     continue;
                 availablelinks.add(link.replace("https://www.ptt.cc", ""));
             }
