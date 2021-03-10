@@ -36,4 +36,5 @@ public class CrawlerController {
         beautyCrawlerService.crawler(pageSize);
         return Result.getDefaultResponse();
     }
+
 }

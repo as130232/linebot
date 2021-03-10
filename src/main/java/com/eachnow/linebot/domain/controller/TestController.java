@@ -1,8 +1,8 @@
 package com.eachnow.linebot.domain.controller;
 
 import com.eachnow.linebot.common.po.Result;
-import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
+import com.eachnow.linebot.domain.service.line.MessageHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     private MessageHandler messageHandler;
     private BeautyCrawlerService beautyCrawlerService;
+
     @Autowired
     public TestController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService) {
         this.messageHandler = messageHandler;
@@ -30,5 +31,12 @@ public class TestController {
     @GetMapping(value = "/picture")
     public String randomPicture() {
         return beautyCrawlerService.randomPicture();
+    }
+
+    @GetMapping(value = "/pictureSize")
+    public Result<Integer> pictureSize() {
+        Result<Integer> result = new Result<>();
+        result.setData(beautyCrawlerService.listPicture.size());
+        return result;
     }
 }
