@@ -1,9 +1,6 @@
 package com.eachnow.linebot.domain.service.handler;
 
-import com.eachnow.linebot.domain.service.handler.impl.BeautyHandler;
-import com.eachnow.linebot.domain.service.handler.impl.DefaultHandler;
-import com.eachnow.linebot.domain.service.handler.impl.EatWhatHandler;
-import com.eachnow.linebot.domain.service.handler.impl.WeatherHandler;
+import com.eachnow.linebot.domain.service.handler.impl.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -20,6 +17,8 @@ public class CommandHandlerFactory {
     @Autowired
     private BeautyHandler beautyHandler;
     @Autowired
+    private InstagramHandler instagramHandler;
+    @Autowired
     private WeatherHandler weatherHandler;
     @Autowired
     private EatWhatHandler eatWhatHandler;
@@ -33,8 +32,10 @@ public class CommandHandlerFactory {
     }
 
     public CommandHandler getCommandHandler(String command) {
-        CommandHandler result = defaultHandler;   //default CommandHandler;
-        Class<? extends CommandHandler> commandHandlerClass = handlerMap.get(command);
+        CommandHandler result = defaultHandler;
+        if (command == null || "".equals(command))
+            return result;
+        Class<? extends CommandHandler> commandHandlerClass = handlerMap.get(command.toLowerCase());
         if (handlerMap == null) {
             log.warn("Can not get the Class of CommandHandler, command:{}", command);
             return result;
@@ -42,6 +43,8 @@ public class CommandHandlerFactory {
         try {
             if (BeautyHandler.class.equals(commandHandlerClass)) {
                 return beautyHandler;
+            } else if (InstagramHandler.class.equals(commandHandlerClass)) {
+                return eatWhatHandler;
             } else if (WeatherHandler.class.equals(commandHandlerClass)) {
                 return weatherHandler;
             } else if (EatWhatHandler.class.equals(commandHandlerClass)) {

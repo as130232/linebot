@@ -39,7 +39,7 @@
             <artifactId>selenium-java</artifactId>
             <version>3.13.0</version>
         </dependency>
-        <!-- line -->
+        <!-- line start -->
         <dependency>
             <groupId>com.linecorp.bot</groupId>
             <artifactId>line-bot-spring-boot</artifactId>
@@ -55,6 +55,7 @@
             <artifactId>line-bot-model</artifactId>
             <version>4.2.0</version>
         </dependency>
+        <!-- line end -->
 
         <dependency>
             <groupId>org.reflections</groupId>
@@ -62,10 +63,23 @@
             <version>0.9.11</version>
         </dependency>
 
+        <!-- html to json -->
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.12.1</version>
+        </dependency>
+        <!-- return ok status -->
         <dependency>
             <groupId>com.squareup.okio</groupId>
             <artifactId>okio</artifactId>
             <version>2.10.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.0</version>
         </dependency>
 
     </dependencies>

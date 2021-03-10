@@ -29,7 +29,7 @@ public class BeautyCrawlerService {
     private String CHROMEDRIVER_PATH;
     private WebDriver driver;
     private final Integer MAX_SIZE = 500;
-    private List<String> listPicture = new ArrayList<>(MAX_SIZE);
+    public List<String> listPicture = new ArrayList<>(MAX_SIZE);
     private final ThreadPoolExecutor beautyCrawlerExecutor;
 
     @Autowired
@@ -38,7 +38,8 @@ public class BeautyCrawlerService {
     }
 
     //    @PostConstruct
-    private void init() {
+    public void init() {
+        listPicture =  new ArrayList<>(MAX_SIZE);
         crawler(3);
     }
 

@@ -26,6 +26,8 @@ public class BeautyHandler implements CommandHandler {
     @Override
     public Message execute(String parameters) {
         URI uri = URI.create(beautyCrawlerService.randomPicture());
+        if (parameters.contains("refresh"))
+            beautyCrawlerService.init();
         return new ImageMessage(uri, uri);
     }
 
