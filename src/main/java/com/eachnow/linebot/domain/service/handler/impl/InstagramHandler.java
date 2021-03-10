@@ -33,7 +33,6 @@ public class InstagramHandler implements CommandHandler {
         if (paramArr.length == 1)
             return null;
         String account = paramArr[1];
-        log.info("搜尋ig帳號account:{}", account);
         User user = getAccountInfo(account);
         String content = String.format("貼文：%d, 粉絲：%d\n%s", user.getEdgeOwnerToTimelineMedia().getCount(),
                 user.getEdgeFollowedBy().getCount(), user.getBiography());
@@ -55,6 +54,7 @@ public class InstagramHandler implements CommandHandler {
         Document document;
         try {
             document = Jsoup.connect(INSTAGRAM_BASE_URI + account).get();
+            log.info("連線成功。");
         } catch (IOException e) {
             log.error("error msg:{}", e.getMessage());
             return null;
