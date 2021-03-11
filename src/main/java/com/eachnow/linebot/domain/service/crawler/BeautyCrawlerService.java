@@ -40,7 +40,7 @@ public class BeautyCrawlerService {
     //    @PostConstruct
     public void init() {
         log.info("清空圖庫，並重新爬取表特版。");
-        listPicture =  new ArrayList<>(MAX_SIZE);
+        listPicture = new ArrayList<>(MAX_SIZE);
         crawler(2);
     }
 
@@ -56,7 +56,7 @@ public class BeautyCrawlerService {
             driver.quit();
             log.info("爬取表特版，完成。");
         }, beautyCrawlerExecutor).exceptionally(e -> {
-                    log.error("爬取表特版，失敗! error msg:{}", e.getMessage(), e);
+                    log.error("爬取表特版，失敗! error msg:{}", e.getMessage());
                     return null;
                 }
         );
@@ -87,7 +87,7 @@ public class BeautyCrawlerService {
                 String link = articleElement.getAttribute("href");
                 //過濾連結
                 if (articleElement.getAttribute("text").contains("[公告]") || articleElement.getAttribute("text").contains("[帥哥]")
-                    || articleElement.getAttribute("text").contains("肉特") )
+                        || articleElement.getAttribute("text").contains("肉特"))
                     continue;
                 availablelinks.add(link.replace("https://www.ptt.cc", ""));
             }

@@ -25,7 +25,6 @@ public class BeautyHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
-        log.info("parameters:{}", parameters);
         if (beautyCrawlerService.listPicture.size() == 0) {
             beautyCrawlerService.crawler(1);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
