@@ -1,9 +1,10 @@
 package com.eachnow.linebot.domain.service.handler.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
-import com.eachnow.linebot.common.constant.InstagramParameter;
+import com.eachnow.linebot.common.constant.InstagramParamEnum;
 import com.eachnow.linebot.common.po.ig.Graphql;
 import com.eachnow.linebot.common.po.ig.User;
+import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
@@ -36,10 +36,7 @@ public class InstagramHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
-        String[] paramArr = parameters.split(" ");
-        if (paramArr.length == 1)
-            return null;
-        String account = paramArr[1];
+        String account = ParamterUtils.getParameter(parameters);
         User user = getAccountInfo(account);
         if (user == null)
             return null;
@@ -51,13 +48,15 @@ public class InstagramHandler implements CommandHandler {
         String title = StringUtils.isBlank(user.getFullName()) ? user.getUsername() : user.getFullName();
         URI uri = URI.create(INSTAGRAM_BASE_URI + account);
         ButtonsTemplate template = new ButtonsTemplate(URI.create(user.getProfilePicUrlHd()), title, content,
-                Arrays.asList(new PostbackAction("最新貼文", "IG " + account + " " + InstagramParameter.RECENT.getValue()),
-                        new PostbackAction("精選貼文", "IG " + account + " " + InstagramParameter.COLLECTION.getValue()),
+                Arrays.asList(new PostbackAction("最新貼文", "IG " + account + " " + InstagramParamEnum.RECENT.getValue()),
+                        new PostbackAction("精選貼文", "IG " + account + " " + InstagramParamEnum.COLLECTION.getValue()),
                         new URIAction("IG", uri, new URIAction.AltUri(uri))));
         return new TemplateMessage(user.getFullName() + " " + user.getBiography(), template);
     }
 
     private User getAccountInfo(String account) {
+        if (account == null)
+            return null;
         Document document;
         try {
             document = Jsoup.connect(INSTAGRAM_BASE_URI.replace("{account}", account)).get();

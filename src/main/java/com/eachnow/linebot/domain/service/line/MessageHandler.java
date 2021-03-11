@@ -1,6 +1,5 @@
 package com.eachnow.linebot.domain.service.line;
 
-import com.eachnow.linebot.common.util.CommandUtils;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.CommandHandlerFactory;
 import com.linecorp.bot.model.event.Event;
@@ -26,8 +25,7 @@ public class MessageHandler {
     }
 
     public Message executeCommand(String text) {
-        String command = CommandUtils.parseCommand(text);
-        CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(command);
+        CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(text);
         return commandHandler.execute(text);
     }
 
@@ -36,7 +34,7 @@ public class MessageHandler {
         log.info("userId:{}, event:{}", event.getSource().getUserId(), event);
         final String text = event.getMessage().getText();
         //根據指令取得對應指令處理服務
-        return this.executeCommand(text);
+        return executeCommand(text);
     }
 
     @EventMapping

@@ -35,5 +35,4 @@ public class BeautyHandler implements CommandHandler {
             beautyCrawlerService.init();
         return new ImageMessage(uri, uri);
     }
-
 }
