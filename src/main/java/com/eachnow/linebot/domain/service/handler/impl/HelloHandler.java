@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
-@Command({"hi", "hello", "你好"})
+@Command({"hi", "hello", "你好", "哈囉"})
 public class HelloHandler implements CommandHandler {
 
     @Override

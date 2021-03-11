@@ -26,6 +26,7 @@ public class TranslationHandler implements CommandHandler {
         if (parameters.contains("[translate]")) {
             return new TextMessage("[已開啟翻譯模式]");
         }
+        log.info("欲翻譯語言:{}, 翻譯字串:{}", lang, parameters);
         String result = googleTranslationService.translate(parameters, lang.getLang());
         return new TextMessage(result);
     }
