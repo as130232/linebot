@@ -16,7 +16,8 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Slf4j
 @Component
-public class BeautyCrawlerService {
+public class ActressCrawlerService {
+
     private PttCrawlerService pttCrawlerService;
     private final ThreadPoolExecutor pttCrawlerExecutor;
 
@@ -24,21 +25,21 @@ public class BeautyCrawlerService {
     public List<String> listPicture = new ArrayList<>(MAX_SIZE);
 
     @Autowired
-    public BeautyCrawlerService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
-                                PttCrawlerService pttCrawlerService) {
-        this.pttCrawlerExecutor = pttCrawlerExecutor;
+    public ActressCrawlerService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
+                                 PttCrawlerService pttCrawlerService) {
         this.pttCrawlerService = pttCrawlerService;
+        this.pttCrawlerExecutor = pttCrawlerExecutor;
     }
 
     //    @PostConstruct
     public void init() {
-        log.info("清空圖庫，並重新爬取表特版。");
+        log.info("清空圖庫，並重新爬取女優版。");
         listPicture = new ArrayList<>(MAX_SIZE);
         crawler(3);
     }
 
     public void crawler(int pageSize) {
-        String url = "https://www.ptt.cc/bbs/Beauty/index.html";
+        String url = "https://www.ptt.cc/bbs/Japanavgirls/index.html";
         CompletableFuture.runAsync(() -> {
             List<String> result = pttCrawlerService.crawler(url, pageSize);
             this.setPicture(result);

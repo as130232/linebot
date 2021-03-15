@@ -16,6 +16,9 @@ import java.util.Map;
 public class CommandHandlerFactory {
     private Map<String, Class<? extends CommandHandler>> handlerMap;
     private ApplicationContext applicationContext;
+
+    @Autowired
+    private ActressHandler actressHandler;
     @Autowired
     private BeautyHandler beautyHandler;
     @Autowired
@@ -59,6 +62,8 @@ public class CommandHandlerFactory {
         try {
             if (BeautyHandler.class.equals(commandHandlerClass)) {
                 commandHandler = beautyHandler;
+            } else if (ActressHandler.class.equals(commandHandlerClass)) {
+                commandHandler = actressHandler;
             } else if (InstagramHandler.class.equals(commandHandlerClass)) {
                 commandHandler = instagramHandler;
             } else if (WeatherHandler.class.equals(commandHandlerClass)) {
