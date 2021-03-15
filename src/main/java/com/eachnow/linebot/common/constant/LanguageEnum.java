@@ -14,8 +14,10 @@ public enum LanguageEnum {
     FR("法", "fr"),
     JA("日", "ja"),
     KO("韓", "ko"),
+    TH("泰", "th"),
     ID("印尼", "id"),
-    TH("泰國", "th"),
+    VI("越", "vi"),
+    RU("俄", "ru"),
     ;
 
     private String code;
