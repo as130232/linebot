@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
-@Command(value = {"[translate]"}, resident = true)
+@Command(value = {"@translate"}, resident = true)
 public class TranslationHandler implements CommandHandler {
     private GoogleTranslationService googleTranslationService;
     private LanguageEnum lang;
