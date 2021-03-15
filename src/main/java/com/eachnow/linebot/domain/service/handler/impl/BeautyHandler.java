@@ -26,7 +26,7 @@ public class BeautyHandler implements CommandHandler {
     @Override
     public Message execute(String parameters) {
         if (beautyCrawlerService.listPicture.size() == 0) {
-            beautyCrawlerService.crawler(1);
+            beautyCrawlerService.crawler(2);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
         URI uri = URI.create(beautyCrawlerService.randomPicture());

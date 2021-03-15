@@ -41,7 +41,7 @@ public class BeautyCrawlerService {
     public void init() {
         log.info("清空圖庫，並重新爬取表特版。");
         listPicture = new ArrayList<>(MAX_SIZE);
-        crawler(2);
+        crawler(3);
     }
 
     public void crawler(int pageSize) {
