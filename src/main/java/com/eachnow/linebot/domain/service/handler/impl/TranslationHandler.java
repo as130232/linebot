@@ -23,7 +23,7 @@ public class TranslationHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
-        if (parameters.contains("[translate]")) {
+        if (parameters.contains("@translate")) {
             return new TextMessage("[已開啟翻譯模式]");
         }
         log.info("欲翻譯語言:{}, 翻譯字串:{}", lang, parameters);
