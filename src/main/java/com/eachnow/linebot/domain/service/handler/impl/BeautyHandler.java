@@ -52,7 +52,7 @@ public class BeautyHandler implements CommandHandler {
             for (String picture : pictures) {
                 URI uri = URI.create(picture);
                 List<Action> actions = Arrays.asList(new URIAction("連結", uri, new URIAction.AltUri(uri)));
-                CarouselColumn carousel = CarouselColumn.builder().title("表特" + i.toString()).text("").thumbnailImageUrl(uri).actions(actions).build();
+                CarouselColumn carousel = CarouselColumn.builder().title("表特" + i.toString()).text(picture).thumbnailImageUrl(uri).actions(actions).build();
                 columns.add(carousel);
                 i++;
             }
