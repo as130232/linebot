@@ -54,7 +54,7 @@ public class BeautyHandler implements CommandHandler {
                 List<Action> actions = Arrays.asList(
                         new PostbackAction("測試", "test"),
                         new URIAction("連結", uri, new URIAction.AltUri(uri)));
-                CarouselColumn carousel = CarouselColumn.builder().title("表特").thumbnailImageUrl(uri).actions(actions).build();
+                CarouselColumn carousel = CarouselColumn.builder().title("表特").text("表特文本").thumbnailImageUrl(uri).actions(actions).build();
                 columns.add(carousel);
             }
             CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();

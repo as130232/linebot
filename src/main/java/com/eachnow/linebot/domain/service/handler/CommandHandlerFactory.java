@@ -46,7 +46,7 @@ public class CommandHandlerFactory {
 
     public CommandHandler getCommandHandler(String text) {
         String command = ParamterUtils.parseCommand(text);
-        log.info("command:{}", command);
+        log.info("command:{}", text);
         CommandHandler commandHandler = defaultHandler;
         //若已下達常駐指令，則直到關閉為止
         if (residentCommandHandler != null && !text.contains("@close"))
