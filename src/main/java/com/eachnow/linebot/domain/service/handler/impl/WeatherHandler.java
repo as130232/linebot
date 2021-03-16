@@ -31,19 +31,19 @@ public class WeatherHandler implements CommandHandler {
         this.openWeatherService = openWeatherService;
     }
 
-//    @PostConstruct
-//    private void test() {
-//        String area = "天氣 新北市";
-//        this.execute(area);
-//    }
+    @PostConstruct
+    private void test() {
+        String area = "天氣 新北市";
+        this.execute(area);
+    }
 
     @Override
     public Message execute(String parameters) {
         parameters = parameters.replace("台", "臺");
         List<String> params = ParamterUtils.parse(parameters);
         String locationName = params.get(1);
-        String elementName = params.size() > 2 ? params.get(0) : null;
-        WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, WeatherElementEnum.getElement(elementName));
+        String elementName = params.size() > 2 ? WeatherElementEnum.getElement(params.get(0)) : null;
+        WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, elementName);
 
         StringBuilder sb = new StringBuilder();
         sb.append(" - " + weatherResultPO.getRecords().getDatasetDescription() + " - ");
