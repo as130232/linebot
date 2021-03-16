@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class ParameterPO {
     private String parameterName;
     private String parameterValue;
+    private String parameterUnit;
 }
