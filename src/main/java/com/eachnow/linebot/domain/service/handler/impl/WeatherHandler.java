@@ -41,7 +41,7 @@ public class WeatherHandler implements CommandHandler {
     public Message execute(String parameters) {
         parameters = parameters.replace("台", "臺");
         List<String> params = ParamterUtils.parse(parameters);
-        String locationName = params.get(1);
+        String locationName = params.size() > 1 ? params.get(1) : null;
         String elementName = params.size() > 2 ? WeatherElementEnum.getElement(params.get(0)) : null;
         WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, elementName);
 
