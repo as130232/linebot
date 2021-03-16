@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Component
 public class GoogleTranslationServiceImpl implements GoogleTranslationService {
-    @Value("${google.translation.key:none}")
+    @Value("${google.translation.key}")
     private String TRANSLATION_KEY;
     private RestTemplate restTemplate;
 

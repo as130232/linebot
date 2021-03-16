@@ -15,6 +15,7 @@ import java.net.URI;
 @Command({"女優", "av"})
 public class ActressHandler implements CommandHandler {
     private ActressCrawlerService actressCrawlerService;
+    private String currentPicture;
 
     @Autowired
     public ActressHandler(ActressCrawlerService actressCrawlerService) {
@@ -23,8 +24,16 @@ public class ActressHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
+        if (parameters.contains("存")) {
+            //TODO 新增至DB
+            return new TextMessage("儲存成功。");
+        }
         if (parameters.contains("size")) {
             return new TextMessage("圖片資源size:" + actressCrawlerService.listPicture.size());
+        }
+        if (parameters.contains("上一張") && currentPicture != null) {
+            URI uri = URI.create(currentPicture);
+            return new ImageMessage(uri, uri);
         }
         if (parameters.contains("refresh")) {
             actressCrawlerService.init(); //重新取得圖片資源
@@ -33,7 +42,9 @@ public class ActressHandler implements CommandHandler {
             actressCrawlerService.crawler(2);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
-        URI uri = URI.create(actressCrawlerService.randomPicture());
+        String pictureUrl = actressCrawlerService.randomPicture();
+        currentPicture = pictureUrl;
+        URI uri = URI.create(pictureUrl);
         return new ImageMessage(uri, uri);
     }
 }
