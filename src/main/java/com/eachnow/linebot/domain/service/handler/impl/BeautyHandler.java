@@ -3,13 +3,20 @@ package com.eachnow.linebot.domain.service.handler.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
+import com.linecorp.bot.model.action.Action;
+import com.linecorp.bot.model.action.PostbackAction;
+import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.template.CarouselColumn;
+import com.linecorp.bot.model.message.template.CarouselTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
+import java.util.*;
 
 @Slf4j
 @Command({"抽", "beauty", "表特"})
@@ -35,6 +42,20 @@ public class BeautyHandler implements CommandHandler {
             URI uri = URI.create(currentPicture);
             return new ImageMessage(uri, uri);
         }
+        if (parameters.contains("多")) {
+            List<CarouselColumn> columns = new ArrayList<>(10);
+            Set<String> pictures = randomListPicture(10);
+            for (String picture : pictures) {
+                URI uri = URI.create(picture);
+                List<Action> actions = Arrays.asList(
+                        new PostbackAction("測試", "test"),
+                        new URIAction("連結", uri, new URIAction.AltUri(uri)));
+                CarouselColumn carousel = CarouselColumn.builder().thumbnailImageUrl(uri).actions(actions).build();
+                columns.add(carousel);
+            }
+            CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
+            return new TemplateMessage("表特版精選", carouselTemplate);
+        }
         if (parameters.contains("refresh")) {
             beautyCrawlerService.init(); //重新取得圖片資源
         }
@@ -43,8 +64,15 @@ public class BeautyHandler implements CommandHandler {
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
         String pictureUrl = beautyCrawlerService.randomPicture();
-        currentPicture = pictureUrl;
+        currentPicture = pictureUrl;    //紀錄當前圖片
         URI uri = URI.create(pictureUrl);
         return new ImageMessage(uri, uri);
+    }
+
+    private Set<String> randomListPicture(int size) {
+        Set<String> result = new HashSet<>(size);
+        while (result.size() == size)
+            result.add(beautyCrawlerService.randomPicture());
+        return result;
     }
 }

@@ -49,11 +49,11 @@ public class WeatherHandler implements CommandHandler {
         sb.append(" - " + weatherResultPO.getRecords().getDatasetDescription() + " - ");
         sb.append("\n");
         weatherResultPO.getRecords().getLocation().stream().forEach(locationPO -> {
-            sb.append("【" + locationPO.getLocationName() + "】");
+            sb.append("＊" + locationPO.getLocationName());
             sb.append("\n");
             List<WeatherElementPO> listElement = locationPO.getWeatherElement();
             listElement.stream().forEach(weatherElementPO -> {
-                sb.append("　＊" + WeatherElementEnum.getName(weatherElementPO.getElementName()));
+                sb.append("　【" + WeatherElementEnum.getName(weatherElementPO.getElementName()) + "】");
                 sb.append("\n");
                 weatherElementPO.getTime().stream().forEach(timePO -> {
                     sb.append(parseDate(timePO.getStartTime()) + "-" + parseDate(timePO.getEndTime()));
