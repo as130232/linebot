@@ -31,12 +31,6 @@ public class WeatherHandler implements CommandHandler {
         this.openWeatherService = openWeatherService;
     }
 
-    @PostConstruct
-    private void test() {
-        String area = "天氣 新北市";
-        this.execute(area);
-    }
-
     @Override
     public Message execute(String parameters) {
         parameters = parameters.replace("台", "臺");
