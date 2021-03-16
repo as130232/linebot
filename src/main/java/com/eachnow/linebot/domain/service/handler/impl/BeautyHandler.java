@@ -4,7 +4,6 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
 import com.linecorp.bot.model.action.Action;
-import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.Message;
@@ -32,7 +31,7 @@ public class BeautyHandler implements CommandHandler {
     @Override
     public Message execute(String parameters) {
         if (parameters.contains("存")) {
-            //TODO 新增至DB
+            //TODO currentPicture新增至DB
             return new TextMessage("儲存成功。");
         }
         if (parameters.contains("size")) {
@@ -49,20 +48,19 @@ public class BeautyHandler implements CommandHandler {
                 beautyCrawlerService.crawler(2);
                 return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
             }
+            Integer i = 1;
             for (String picture : pictures) {
                 URI uri = URI.create(picture);
-                List<Action> actions = Arrays.asList(
-                        new PostbackAction("測試", "test"),
-                        new URIAction("連結", uri, new URIAction.AltUri(uri)));
-                CarouselColumn carousel = CarouselColumn.builder().title("表特").text("表特文本").thumbnailImageUrl(uri).actions(actions).build();
+                List<Action> actions = Arrays.asList(new URIAction("連結", uri, new URIAction.AltUri(uri)));
+                CarouselColumn carousel = CarouselColumn.builder().title("表特" + i.toString()).text("").thumbnailImageUrl(uri).actions(actions).build();
                 columns.add(carousel);
+                i++;
             }
             CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
             return new TemplateMessage("表特版精選", carouselTemplate);
         }
-        if (parameters.contains("refresh")) {
+        if (parameters.contains("refresh"))
             beautyCrawlerService.init(); //重新取得圖片資源
-        }
         if (beautyCrawlerService.listPicture.size() == 0) {
             beautyCrawlerService.crawler(2);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
