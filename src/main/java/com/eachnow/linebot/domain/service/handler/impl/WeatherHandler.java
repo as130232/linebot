@@ -31,11 +31,11 @@ public class WeatherHandler implements CommandHandler {
         this.openWeatherService = openWeatherService;
     }
 
-    @PostConstruct
-    private void test() {
-        String area = "天氣 新北市";
-        this.execute(area);
-    }
+//    @PostConstruct
+//    private void test() {
+//        String area = "天氣 新北市";
+//        this.execute(area);
+//    }
 
     @Override
     public Message execute(String parameters) {
@@ -43,10 +43,10 @@ public class WeatherHandler implements CommandHandler {
         List<String> params = ParamterUtils.parse(parameters);
         String locationName = params.get(1);
         String elementName = params.size() > 2 ? params.get(0) : null;
-        WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, elementName);
+        WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, WeatherElementEnum.getElement(elementName));
 
         StringBuilder sb = new StringBuilder();
-        sb.append(weatherResultPO.getRecords().getDatasetDescription());
+        sb.append(" - " + weatherResultPO.getRecords().getDatasetDescription() + " - ");
         sb.append("\n");
         weatherResultPO.getRecords().getLocation().stream().forEach(locationPO -> {
             sb.append("【" + locationPO.getLocationName() + "】");
@@ -56,8 +56,8 @@ public class WeatherHandler implements CommandHandler {
                 sb.append("　＊" + WeatherElementEnum.getName(weatherElementPO.getElementName()));
                 sb.append("\n");
                 weatherElementPO.getTime().stream().forEach(timePO -> {
-                    sb.append("　　" + parseDate(timePO.getStartTime()) + "-" + parseDate(timePO.getEndTime()));
-                    sb.append("　　" + timePO.getParameter().getParameterName());
+                    sb.append(parseDate(timePO.getStartTime()) + "-" + parseDate(timePO.getEndTime()));
+                    sb.append("　" + timePO.getParameter().getParameterName());
                     if (timePO.getParameter().getParameterUnit() != null) {  //單位
                         sb.append("({unit})".replace("{unit}", parseUnit(timePO.getParameter().getParameterUnit())));
                     }
