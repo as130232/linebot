@@ -26,12 +26,12 @@ public class OpenWeatherServiceImpl implements OpenWeatherService {
         this.restTemplate = restTemplate;
     }
 
-    @PostConstruct
-    private void test() {
-        String area = "台北市";
-        WeatherResultPO weatherResultPO = this.getWeatherInfo(area);
-        System.out.println(weatherResultPO);
-    }
+//    @PostConstruct
+//    private void test() {
+//        String area = "台北市";
+//        WeatherResultPO weatherResultPO = this.getWeatherInfo(area);
+//        System.out.println(weatherResultPO);
+//    }
 
     public WeatherResultPO getWeatherInfo(String locationName) {
         String url = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization={authCode}&locationName={locationName}"
