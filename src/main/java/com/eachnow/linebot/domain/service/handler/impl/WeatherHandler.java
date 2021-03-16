@@ -61,6 +61,7 @@ public class WeatherHandler implements CommandHandler {
                     if (timePO.getParameter().getParameterUnit() != null) {  //單位
                         sb.append("({unit})".replace("{unit}", parseUnit(timePO.getParameter().getParameterUnit())));
                     }
+                    sb.append("\n");
                 });
                 sb.append("\n");
             });
