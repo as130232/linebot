@@ -25,7 +25,7 @@ public class WebDriverFactory {
 //        options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
         driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         driver.get(url);
         log.info("webdriver連線url: {}", url);
         driver.findElement(By.xpath("//button[@value=\"yes\"]")).click();
