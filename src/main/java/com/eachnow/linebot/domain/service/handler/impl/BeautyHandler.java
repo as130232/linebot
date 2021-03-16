@@ -45,6 +45,7 @@ public class BeautyHandler implements CommandHandler {
         if (parameters.contains("多")) {
             List<CarouselColumn> columns = new ArrayList<>(10);
             Set<String> pictures = randomListPicture(10);
+            log.info("--- pictures:{}", pictures);
             for (String picture : pictures) {
                 URI uri = URI.create(picture);
                 List<Action> actions = Arrays.asList(
@@ -53,8 +54,10 @@ public class BeautyHandler implements CommandHandler {
                 CarouselColumn carousel = CarouselColumn.builder().title("表特").thumbnailImageUrl(uri).actions(actions).build();
                 columns.add(carousel);
             }
-            CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
-            log.info("carouselTemplate:{}", carouselTemplate);
+            log.info("--- columns:{}", columns);
+//            CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
+            CarouselTemplate carouselTemplate = new CarouselTemplate(columns);
+            log.info("--- carouselTemplate:{}", carouselTemplate);
             return new TemplateMessage("表特版精選", carouselTemplate);
         }
         if (parameters.contains("refresh")) {
