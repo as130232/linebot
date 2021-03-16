@@ -45,7 +45,10 @@ public class BeautyHandler implements CommandHandler {
         if (parameters.contains("多")) {
             List<CarouselColumn> columns = new ArrayList<>(10);
             Set<String> pictures = randomListPicture(10);
-            log.info("--- pictures:{}", pictures);
+            if (pictures.size() == 0) {
+                beautyCrawlerService.crawler(2);
+                return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
+            }
             for (String picture : pictures) {
                 URI uri = URI.create(picture);
                 List<Action> actions = Arrays.asList(
@@ -54,10 +57,7 @@ public class BeautyHandler implements CommandHandler {
                 CarouselColumn carousel = CarouselColumn.builder().title("表特").thumbnailImageUrl(uri).actions(actions).build();
                 columns.add(carousel);
             }
-            log.info("--- columns:{}", columns);
-//            CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
-            CarouselTemplate carouselTemplate = new CarouselTemplate(columns);
-            log.info("--- carouselTemplate:{}", carouselTemplate);
+            CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
             return new TemplateMessage("表特版精選", carouselTemplate);
         }
         if (parameters.contains("refresh")) {
@@ -75,7 +75,7 @@ public class BeautyHandler implements CommandHandler {
 
     private Set<String> randomListPicture(int size) {
         Set<String> result = new HashSet<>(size);
-        while (result.size() == size)
+        while (result.size() != size)
             result.add(beautyCrawlerService.randomPicture());
         return result;
     }
