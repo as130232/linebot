@@ -3,13 +3,19 @@ package com.eachnow.linebot.domain.service.handler.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.domain.service.crawler.ActressCrawlerService;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
+import com.linecorp.bot.model.action.Action;
+import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.template.CarouselColumn;
+import com.linecorp.bot.model.message.template.CarouselTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
+import java.util.*;
 
 @Slf4j
 @Command({"女優", "av"})
@@ -35,6 +41,24 @@ public class ActressHandler implements CommandHandler {
             URI uri = URI.create(currentPicture);
             return new ImageMessage(uri, uri);
         }
+        if (parameters.contains("多")) {
+            List<CarouselColumn> columns = new ArrayList<>(10);
+            Set<String> pictures = randomListPicture(10);
+            if (pictures.size() == 0) {
+                actressCrawlerService.crawler(2);
+                return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
+            }
+            Integer i = 1;
+            for (String picture : pictures) {
+                URI uri = URI.create(picture);
+                List<Action> actions = Arrays.asList(new URIAction("連結", uri, new URIAction.AltUri(uri)));
+                CarouselColumn carousel = CarouselColumn.builder().title("女優" + i.toString()).text(picture).thumbnailImageUrl(uri).actions(actions).build();
+                columns.add(carousel);
+                i++;
+            }
+            CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
+            return new TemplateMessage("女優版精選", carouselTemplate);
+        }
         if (parameters.contains("refresh")) {
             actressCrawlerService.init(); //重新取得圖片資源
         }
@@ -46,5 +70,12 @@ public class ActressHandler implements CommandHandler {
         currentPicture = pictureUrl;
         URI uri = URI.create(pictureUrl);
         return new ImageMessage(uri, uri);
+    }
+
+    private Set<String> randomListPicture(int size) {
+        Set<String> result = new HashSet<>(size);
+        while (result.size() != size && actressCrawlerService.listPicture.size() > size)
+            result.add(actressCrawlerService.randomPicture());
+        return result;
     }
 }

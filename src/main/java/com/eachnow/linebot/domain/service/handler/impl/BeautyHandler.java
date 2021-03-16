@@ -73,7 +73,7 @@ public class BeautyHandler implements CommandHandler {
 
     private Set<String> randomListPicture(int size) {
         Set<String> result = new HashSet<>(size);
-        while (result.size() != size)
+        while (result.size() != size && beautyCrawlerService.listPicture.size() > size)
             result.add(beautyCrawlerService.randomPicture());
         return result;
     }
