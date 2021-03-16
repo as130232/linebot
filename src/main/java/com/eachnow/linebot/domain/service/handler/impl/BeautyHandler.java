@@ -50,10 +50,11 @@ public class BeautyHandler implements CommandHandler {
                 List<Action> actions = Arrays.asList(
                         new PostbackAction("測試", "test"),
                         new URIAction("連結", uri, new URIAction.AltUri(uri)));
-                CarouselColumn carousel = CarouselColumn.builder().thumbnailImageUrl(uri).actions(actions).build();
+                CarouselColumn carousel = CarouselColumn.builder().title("表特").thumbnailImageUrl(uri).actions(actions).build();
                 columns.add(carousel);
             }
             CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
+            log.info("carouselTemplate:{}", carouselTemplate);
             return new TemplateMessage("表特版精選", carouselTemplate);
         }
         if (parameters.contains("refresh")) {
