@@ -30,6 +30,8 @@ public class CommandHandlerFactory {
     @Autowired
     private EatWhatHandler eatWhatHandler;
     @Autowired
+    private RestaurantHandler restaurantHandler;
+    @Autowired
     private HelloHandler helloHandler;
 
     @Autowired
@@ -70,6 +72,8 @@ public class CommandHandlerFactory {
                 commandHandler = weatherHandler;
             } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
                 commandHandler = eatWhatHandler;
+            } else if (RestaurantHandler.class.equals(commandHandlerClass)) {
+                commandHandler = restaurantHandler;
             } else if (HelloHandler.class.equals(commandHandlerClass)) {
                 commandHandler = helloHandler;
             } else if (TranslationHandler.class.equals(commandHandlerClass)) {
