@@ -11,6 +11,8 @@ import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.template.CarouselColumn;
 import com.linecorp.bot.model.message.template.CarouselTemplate;
+import com.linecorp.bot.model.message.template.ImageCarouselColumn;
+import com.linecorp.bot.model.message.template.ImageCarouselTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -42,7 +44,7 @@ public class ActressHandler implements CommandHandler {
             return new ImageMessage(uri, uri);
         }
         if (parameters.contains("多")) {
-            List<CarouselColumn> columns = new ArrayList<>(10);
+            List<ImageCarouselColumn> columns = new ArrayList<>(10);
             Set<String> pictures = randomListPicture(10);
             if (pictures.size() == 0) {
                 actressCrawlerService.crawler(2);
@@ -51,12 +53,11 @@ public class ActressHandler implements CommandHandler {
             Integer i = 1;
             for (String picture : pictures) {
                 URI uri = URI.create(picture);
-                List<Action> actions = Arrays.asList(new URIAction("連結", uri, new URIAction.AltUri(uri)));
-                CarouselColumn carousel = CarouselColumn.builder().title("女優" + i.toString()).text(picture).thumbnailImageUrl(uri).actions(actions).build();
+                ImageCarouselColumn carousel = new ImageCarouselColumn(uri, new URIAction("連結", uri, new URIAction.AltUri(uri)));
                 columns.add(carousel);
                 i++;
             }
-            CarouselTemplate carouselTemplate = CarouselTemplate.builder().columns(columns).build();
+            ImageCarouselTemplate carouselTemplate = new ImageCarouselTemplate(columns);
             return new TemplateMessage("女優版精選", carouselTemplate);
         }
         if (parameters.contains("refresh")) {
