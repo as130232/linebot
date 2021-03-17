@@ -24,6 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,6 +36,10 @@ import java.util.Iterator;
 public class InstagramHandler implements CommandHandler {
     private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/";
     private WebDriverFactory webDriverFactory;
+    @Value("${ig.account}")
+    private String ACCOUNT;
+    @Value("${ig.password}")
+    private String PASSWORD;
 
     @Autowired
     public InstagramHandler(WebDriverFactory webDriverFactory) {
@@ -117,10 +122,10 @@ public class InstagramHandler implements CommandHandler {
         log.info("準備登入IG");
         WebDriver driver = webDriverFactory.bulidDriver(INSTAGRAM_BASE_URI, false);
         new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.name("username")));
-        WebElement username = driver.findElements(By.name("username")).get(0);
-        WebElement password = driver.findElements(By.name("password")).get(0);
-        username.sendKeys("matchakon");
-        password.sendKeys("a124679014");
+        WebElement usernameWebElement = driver.findElements(By.name("username")).get(0);
+        WebElement passwordWebElement = driver.findElements(By.name("password")).get(0);
+        usernameWebElement.sendKeys(this.ACCOUNT);
+        passwordWebElement.sendKeys(this.PASSWORD);
         new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")));
         WebElement loginButton = driver.findElements(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")).get(0);
         loginButton.click();
