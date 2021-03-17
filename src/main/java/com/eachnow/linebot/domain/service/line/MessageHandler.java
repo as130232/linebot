@@ -5,6 +5,7 @@ import com.eachnow.linebot.domain.service.handler.CommandHandlerFactory;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
+import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
@@ -29,6 +30,9 @@ public class MessageHandler {
         return commandHandler.execute(text);
     }
 
+    /**
+     * 處理文字訊息
+     */
     @EventMapping
     public Message handleTextMessageEvent(MessageEvent<TextMessageContent> event) {
         log.info("userId:{}, event:{}", event.getSource().getUserId(), event);
@@ -37,11 +41,29 @@ public class MessageHandler {
         return executeCommand(text);
     }
 
+
+    /**
+     * 處理地區訊息
+     */
+    @EventMapping
+    public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
+        System.out.println("handleLocationMessageEvent，event: " + event);
+        LocationMessageContent locationMessageContent = event.getMessage();
+        locationMessageContent.getTitle();
+        locationMessageContent.getAddress();    //地址
+        locationMessageContent.getLatitude();   //經度
+        locationMessageContent.getLongitude();  //經度
+    }
+
     @EventMapping
     public void handleDefaultMessageEvent(Event event) {
         System.out.println("handleDefaultMessageEvent，event: " + event);
+
     }
 
+    /**
+     * 處理圖片訊息
+     */
     @EventMapping
     public void handleImageMessageEvent(MessageEvent<ImageMessageContent> event) throws IOException {
         // You need to install ImageMagick
