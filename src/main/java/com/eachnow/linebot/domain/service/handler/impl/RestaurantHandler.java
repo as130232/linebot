@@ -28,7 +28,7 @@ public class RestaurantHandler implements CommandHandler {
     public Message execute(String parameters) {
         String text = "Please tell me where you are?";
         URI uri = URI.create("https://line.me/R/nv/location");
-        ButtonsTemplate template = new ButtonsTemplate(null, "Location", "Please tell me where you are", Arrays.asList(
+        ButtonsTemplate template = new ButtonsTemplate(null, null, text, Arrays.asList(
                 new URIAction("Send my location", uri, new URIAction.AltUri(uri))));
         return new TemplateMessage(text, template);
     }
