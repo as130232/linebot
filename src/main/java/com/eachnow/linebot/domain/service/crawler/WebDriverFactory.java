@@ -18,12 +18,10 @@ public class WebDriverFactory {
         System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
         log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
-//        options.setHeadless(true);  //無視窗模式，增加效能
-//        options.addArguments("--no-sandbox");
         if (headless) {
-            options.addArguments("--headless");
-            options.addArguments("--disable-gpu");
+            options.setHeadless(true);  //無視窗模式，增加效能
             options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--no-sandbox");
         }
         driver = new ChromeDriver(options);
 //        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
