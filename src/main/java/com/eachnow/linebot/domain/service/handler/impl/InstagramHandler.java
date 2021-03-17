@@ -5,6 +5,7 @@ import com.eachnow.linebot.common.constant.InstagramParamEnum;
 import com.eachnow.linebot.common.po.ig.Graphql;
 import com.eachnow.linebot.common.po.ig.User;
 import com.eachnow.linebot.common.util.ParamterUtils;
+import com.eachnow.linebot.domain.service.crawler.WebDriverFactory;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,6 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,7 +33,13 @@ import java.util.Iterator;
 @Slf4j
 @Command({"ig"})
 public class InstagramHandler implements CommandHandler {
-    private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/{account}/?a=1";
+    private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/";
+    private WebDriverFactory webDriverFactory;
+
+    @Autowired
+    public InstagramHandler(WebDriverFactory webDriverFactory) {
+        this.webDriverFactory = webDriverFactory;
+    }
 
 //    @PostConstruct
 //    private void test() {
@@ -59,13 +72,15 @@ public class InstagramHandler implements CommandHandler {
             return null;
         Document document;
         try {
-            document = Jsoup.connect(INSTAGRAM_BASE_URI.replace("{account}", account)).get();
-            log.info("連線成功。");
+            document = Jsoup.connect(INSTAGRAM_BASE_URI + account + "/?a=1").get();
         } catch (IOException e) {
             log.error("error msg:{}", e.getMessage());
             return null;
         }
         String html = document.toString();
+        if (html.contains("LoginAndSignupPage"))
+            login(); //需先登入
+
         int index = html.indexOf("\"entry_data\":");
         String json = html.substring(index + "\"entry_data\":".length(), html.indexOf(",\"hostname\"", index));
         log.info("json:{}", json);
@@ -96,5 +111,20 @@ public class InstagramHandler implements CommandHandler {
             log.warn("Parse \"graphql\" error");
             return null;
         }
+    }
+
+    private void login() {
+        log.info("準備登入IG");
+        WebDriver driver = webDriverFactory.bulidDriver(INSTAGRAM_BASE_URI, false);
+        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.name("username")));
+        WebElement username = driver.findElements(By.name("username")).get(0);
+        WebElement password = driver.findElements(By.name("password")).get(0);
+        username.sendKeys("matchakon");
+        password.sendKeys("a124679014");
+        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")));
+        WebElement loginButton = driver.findElements(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")).get(0);
+        loginButton.click();
+        driver.quit();
+        log.info("登入IG完成。");
     }
 }

@@ -24,7 +24,8 @@ public class PttCrawlerService {
     public List<String> crawler(String url, int pageSize) {
         List<String> result = new ArrayList<>(300);
         log.info("準備，爬取PTT版，url:{}, pageSize:{}", url, pageSize);
-        WebDriver driver = webDriverFactory.bulidDriver(url);
+        WebDriver driver = webDriverFactory.bulidDriver(url, true);
+        driver.findElement(By.xpath("//button[@value=\"yes\"]")).click();
         driver.navigate().refresh();
         for (int i = 0; i < pageSize; i++) {
             List<String> listPicture = crawlerOnPage(driver);    //爬取該頁素材
@@ -36,10 +37,10 @@ public class PttCrawlerService {
         return result;
     }
 
-    private List<String> crawlerOnPage(WebDriver driver) {
+    public List<String> crawlerOnPage(WebDriver driver) {
         List<String> result = new ArrayList<>();
         //取得該頁所有文章連結
-        List<String> availablelinks = new ArrayList<>();
+        List<String> availableLinks = new ArrayList<>();
         List<WebElement> listLinkOnPage = driver.findElements(By.className("title"));  //該頁所有連結
         for (WebElement webElement : listLinkOnPage) {
             if (webElement.findElements(By.cssSelector("a[href]")).size() > 0) {
@@ -52,10 +53,47 @@ public class PttCrawlerService {
                         || articleElement.getAttribute("text").contains("[問題]")
                         || articleElement.getAttribute("text").contains("[閒聊]"))
                     continue;
-                availablelinks.add(link.replace("https://www.ptt.cc", ""));
+                availableLinks.add(link.replace("https://www.ptt.cc", ""));
             }
         }
-        for (String link : availablelinks) {
+        for (String link : availableLinks) {
+            if (driver.findElements(By.cssSelector("a[href]")).size() > 0) {
+                WebElement webElement = driver.findElement(By.cssSelector(("a[href^=\"{url}\"]").replace("{url}", link)));
+                webElement.click();
+                List<WebElement> listPictureElement = driver.findElements(By.cssSelector(("a[href]")));
+                List<String> listPictureOnPage = listPictureElement.stream().map(e -> e.getAttribute("href"))
+                        .filter(e -> e.contains("jpg")).collect(Collectors.toList());
+                result.addAll(listPictureOnPage);
+                driver.navigate().back();
+            }
+        }
+        return result;
+    }
+
+    public List<String> findAllLink(WebDriver driver) {
+        //取得該頁所有文章連結
+        List<String> availableLinks = new ArrayList<>();
+        List<WebElement> listLinkOnPage = driver.findElements(By.className("title"));  //該頁所有連結
+        for (WebElement webElement : listLinkOnPage) {
+            if (webElement.findElements(By.cssSelector("a[href]")).size() > 0) {
+                WebElement articleElement = webElement.findElement(By.cssSelector("a[href]"));
+                String link = articleElement.getAttribute("href");
+                //過濾連結
+                if (articleElement.getAttribute("text").contains("[公告]")
+                        || articleElement.getAttribute("text").contains("[帥哥]")
+                        || articleElement.getAttribute("text").contains("肉特")
+                        || articleElement.getAttribute("text").contains("[問題]")
+                        || articleElement.getAttribute("text").contains("[閒聊]"))
+                    continue;
+                availableLinks.add(link.replace("https://www.ptt.cc", ""));
+            }
+        }
+        return availableLinks;
+    }
+
+    public List<String> findAllPicture(WebDriver driver, List<String> availableLinks) {
+        List<String> result = new ArrayList<>();
+        for (String link : availableLinks) {
             if (driver.findElements(By.cssSelector("a[href]")).size() > 0) {
                 WebElement webElement = driver.findElement(By.cssSelector(("a[href^=\"{url}\"]").replace("{url}", link)));
                 webElement.click();
