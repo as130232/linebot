@@ -1,5 +1,6 @@
 package com.eachnow.linebot.domain.service.line;
 
+import com.eachnow.linebot.common.constant.CommandConstants;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.CommandHandlerFactory;
 import com.linecorp.bot.model.event.Event;
@@ -19,6 +20,7 @@ import java.io.IOException;
 @LineMessageHandler
 public class MessageHandler {
     private CommandHandlerFactory handlerCommandFactory;
+    public static String command;
 
     @Autowired
     public MessageHandler(CommandHandlerFactory handlerCommandFactory) {
@@ -46,13 +48,18 @@ public class MessageHandler {
      * 處理地區訊息
      */
     @EventMapping
-    public void handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
+    public Message handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
         System.out.println("handleLocationMessageEvent，event: " + event);
         LocationMessageContent locationMessageContent = event.getMessage();
         locationMessageContent.getTitle();
         locationMessageContent.getAddress();    //地址
         locationMessageContent.getLatitude();   //經度
         locationMessageContent.getLongitude();  //經度
+        if (CommandConstants.LOCATION_RESTAURANT.equals(command)) {
+
+        }
+        command = null;    //清空
+        return null;
     }
 
     @EventMapping

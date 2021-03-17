@@ -3,6 +3,7 @@ package com.eachnow.linebot.domain.service.handler.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.CommandHandler;
+import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TemplateMessage;
@@ -30,6 +31,7 @@ public class RestaurantHandler implements CommandHandler {
         URI uri = URI.create("https://line.me/R/nv/location");
         ButtonsTemplate template = new ButtonsTemplate(null, null, text, Arrays.asList(
                 new URIAction("Send my location", uri, new URIAction.AltUri(uri))));
+        MessageHandler.command = "@restaurant";
         return new TemplateMessage(text, template);
     }
 }

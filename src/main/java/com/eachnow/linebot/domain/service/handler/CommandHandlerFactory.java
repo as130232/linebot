@@ -78,7 +78,7 @@ public class CommandHandlerFactory {
                 commandHandler = helloHandler;
             } else if (TranslationHandler.class.equals(commandHandlerClass)) {
                 commandHandler = translationHandler;
-                translationHandler.setCurrentLang(text);
+                translationHandler.setCurrentLang(text);    //設定翻譯語言
             } else if (CloseResidentCommandHandler.class.equals(commandHandlerClass)) {
                 residentCommandHandler = null;   //關閉常駐指令
                 commandHandler = closeResidentCommandHandler;

@@ -16,8 +16,8 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @Component
 public class GoogleTranslationServiceImpl implements GoogleTranslationService {
-    @Value("${google.translation.key}")
-    private String TRANSLATION_KEY;
+    @Value("${google.api.key}")
+    private String GOOGLE_API_KEY;
     private RestTemplate restTemplate;
 
     @Autowired
@@ -34,7 +34,7 @@ public class GoogleTranslationServiceImpl implements GoogleTranslationService {
     @Override
     public String translate(String text, String code) {
         try {
-            String url = "https://translation.googleapis.com/language/translate/v2?key=" + TRANSLATION_KEY;
+            String url = "https://translation.googleapis.com/language/translate/v2?key=" + GOOGLE_API_KEY;
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
