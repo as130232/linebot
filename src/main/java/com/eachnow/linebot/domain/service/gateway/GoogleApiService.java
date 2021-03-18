@@ -1,5 +1,6 @@
 package com.eachnow.linebot.domain.service.gateway;
 
+import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 
 public interface GoogleApiService {
@@ -16,12 +17,12 @@ public interface GoogleApiService {
      *
      * @param latitude  緯度
      * @param longitude 經度
-     * @param type      restaurant
+     * @param type      GooglePlaceTypeEnum
      * @param language  語言
      */
-    public ResultLocationPO getLocation(String latitude, String longitude, String type, String language);
+    public ResultLocationPO getLocation(String latitude, String longitude, GooglePlaceTypeEnum type, String language);
 
-    String parseMapUrl(String lat, String lng, String placeId);
+    public String parseMapUrl(String lat, String lng, String placeId);
 
-    String parseMapPictureUrl(String photoreference);
+    public String parseMapPictureUrl(String photoreference);
 }

@@ -1,12 +1,11 @@
 package com.eachnow.linebot.domain.service.handler.location.impl;
 
+import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.common.constant.LanguageEnum;
-import com.eachnow.linebot.common.constant.LocationConstants;
 import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 import com.eachnow.linebot.common.po.google.map.ResultPO;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
-import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
 import com.linecorp.bot.model.action.Action;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
@@ -35,7 +34,7 @@ public class RestaurantLocationHandler implements LocationHandler {
 
     @Override
     public Message execute(LocationMessageContent content) {
-        ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), LocationConstants.RESTAURANT, LanguageEnum.TW.getLang());
+        ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), GooglePlaceTypeEnum.RESTAURANT, LanguageEnum.TW.getLang());
         //排序，評分高、評論高的在前，並指定推薦餐廳數量
         List<ResultPO> results = resultLocationPO.getResults().stream()
                 .sorted(Comparator.comparing(ResultPO::getRating).thenComparing(ResultPO::getUserRatingsTotal).reversed())
@@ -55,8 +54,6 @@ public class RestaurantLocationHandler implements LocationHandler {
             return carousel;
         }).collect(Collectors.toList());
         CarouselTemplate carouselTemplate = new CarouselTemplate(columns);
-        //處理完需清空暫存類型
-        LocationHandlerFactory.type = null;
         return new TemplateMessage("餐廳精選", carouselTemplate);
     }
 

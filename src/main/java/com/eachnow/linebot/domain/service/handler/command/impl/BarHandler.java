@@ -1,7 +1,6 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
-import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.common.util.LineTemplateUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
@@ -10,16 +9,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
-@Command({"restaurant", "餐廳", "餓"})
-public class RestaurantHandler implements CommandHandler {
+@Command({"bar", "酒"})
+public class BarHandler implements CommandHandler {
 
     @Autowired
-    public RestaurantHandler() {
+    public BarHandler() {
     }
 
     @Override
     public Message execute(String parameters) {
-        LocationHandlerFactory.type = GooglePlaceTypeEnum.RESTAURANT;
+        LocationHandlerFactory.type = LocationConstants.BAR;
         return LineTemplateUtils.getLocationButtonsTemplate();
     }
 

@@ -1,5 +1,6 @@
 package com.eachnow.linebot.domain.service.gateway.impl;
 
+import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.common.constant.LanguageEnum;
 import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 import com.eachnow.linebot.common.po.google.translation.InputTranslationPO;
@@ -52,7 +53,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
     }
 
     @Override
-    public ResultLocationPO getLocation(String latitude, String longitude, String type, String language) {
+    public ResultLocationPO getLocation(String latitude, String longitude, GooglePlaceTypeEnum type, String language) {
         if (language == null)
             language = LanguageEnum.TW.getLang();   //default
         try {
@@ -60,7 +61,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
                     "key={key}".replace("{key}", GOOGLE_API_KEY) +
                     "&location={latitude},{longitude}".replace("{latitude}", latitude).replace("{longitude}", longitude) +
                     "&rankby=distance" +
-                    "&type={type}".replace("{type}", type) +
+                    "&type={type}".replace("{type}", type.toString().toLowerCase()) +
                     "&language={language}".replace("{language}", language);
             ResponseEntity<ResultLocationPO> responseEntity = restTemplate.getForEntity(url, ResultLocationPO.class);
             ResultLocationPO result = responseEntity.getBody();
