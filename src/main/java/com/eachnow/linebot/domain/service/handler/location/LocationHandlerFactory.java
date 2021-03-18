@@ -1,7 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.location;
 
 import com.eachnow.linebot.common.constant.LocationConstants;
-import com.eachnow.linebot.domain.service.handler.command.impl.DefaultHandler;
+import com.eachnow.linebot.domain.service.handler.DefaultHandler;
 import com.eachnow.linebot.domain.service.handler.location.impl.RestaurantLocationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

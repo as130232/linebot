@@ -40,7 +40,7 @@ public class RestaurantLocationHandler implements LocationHandler {
         List<ResultPO> results = resultLocationPO.getResults().stream().sorted(Comparator.comparing(ResultPO::getRating).reversed()).limit(MAX_SIZE).collect(Collectors.toList());
         List<CarouselColumn> columns = results.stream().map(po -> {
             //取得餐廳的圖片網址
-            URI imageUrl = null;
+            URI imageUrl = URI.create("https://i.imgur.com/R0qpw6h.jpg");   //default
             if (po.getPhotos() != null && po.getPhotos().size() > 0 && po.getPhotos().get(0).getPhotoReference() != null)
                 imageUrl = URI.create(googleApiService.parseMapPictureUrl(po.getPhotos().get(0).getPhotoReference()));
             //取得餐廳的 Google map 網址

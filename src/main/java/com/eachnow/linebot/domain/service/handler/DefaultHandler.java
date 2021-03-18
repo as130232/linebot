@@ -1,4 +1,4 @@
-package com.eachnow.linebot.domain.service.handler.command.impl;
+package com.eachnow.linebot.domain.service.handler;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
