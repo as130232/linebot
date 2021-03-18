@@ -46,7 +46,6 @@ public class MessageHandler {
         return executeCommand(text);
     }
 
-
     /**
      * 處理地區訊息
      */

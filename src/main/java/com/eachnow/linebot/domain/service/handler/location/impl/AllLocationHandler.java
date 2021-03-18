@@ -37,7 +37,7 @@ public class AllLocationHandler implements LocationHandler {
     public Message execute(LocationMessageContent content) {
         GooglePlaceTypeEnum typeEnum = LocationHandlerFactory.type;
         ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), typeEnum, LanguageEnum.TW.getLang());
-        //排序，評分高、評論高的在前，並指定推薦餐廳數量
+        //排序，評分高、評論高的在前，並指定上限數量
         List<ResultPO> results = resultLocationPO.getResults().stream()
                 .sorted(Comparator.comparing(ResultPO::getRating).thenComparing(ResultPO::getUserRatingsTotal).reversed())
                 .limit(MAX_SIZE).collect(Collectors.toList());
