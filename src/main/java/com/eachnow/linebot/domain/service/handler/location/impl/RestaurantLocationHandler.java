@@ -40,6 +40,8 @@ public class RestaurantLocationHandler implements LocationHandler {
         List<ResultPO> results = resultLocationPO.getResults().stream()
                 .sorted(Comparator.comparing(ResultPO::getRating).thenComparing(ResultPO::getUserRatingsTotal).reversed())
                 .limit(MAX_SIZE).collect(Collectors.toList());
+        if (results.size() == 0)
+            return null;
         List<CarouselColumn> columns = results.stream().map(po -> {
             //取得餐廳的圖片網址
             URI imageUrl = URI.create("https://i.imgur.com/R0qpw6h.jpg");   //default
