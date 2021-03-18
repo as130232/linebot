@@ -1,9 +1,8 @@
-package com.eachnow.linebot.domain.service.handler.impl;
+package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
-import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
-import com.eachnow.linebot.domain.service.handler.CommandHandler;
-import com.linecorp.bot.model.action.Action;
+import com.eachnow.linebot.domain.service.crawler.ActressCrawlerService;
+import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.ImageMessage;
 import com.linecorp.bot.model.message.Message;
@@ -18,24 +17,24 @@ import java.net.URI;
 import java.util.*;
 
 @Slf4j
-@Command({"抽", "beauty", "表特"})
-public class BeautyHandler implements CommandHandler {
-    private BeautyCrawlerService beautyCrawlerService;
+@Command({"女優", "av"})
+public class ActressHandler implements CommandHandler {
+    private ActressCrawlerService actressCrawlerService;
     private String currentPicture;
 
     @Autowired
-    public BeautyHandler(BeautyCrawlerService beautyCrawlerService) {
-        this.beautyCrawlerService = beautyCrawlerService;
+    public ActressHandler(ActressCrawlerService actressCrawlerService) {
+        this.actressCrawlerService = actressCrawlerService;
     }
 
     @Override
     public Message execute(String parameters) {
         if (parameters.contains("存")) {
-            //TODO currentPicture新增至DB
+            //TODO 新增至DB
             return new TextMessage("儲存成功。");
         }
         if (parameters.contains("size")) {
-            return new TextMessage("圖片資源size:" + beautyCrawlerService.listPicture.size());
+            return new TextMessage("圖片資源size:" + actressCrawlerService.listPicture.size());
         }
         if (parameters.contains("上一張") && currentPicture != null) {
             URI uri = URI.create(currentPicture);
@@ -45,7 +44,7 @@ public class BeautyHandler implements CommandHandler {
             List<ImageCarouselColumn> columns = new ArrayList<>(10);
             Set<String> pictures = randomListPicture(10);
             if (pictures.size() == 0) {
-                beautyCrawlerService.crawler(2);
+                actressCrawlerService.crawler(2);
                 return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
             }
             Integer i = 1;
@@ -56,24 +55,25 @@ public class BeautyHandler implements CommandHandler {
                 i++;
             }
             ImageCarouselTemplate carouselTemplate = new ImageCarouselTemplate(columns);
-            return new TemplateMessage("表特版精選", carouselTemplate);
+            return new TemplateMessage("女優版精選", carouselTemplate);
         }
-        if (parameters.contains("refresh"))
-            beautyCrawlerService.init(); //重新取得圖片資源
-        if (beautyCrawlerService.listPicture.size() == 0) {
-            beautyCrawlerService.crawler(2);
+        if (parameters.contains("refresh")) {
+            actressCrawlerService.init(); //重新取得圖片資源
+        }
+        if (actressCrawlerService.listPicture.size() == 0) {
+            actressCrawlerService.crawler(2);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
-        String pictureUrl = beautyCrawlerService.randomPicture();
-        currentPicture = pictureUrl;    //紀錄當前圖片
+        String pictureUrl = actressCrawlerService.randomPicture();
+        currentPicture = pictureUrl;
         URI uri = URI.create(pictureUrl);
         return new ImageMessage(uri, uri);
     }
 
     private Set<String> randomListPicture(int size) {
         Set<String> result = new HashSet<>(size);
-        while (result.size() != size && beautyCrawlerService.listPicture.size() > size)
-            result.add(beautyCrawlerService.randomPicture());
+        while (result.size() != size && actressCrawlerService.listPicture.size() > size)
+            result.add(actressCrawlerService.randomPicture());
         return result;
     }
 }

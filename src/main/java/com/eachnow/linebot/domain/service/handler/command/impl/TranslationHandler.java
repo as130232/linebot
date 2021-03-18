@@ -1,10 +1,10 @@
-package com.eachnow.linebot.domain.service.handler.impl;
+package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.LanguageEnum;
 import com.eachnow.linebot.common.util.ParamterUtils;
-import com.eachnow.linebot.domain.service.gateway.GoogleTranslationService;
-import com.eachnow.linebot.domain.service.handler.CommandHandler;
+import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
+import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Slf4j
 @Command(value = {"@translate", "@翻譯"}, resident = true)
 public class TranslationHandler implements CommandHandler {
-    private GoogleTranslationService googleTranslationService;
+    private GoogleApiService googleApiService;
     private LanguageEnum lang;
 
     @Autowired
-    public TranslationHandler(GoogleTranslationService googleTranslationService) {
-        this.googleTranslationService = googleTranslationService;
+    public TranslationHandler(GoogleApiService googleApiService) {
+        this.googleApiService = googleApiService;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class TranslationHandler implements CommandHandler {
             return new TextMessage("[已開啟翻譯模式]");
         }
         log.info("欲翻譯語言:{}, 翻譯字串:{}", lang, parameters);
-        String result = googleTranslationService.translate(parameters, lang.getLang());
+        String result = googleApiService.translate(parameters, lang.getLang());
         return new TextMessage(result);
     }
 

@@ -1,4 +1,4 @@
-package com.eachnow.linebot.domain.service.handler.impl;
+package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.WeatherElementEnum;
@@ -6,13 +6,12 @@ import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
-import com.eachnow.linebot.domain.service.handler.CommandHandler;
+import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

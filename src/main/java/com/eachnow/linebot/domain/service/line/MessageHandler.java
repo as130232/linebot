@@ -1,8 +1,8 @@
 package com.eachnow.linebot.domain.service.line;
 
-import com.eachnow.linebot.common.constant.CommandConstants;
-import com.eachnow.linebot.domain.service.handler.CommandHandler;
-import com.eachnow.linebot.domain.service.handler.CommandHandlerFactory;
+import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
+import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
+import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
@@ -20,11 +20,13 @@ import java.io.IOException;
 @LineMessageHandler
 public class MessageHandler {
     private CommandHandlerFactory handlerCommandFactory;
-    public static String command;
+    private LocationHandlerFactory locationHandlerFactory;
 
     @Autowired
-    public MessageHandler(CommandHandlerFactory handlerCommandFactory) {
+    public MessageHandler(CommandHandlerFactory handlerCommandFactory,
+                          LocationHandlerFactory locationHandlerFactory) {
         this.handlerCommandFactory = handlerCommandFactory;
+        this.locationHandlerFactory = locationHandlerFactory;
     }
 
     public Message executeCommand(String text) {
@@ -51,14 +53,6 @@ public class MessageHandler {
     public Message handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
         System.out.println("handleLocationMessageEvent，event: " + event);
         LocationMessageContent locationMessageContent = event.getMessage();
-        locationMessageContent.getTitle();
-        locationMessageContent.getAddress();    //地址
-        locationMessageContent.getLatitude();   //經度
-        locationMessageContent.getLongitude();  //經度
-        if (CommandConstants.LOCATION_RESTAURANT.equals(command)) {
-
-        }
-        command = null;    //清空
         return null;
     }
 

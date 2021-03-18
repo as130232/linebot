@@ -33,10 +33,4 @@ public class TestController {
         return beautyCrawlerService.randomPicture();
     }
 
-    @GetMapping(value = "/pictureSize")
-    public Result<Integer> pictureSize() {
-        Result<Integer> result = new Result<>();
-        result.setData(beautyCrawlerService.listPicture.size());
-        return result;
-    }
 }

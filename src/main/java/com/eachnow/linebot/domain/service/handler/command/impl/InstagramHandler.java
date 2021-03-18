@@ -1,4 +1,4 @@
-package com.eachnow.linebot.domain.service.handler.impl;
+package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.InstagramParamEnum;
@@ -6,7 +6,7 @@ import com.eachnow.linebot.common.po.ig.Graphql;
 import com.eachnow.linebot.common.po.ig.User;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.crawler.WebDriverFactory;
-import com.eachnow.linebot.domain.service.handler.CommandHandler;
+import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linecorp.bot.model.action.PostbackAction;
@@ -26,7 +26,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
