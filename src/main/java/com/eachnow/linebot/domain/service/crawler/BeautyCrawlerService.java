@@ -42,6 +42,8 @@ public class BeautyCrawlerService {
         CompletableFuture.runAsync(() -> {
             List<String> result = pttCrawlerService.crawler(url, pageSize);
             this.setPicture(result);
+            //爬取完通知
+
         }, pttCrawlerExecutor).exceptionally(e -> {
                     log.error("爬取PTT版，失敗! url:{}, error msg:{}", url, e.getMessage());
                     return null;

@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 import com.eachnow.linebot.common.po.google.map.ResultPO;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
+import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
 import com.linecorp.bot.model.action.Action;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
@@ -16,7 +17,6 @@ import com.linecorp.bot.model.message.template.CarouselTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -51,6 +51,8 @@ public class RestaurantLocationHandler implements LocationHandler {
             return carousel;
         }).collect(Collectors.toList());
         CarouselTemplate carouselTemplate = new CarouselTemplate(columns);
+        //處理完需清空暫存類型
+        LocationHandlerFactory.type = null;
         return new TemplateMessage("餐廳精選", carouselTemplate);
     }
 

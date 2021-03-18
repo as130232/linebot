@@ -2,6 +2,7 @@ package com.eachnow.linebot.domain.service.line;
 
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
+import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
@@ -51,14 +52,14 @@ public class MessageHandler {
      */
     @EventMapping
     public Message handleLocationMessageEvent(MessageEvent<LocationMessageContent> event) {
-        System.out.println("handleLocationMessageEvent，event: " + event);
-        LocationMessageContent locationMessageContent = event.getMessage();
-        return null;
+        log.info("handleLocationMessageEvent，event: " + event);
+        LocationHandler locationHandler = locationHandlerFactory.getLocationHandler();
+        return locationHandler.execute(event.getMessage());
     }
 
     @EventMapping
     public void handleDefaultMessageEvent(Event event) {
-        System.out.println("handleDefaultMessageEvent，event: " + event);
+        log.info("handleDefaultMessageEvent，event: " + event);
 
     }
 

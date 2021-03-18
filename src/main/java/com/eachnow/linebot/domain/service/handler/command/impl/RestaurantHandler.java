@@ -14,14 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Slf4j
 @Command({"restaurant", "餐廳", "餓"})
 public class RestaurantHandler implements CommandHandler {
-    private BeautyCrawlerService beautyCrawlerService;
-    private GoogleApiService googleApiService;
 
     @Autowired
-    public RestaurantHandler(BeautyCrawlerService beautyCrawlerService,
-                             GoogleApiService googleApiService) {
-        this.beautyCrawlerService = beautyCrawlerService;
-        this.googleApiService = googleApiService;
+    public RestaurantHandler() {
     }
 
     @Override
