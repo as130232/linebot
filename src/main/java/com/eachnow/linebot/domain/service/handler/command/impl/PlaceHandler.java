@@ -3,6 +3,7 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.common.util.LineTemplateUtils;
+import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.crawler.ActressCrawlerService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
@@ -24,7 +25,7 @@ public class PlaceHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
-        GooglePlaceTypeEnum typeEnum = GooglePlaceTypeEnum.parse(parameters);
+        GooglePlaceTypeEnum typeEnum = GooglePlaceTypeEnum.parse(ParamterUtils.getParameter(parameters));
         if (typeEnum == null)
             return new TextMessage("Incorrect location. 找不到該地點，請在重新輸入.");
         LocationHandlerFactory.type = typeEnum;
