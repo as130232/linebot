@@ -36,8 +36,10 @@ public class RestaurantLocationHandler implements LocationHandler {
     @Override
     public Message execute(LocationMessageContent content) {
         ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), LocationConstants.RESTAURANT, LanguageEnum.TW.getLang());
-        //排序，評分高的在前，並指定推薦餐廳數量
-        List<ResultPO> results = resultLocationPO.getResults().stream().sorted(Comparator.comparing(ResultPO::getRating).reversed()).limit(MAX_SIZE).collect(Collectors.toList());
+        //排序，評分高、評論高的在前，並指定推薦餐廳數量
+        List<ResultPO> results = resultLocationPO.getResults().stream()
+                .sorted(Comparator.comparing(ResultPO::getRating).reversed().thenComparing(ResultPO::getUserRatingsTotal).reversed())
+                .limit(MAX_SIZE).collect(Collectors.toList());
         List<CarouselColumn> columns = results.stream().map(po -> {
             //取得餐廳的圖片網址
             URI imageUrl = URI.create("https://i.imgur.com/R0qpw6h.jpg");   //default
