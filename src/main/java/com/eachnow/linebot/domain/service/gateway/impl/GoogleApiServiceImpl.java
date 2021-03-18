@@ -64,6 +64,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
                     "&language={language}".replace("{language}", language);
             ResponseEntity<ResultLocationPO> responseEntity = restTemplate.getForEntity(url, ResultLocationPO.class);
             ResultLocationPO result = responseEntity.getBody();
+            log.info("getLocation result:{}", result);
             return result;
         } catch (Exception e) {
             log.error("呼叫Google Map API，失敗! error msg:{}", e.getMessage());
