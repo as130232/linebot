@@ -27,6 +27,8 @@ public class CommandHandlerFactory {
     @Autowired
     private TranslationHandler translationHandler;
     @Autowired
+    private TranslationButtonHandler translationButtonHandler;
+    @Autowired
     private WeatherHandler weatherHandler;
     @Autowired
     private EatWhatHandler eatWhatHandler;
@@ -85,7 +87,9 @@ public class CommandHandlerFactory {
                 commandHandler = placeHandler;
             } else if (HelloHandler.class.equals(commandHandlerClass)) {
                 commandHandler = helloHandler;
-            } else if (TranslationHandler.class.equals(commandHandlerClass)) {
+            } else if (TranslationButtonHandler.class.equals(commandHandlerClass)) {
+                commandHandler = translationButtonHandler;
+            }else if (TranslationHandler.class.equals(commandHandlerClass)) {
                 commandHandler = translationHandler;
                 translationHandler.setCurrentLang(text);    //設定翻譯語言
             } else if (CloseResidentCommandHandler.class.equals(commandHandlerClass)) {
