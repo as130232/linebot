@@ -17,6 +17,7 @@ import com.linecorp.bot.model.message.template.CarouselTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -52,11 +53,24 @@ public class GoogleLocationHandler implements LocationHandler {
             URI googleMapUrl = URI.create(googleApiService.parseMapUrl(po.getGeometry().getLocation().getLat(), po.getGeometry().getLocation().getLng(), po.getPlaceId()));
             String detail = String.format("評分:%s, 評論:%s\n地址:%s", po.getRating(), po.getUserRatingsTotal(), po.getVicinity());
             List<Action> actions = Arrays.asList(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl)));
-            CarouselColumn carousel = new CarouselColumn(imageUrl, po.getName(), detail, actions);
+            String title = po.getName();
+            if (title.length() > 40) {  //title有字數限制
+                String[] arr = title.split(",");
+                title = arr[arr.length - 1];
+            }
+            CarouselColumn carousel = new CarouselColumn(imageUrl, title, detail, actions);
             return carousel;
         }).collect(Collectors.toList());
         CarouselTemplate carouselTemplate = new CarouselTemplate(columns);
-        return new TemplateMessage(typeEnum.getName() + " 十大精選", carouselTemplate);
+        return new TemplateMessage(typeEnum.getName() + " 精選", carouselTemplate);
     }
 
+//    @PostConstruct
+//    private void test() {
+//        LocationHandlerFactory.type = GooglePlaceTypeEnum.CITY_HALL;
+//        LocationMessageContent content = LocationMessageContent.builder().id("13744078637930")
+//                .address("114台灣台北市內湖區港墘路187號")
+//                .latitude(25.075796639438316).longitude(121.57483376562594).build();
+//        this.execute(content);
+//    }
 }

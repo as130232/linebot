@@ -20,7 +20,7 @@ public class BarHandler implements CommandHandler {
     @Override
     public Message execute(String parameters) {
         LocationHandlerFactory.type = GooglePlaceTypeEnum.BAR;
-        return LineTemplateUtils.getLocationButtonsTemplate();
+        return LineTemplateUtils.getLocationButtonsTemplate(LocationHandlerFactory.type.getName());
     }
 
 }

@@ -2,7 +2,6 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.LanguageEnum;
-import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.PostbackAction;
@@ -42,7 +41,7 @@ public class TranslationButtonHandler implements CommandHandler {
                         QuickReplyItem.builder().action(PostbackAction.builder().label("French(法)").data(translateKey + "法").build()).build(),
                         QuickReplyItem.builder().action(PostbackAction.builder().label("Russian(俄)").data(translateKey + "俄").build()).build()
                 )).build();
-        return new TextMessage("Choose translation language.\n結束時請輸入@close關閉翻譯模式", quickReply);
+        return new TextMessage("Choose translation language.\nPlease input @close when you end. 結束時請輸入@close關閉翻譯模式.", quickReply);
     }
 
 }

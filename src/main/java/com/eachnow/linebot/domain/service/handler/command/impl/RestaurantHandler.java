@@ -20,7 +20,7 @@ public class RestaurantHandler implements CommandHandler {
     @Override
     public Message execute(String parameters) {
         LocationHandlerFactory.type = GooglePlaceTypeEnum.RESTAURANT;
-        return LineTemplateUtils.getLocationButtonsTemplate();
+        return LineTemplateUtils.getLocationButtonsTemplate(LocationHandlerFactory.type.getName());
     }
 
 }

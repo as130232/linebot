@@ -31,7 +31,7 @@ public class ActressHandler implements CommandHandler {
     public Message execute(String parameters) {
         if (parameters.contains("存")) {
             //TODO 新增至DB
-            return new TextMessage("儲存成功。");
+            //return new TextMessage("儲存成功。");
         }
         if (parameters.contains("size")) {
             return new TextMessage("圖片資源size:" + actressCrawlerService.listPicture.size());
@@ -43,7 +43,7 @@ public class ActressHandler implements CommandHandler {
         if (parameters.contains("爬")) {
             actressCrawlerService.crawler(1);
         }
-        if (parameters.contains("多")) {
+        if (parameters.contains("多") || parameters.contains("more")) {
             List<ImageCarouselColumn> columns = new ArrayList<>(10);
             Set<String> pictures = randomListPicture(10);
             if (pictures.size() == 0) {

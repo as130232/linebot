@@ -23,10 +23,13 @@ public class LineTemplateUtils {
     private static String GOOGLE_API_KEY;
     private static long MAX_SIZE = 10;
 
-    public static Message getLocationButtonsTemplate() {
+    public static Message getLocationButtonsTemplate(String loaction) {
         String text = "Please tell me where you are?";
+        String title = null;
+        if (loaction != null)
+            title = "Search: " + loaction;
         URI uri = URI.create("https://line.me/R/nv/location");
-        ButtonsTemplate template = new ButtonsTemplate(null, null, text, Arrays.asList(
+        ButtonsTemplate template = new ButtonsTemplate(null, title, text, Arrays.asList(
                 new URIAction("Send my location", uri, new URIAction.AltUri(uri))));
         return new TemplateMessage(text, template);
     }

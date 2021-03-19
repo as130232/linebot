@@ -23,11 +23,8 @@ public class TranslationHandler implements CommandHandler {
 
     @Override
     public Message execute(String parameters) {
-//        Command commandArr = this.getClass().getAnnotation(Command.class);
-        if (parameters.contains("@translate") || parameters.contains("@翻譯")) {
-            return new TextMessage("[已開啟翻譯模式]");
-        }
-        log.info("欲翻譯語言:{}, 翻譯字串:{}", lang, parameters);
+        if (parameters.contains("@translate") || parameters.contains("@翻譯"))
+            return new TextMessage("[Translate mode已開啟翻譯模式]");
         String result = googleApiService.translate(parameters, lang.getLang());
         return new TextMessage(result);
     }

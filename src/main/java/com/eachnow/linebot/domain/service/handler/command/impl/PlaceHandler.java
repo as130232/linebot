@@ -27,9 +27,9 @@ public class PlaceHandler implements CommandHandler {
     public Message execute(String parameters) {
         GooglePlaceTypeEnum typeEnum = GooglePlaceTypeEnum.parse(ParamterUtils.getParameter(parameters));
         if (typeEnum == null)
-            return new TextMessage("Incorrect location. 找不到該地點，請在重新輸入.");
+            return new TextMessage("Incorrect location. Please input again.\n找不到該地點請重新輸入.");
         LocationHandlerFactory.type = typeEnum;
-        return LineTemplateUtils.getLocationButtonsTemplate();
+        return LineTemplateUtils.getLocationButtonsTemplate(typeEnum.getName());
     }
 
 }

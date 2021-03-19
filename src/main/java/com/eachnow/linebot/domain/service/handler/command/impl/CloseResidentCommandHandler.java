@@ -11,6 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CloseResidentCommandHandler implements CommandHandler {
     @Override
     public Message execute(String parameters) {
-        return new TextMessage("[已關閉常駐指令模式]");
+        return new TextMessage("[Shut down mode.已關閉常駐指令模式]");
     }
 }
