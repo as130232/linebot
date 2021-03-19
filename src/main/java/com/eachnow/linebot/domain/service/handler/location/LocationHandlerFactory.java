@@ -2,7 +2,7 @@ package com.eachnow.linebot.domain.service.handler.location;
 
 import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.domain.service.handler.DefaultHandler;
-import com.eachnow.linebot.domain.service.handler.location.impl.AllLocationHandler;
+import com.eachnow.linebot.domain.service.handler.location.impl.GoogleLocationHandler;
 import com.eachnow.linebot.domain.service.handler.location.impl.RestaurantLocationHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ public class LocationHandlerFactory {
     @Autowired
     private RestaurantLocationHandler restaurantLocationHandler;
     @Autowired
-    private AllLocationHandler allLocationHandler;
+    private GoogleLocationHandler googleLocationHandler;
     @Autowired
     private DefaultHandler defaultHandler;
 
@@ -25,7 +25,7 @@ public class LocationHandlerFactory {
         if (GooglePlaceTypeEnum.RESTAURANT.equals(type)) {
             locationHandler = restaurantLocationHandler;
         } else {
-            locationHandler = allLocationHandler;
+            locationHandler = googleLocationHandler;
         }
         return locationHandler;
     }

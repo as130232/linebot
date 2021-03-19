@@ -40,6 +40,9 @@ public class BeautyHandler implements CommandHandler {
             URI uri = URI.create(currentPicture);
             return new ImageMessage(uri, uri);
         }
+        if (parameters.contains("爬")) {
+            beautyCrawlerService.crawler(1);
+        }
         if (parameters.contains("多")) {
             List<ImageCarouselColumn> columns = new ArrayList<>(10);
             Set<String> pictures = randomListPicture(10);

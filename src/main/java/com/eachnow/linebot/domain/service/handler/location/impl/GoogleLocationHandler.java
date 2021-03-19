@@ -24,12 +24,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class AllLocationHandler implements LocationHandler {
+public class GoogleLocationHandler implements LocationHandler {
     private final Integer MAX_SIZE = 10;
     private GoogleApiService googleApiService;
 
     @Autowired
-    public AllLocationHandler(GoogleApiService googleApiService) {
+    public GoogleLocationHandler(GoogleApiService googleApiService) {
         this.googleApiService = googleApiService;
     }
 
