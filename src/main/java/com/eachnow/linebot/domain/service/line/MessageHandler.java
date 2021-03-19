@@ -60,9 +60,11 @@ public class MessageHandler {
     }
 
     @EventMapping
-    public void handlePostbackEvent(PostbackEvent event) {
+    public Message handlePostbackEvent(PostbackEvent event) {
         log.info("handlePostbackEvent，event: " + event);
-
+        final String text = event.getPostbackContent().getData();
+        //根據指令取得對應指令處理服務
+        return executeCommand(text);
     }
 
     @EventMapping
