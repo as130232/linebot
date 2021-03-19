@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 
 @Slf4j
-@Command(value = {"translate", "翻譯"}, resident = true)
+@Command(value = {"translate", "翻譯"})
 public class TranslationButtonHandler implements CommandHandler {
     private GoogleApiService googleApiService;
     private LanguageEnum lang;

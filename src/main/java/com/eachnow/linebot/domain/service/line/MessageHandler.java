@@ -6,9 +6,12 @@ import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
 import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
+import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
+import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.event.postback.PostbackContent;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
@@ -54,6 +57,12 @@ public class MessageHandler {
         log.info("handleLocationMessageEvent，event: " + event);
         LocationHandler locationHandler = locationHandlerFactory.getLocationHandler();
         return locationHandler.execute(event.getMessage());
+    }
+
+    @EventMapping
+    public void handlePostbackEvent(PostbackEvent event) {
+        log.info("handlePostbackEvent，event: " + event);
+
     }
 
     @EventMapping
