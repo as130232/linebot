@@ -48,9 +48,15 @@ public class RestaurantLocationHandler implements LocationHandler {
                 imageUrl = URI.create(googleApiService.parseMapPictureUrl(po.getPhotos().get(0).getPhotoReference()));
             //取得餐廳的 Google map 網址
             URI googleMapUrl = URI.create(googleApiService.parseMapUrl(po.getGeometry().getLocation().getLat(), po.getGeometry().getLocation().getLng(), po.getPlaceId()));
-            String detail = String.format("評分:%s, 評論:%s\n地址:%s", po.getRating(), po.getUserRatingsTotal(), po.getVicinity());
+            String detail = String.format("評分:%s, 評論:%s  |  %s\n地址:%s", po.getRating(), po.getUserRatingsTotal(), po.getOpeningHours().getOpenNow() ? "營業中" : "休息中",
+                    po.getVicinity());
             List<Action> actions = Arrays.asList(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl)));
-            CarouselColumn carousel = new CarouselColumn(imageUrl, po.getName(), detail, actions);
+            String title = po.getName();
+            if (title.length() > 40) {  //title有字數限制
+                String[] arr = title.split(",");
+                title = arr[arr.length - 1];
+            }
+            CarouselColumn carousel = new CarouselColumn(imageUrl, title, detail, actions);
             return carousel;
         }).collect(Collectors.toList());
         CarouselTemplate carouselTemplate = new CarouselTemplate(columns);
