@@ -96,7 +96,9 @@ public class RestaurantLocationHandler implements LocationHandler {
                     Text.builder().text(po.getVicinity()).color("#666666").wrap(true).size(FlexFontSize.SM).flex(5).build()
             );
             List<FlexComponent> bodyContents = Arrays.asList(
-                    Box.builder().layout(FlexLayout.BASELINE).spacing(FlexMarginSize.SM).contents(placeContents).build()  //地址
+                    Text.builder().text(title).weight(Text.TextWeight.BOLD).size(FlexFontSize.XL).build(),  //標頭
+                    Box.builder().layout(FlexLayout.BASELINE).margin(FlexMarginSize.MD).contents(starContents).build(),     //評價
+                    Box.builder().layout(FlexLayout.BASELINE).spacing(FlexMarginSize.SM).contents(placeContents).build()    //地址
             );
             Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).build();
 
