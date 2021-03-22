@@ -14,9 +14,8 @@ import com.linecorp.bot.model.message.flex.component.Image;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.Carousel;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
-import com.linecorp.bot.model.message.flex.unit.FlexGravity;
 import com.linecorp.bot.model.message.flex.unit.FlexLayout;
-import com.linecorp.bot.model.message.flex.unit.FlexMarginSize;
+import com.linecorp.bot.model.message.flex.unit.FlexPaddingSize;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -60,21 +59,11 @@ public class BeautyHandler implements CommandHandler {
                 beautyCrawlerService.crawler(2);
                 return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
             }
-//            List<ImageCarouselColumn> columns = new ArrayList<>(10);
-//            Integer i = 1;
-//            for (String picture : pictures) {
-//                URI uri = URI.create(picture);
-//                ImageCarouselColumn carousel = new ImageCarouselColumn(uri, new URIAction("連結", uri, new URIAction.AltUri(uri)));
-//                columns.add(carousel);
-//                i++;
-//            }
-//            ImageCarouselTemplate carouselTemplate = new ImageCarouselTemplate(columns);
-//            return new TemplateMessage("表特版精選", carouselTemplate);
             List<Bubble> listBubble = pictures.stream().map(picture -> {
                 URI uri = URI.create(picture);
-                List<FlexComponent> bodyContents = Arrays.asList(Image.builder().size(Image.ImageSize.FULL_WIDTH).margin(FlexMarginSize.MD).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7).gravity(FlexGravity.TOP)
+                List<FlexComponent> bodyContents = Arrays.asList(Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7)
                         .url(uri).action(new URIAction("URL", uri, new URIAction.AltUri(uri))).build());
-                Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll("0px").build();
+                Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.NONE).build();
                 Bubble bubble = Bubble.builder().header(null).hero(null).body(body).footer(null).build();
                 return bubble;
             }).collect(Collectors.toList());
