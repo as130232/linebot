@@ -32,7 +32,7 @@ public class ScheduledService {
         return CRON_EXECUTE;
     }
 
-    @Scheduled(fixedRate = 25 * 60 * 1000)
+    @Scheduled(fixedRate = 20 * 60 * 1000)
     public void preventDormancy(){
         log.info("preventDormancy.");
     }
