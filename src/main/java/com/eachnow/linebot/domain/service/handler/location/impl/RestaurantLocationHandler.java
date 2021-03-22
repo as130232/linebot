@@ -101,8 +101,8 @@ public class RestaurantLocationHandler implements LocationHandler {
                     Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.LG).spacing(FlexMarginSize.SM).contents(placeContents).build()
             );
             Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).build();
-            Bubble bubble = Bubble.builder().header(null).hero(hero).body(body)
-                    .footer(Box.builder().build()).action(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl))).build();
+            Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(null)
+                    .action(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl))).build();
             return bubble;
         }).collect(Collectors.toList());
         FlexContainer contents = Carousel.builder().contents(listBubble).build();
