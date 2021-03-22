@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
+import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.URIAction;
@@ -27,6 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Description("表特 {多, 上一張, refresh}")
 @Command({"抽", "beauty", "表特"})
 public class BeautyHandler implements CommandHandler {
     private BeautyCrawlerService beautyCrawlerService;

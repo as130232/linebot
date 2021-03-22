@@ -17,7 +17,6 @@ import com.linecorp.bot.model.message.template.CarouselTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -53,13 +52,20 @@ public class GoogleLocationHandler implements LocationHandler {
             URI googleMapUrl = URI.create(googleApiService.parseMapUrl(po.getGeometry().getLocation().getLat(), po.getGeometry().getLocation().getLng(), po.getPlaceId()));
             String openNow = "休息中";
             if (po.getOpeningHours() != null && po.getOpeningHours().getOpenNow())
-                openNow =  "營業中";
+                openNow = "營業中";
             String detail = String.format("評分:%s, 評論:%s  |  %s\n地址:%s", po.getRating(), po.getUserRatingsTotal(), openNow, po.getVicinity());
             List<Action> actions = Arrays.asList(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl)));
             String title = po.getName();
             if (title.length() > 40) {  //title有字數限制
-                String[] arr = title.split(",");
-                title = arr[arr.length - 1];
+                if (title.contains(",")) {
+                    String[] arr = title.split(",");
+                    title = arr[arr.length - 1];
+                } else if (title.contains(" ")) {
+                    String[] arr = title.split(" ");
+                    title = arr[arr.length - 1];
+                } else {
+                    title = title.substring(0, 39);
+                }
             }
             CarouselColumn carousel = new CarouselColumn(imageUrl, title, detail, actions);
             return carousel;

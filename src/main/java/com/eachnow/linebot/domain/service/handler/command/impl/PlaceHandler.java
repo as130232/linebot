@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
+import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.common.util.LineTemplateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
+@Description("地點 {地點}")
 @Command({"place", "location", "地點", "地方"})
 public class PlaceHandler implements CommandHandler {
     private ActressCrawlerService actressCrawlerService;

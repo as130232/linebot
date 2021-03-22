@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
+import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.constant.WeatherElementEnum;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
@@ -18,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Slf4j
+@Description("天氣 {地區} {類型}")
 @Command({"天氣"})
 public class WeatherHandler implements CommandHandler {
     private OpenWeatherService openWeatherService;
@@ -60,10 +62,6 @@ public class WeatherHandler implements CommandHandler {
             });
         });
         return new TextMessage(sb.toString());
-    }
-
-    public String getFormat() {
-        return "天氣 {地區} {類型}";
     }
 
     private String parseUnit(String parameterUnit) {

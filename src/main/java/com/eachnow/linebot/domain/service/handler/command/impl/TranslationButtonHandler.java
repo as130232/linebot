@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
+import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.constant.LanguageEnum;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 
 @Slf4j
+@Description("翻譯(選擇對應語系按鈕)")
 @Command(value = {"translate", "翻譯"})
 public class TranslationButtonHandler implements CommandHandler {
     private GoogleApiService googleApiService;
