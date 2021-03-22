@@ -80,16 +80,16 @@ public class RestaurantLocationHandler implements LocationHandler {
             }
             FlexComponent hero = Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectRatio(20, 13).aspectMode(Image.ImageAspectMode.Cover)
                     .url(imageUrl).action(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl))).build();
-            String openNow = "休息中";
+            boolean isOpenNow = false;
             if (po.getOpeningHours() != null && po.getOpeningHours().getOpenNow())
-                openNow =  "營業中";
+                isOpenNow = true;
             Integer star = Math.round(po.getRating());
             List<FlexComponent> starContents = new ArrayList();
             for (int i = 0; i < star; i++)
                 starContents.add(Icon.builder().size(FlexFontSize.SM).url(URI.create("https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png")).build());
             starContents.add(Text.builder().text(String.valueOf(po.getRating())).color("#ff991a").flex(1).margin(FlexMarginSize.MD).weight(Text.TextWeight.BOLD).build());
             starContents.add(Text.builder().text(String.valueOf(po.getUserRatingsTotal())).color("#479AC7").weight(Text.TextWeight.BOLD).build());
-            starContents.add(Text.builder().text(openNow).color(po.getOpeningHours().getOpenNow() ? "#00c72e" : "#ff291f").weight(Text.TextWeight.BOLD).build());
+            starContents.add(Text.builder().text(isOpenNow ? "營業中" : "休息中").color(isOpenNow ? "#00c72e" : "#ff291f").weight(Text.TextWeight.BOLD).build());
 
             List<FlexComponent> placeContents = Arrays.asList(
                     Text.builder().text("Place").color("#aaaaaa").size(FlexFontSize.SM).flex(1).build(),
