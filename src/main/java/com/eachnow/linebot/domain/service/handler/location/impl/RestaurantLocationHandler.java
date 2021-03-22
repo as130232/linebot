@@ -88,20 +88,23 @@ public class RestaurantLocationHandler implements LocationHandler {
             for (int i = 0; i < star; i++)
                 starContents.add(Icon.builder().size(FlexFontSize.SM).url(URI.create("https://scdn.line-apps.com/n/channel_devcenter/img/fx/review_gold_star_28.png")).build());
             starContents.add(Text.builder().text(String.valueOf(po.getRating())).color("#ff991a").flex(1).margin(FlexMarginSize.MD).weight(Text.TextWeight.BOLD).build());
-            starContents.add(Text.builder().text(String.valueOf(po.getUserRatingsTotal())).color("#479AC7").weight(Text.TextWeight.BOLD).build());
+            starContents.add(Text.builder().text("評論:" + String.valueOf(po.getUserRatingsTotal())).color("#479AC7").weight(Text.TextWeight.BOLD).build());
             starContents.add(Text.builder().text(isOpenNow ? "營業中" : "休息中").color(isOpenNow ? "#00c72e" : "#ff291f").weight(Text.TextWeight.BOLD).build());
-
+            //地址
             List<FlexComponent> placeContents = Arrays.asList(
                     Text.builder().text("Place").color("#aaaaaa").size(FlexFontSize.SM).flex(1).build(),
                     Text.builder().text(po.getVicinity()).color("#666666").wrap(true).size(FlexFontSize.SM).flex(5).build()
             );
             List<FlexComponent> bodyContents = Arrays.asList(
-                    Text.builder().text(title).weight(Text.TextWeight.BOLD).size(FlexFontSize.XL).build(),  //標頭
-                    Box.builder().layout(FlexLayout.BASELINE).margin(FlexMarginSize.MD).contents(starContents).build(),
-                    Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.LG).spacing(FlexMarginSize.SM).contents(placeContents).build()
+                    Box.builder().layout(FlexLayout.BASELINE).spacing(FlexMarginSize.SM).contents(placeContents).build()  //地址
             );
             Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).build();
-            Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(null)
+
+            //Menu
+            URI menuUrl = googleMapUrl; //Todo 查詢Meun api
+            List<FlexComponent> menuButtonContents = Arrays.asList(Button.builder().height(Button.ButtonHeight.SMALL).style(Button.ButtonStyle.PRIMARY).action(new URIAction("Menu", menuUrl, new URIAction.AltUri(menuUrl))).build());
+            Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(menuButtonContents).build();
+            Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(footer)
                     .action(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl))).build();
             return bubble;
         }).collect(Collectors.toList());
