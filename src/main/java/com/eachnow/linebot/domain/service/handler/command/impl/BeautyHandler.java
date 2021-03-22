@@ -72,7 +72,7 @@ public class BeautyHandler implements CommandHandler {
 //            return new TemplateMessage("表特版精選", carouselTemplate);
             List<Bubble> listBubble = pictures.stream().map(picture -> {
                 URI uri = URI.create(picture);
-                List<FlexComponent> bodyContents = Arrays.asList(Image.builder().size(Image.ImageSize.FULL_WIDTH).margin(FlexMarginSize.MD).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(2, 3).gravity(FlexGravity.TOP)
+                List<FlexComponent> bodyContents = Arrays.asList(Image.builder().size(Image.ImageSize.FULL_WIDTH).margin(FlexMarginSize.MD).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7).gravity(FlexGravity.TOP)
                         .url(uri).action(new URIAction("URL", uri, new URIAction.AltUri(uri))).build());
                 Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll("0px").build();
                 Bubble bubble = Bubble.builder().header(null).hero(null).body(body).footer(null).build();
