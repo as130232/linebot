@@ -45,14 +45,16 @@ public class GoogleLocationHandler implements LocationHandler {
         if (results.size() == 0)
             return null;
         List<CarouselColumn> columns = results.stream().map(po -> {
-            //取得餐廳的圖片網址
+            //取得圖片網址
             URI imageUrl = URI.create("https://i.imgur.com/R0qpw6h.jpg");   //default
             if (po.getPhotos() != null && po.getPhotos().size() > 0 && po.getPhotos().get(0).getPhotoReference() != null)
                 imageUrl = URI.create(googleApiService.parseMapPictureUrl(po.getPhotos().get(0).getPhotoReference()));
-            //取得餐廳的 Google map 網址
+            //取得Google map 網址
             URI googleMapUrl = URI.create(googleApiService.parseMapUrl(po.getGeometry().getLocation().getLat(), po.getGeometry().getLocation().getLng(), po.getPlaceId()));
-            String detail = String.format("評分:%s, 評論:%s  |  %s\n地址:%s", po.getRating(), po.getUserRatingsTotal(), po.getOpeningHours().getOpenNow() ? "營業中" : "休息中",
-                    po.getVicinity());
+            String openNow = "休息中";
+            if (po.getOpeningHours() != null && po.getOpeningHours().getOpenNow())
+                openNow =  "營業中";
+            String detail = String.format("評分:%s, 評論:%s  |  %s\n地址:%s", po.getRating(), po.getUserRatingsTotal(), openNow, po.getVicinity());
             List<Action> actions = Arrays.asList(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl)));
             String title = po.getName();
             if (title.length() > 40) {  //title有字數限制
@@ -68,10 +70,9 @@ public class GoogleLocationHandler implements LocationHandler {
 
 //    @PostConstruct
 //    private void test() {
-//        LocationHandlerFactory.type = GooglePlaceTypeEnum.CITY_HALL;
-//        LocationMessageContent content = LocationMessageContent.builder().id("13744078637930")
-//                .address("114台灣台北市內湖區港墘路187號")
-//                .latitude(25.075796639438316).longitude(121.57483376562594).build();
+//        LocationHandlerFactory.type = GooglePlaceTypeEnum.BAR;
+//        LocationMessageContent content = LocationMessageContent.builder()
+//                .latitude(25.07329493386349).longitude(121.5843254327774).build();
 //        this.execute(content);
 //    }
 }

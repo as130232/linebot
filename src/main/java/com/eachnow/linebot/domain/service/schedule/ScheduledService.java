@@ -32,6 +32,11 @@ public class ScheduledService {
         return CRON_EXECUTE;
     }
 
+    @Scheduled(fixedRate = 25 * 60 * 1000)
+    public void preventDormancy(){
+        log.info("preventDormancy.");
+    }
+
     @Scheduled(cron = "${schedule.beauty.cron}")
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
@@ -40,5 +45,6 @@ public class ScheduledService {
         beautyCrawlerService.crawler(3);
         log.info("[schedule]爬取表特版，完成。time:{}", new Date());
     }
+
 
 }

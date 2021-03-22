@@ -5,6 +5,7 @@ import com.eachnow.linebot.common.constant.LanguageEnum;
 import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 import com.eachnow.linebot.common.po.google.translation.InputTranslationPO;
 import com.eachnow.linebot.common.po.google.translation.OutputTranslationPO;
+import com.eachnow.linebot.common.util.JsonUtils;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,7 +66,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
                     "&language={language}".replace("{language}", language);
             ResponseEntity<ResultLocationPO> responseEntity = restTemplate.getForEntity(url, ResultLocationPO.class);
             ResultLocationPO result = responseEntity.getBody();
-            log.info("getLocation result:{}", result);
+            log.info("getLocation result:{}", JsonUtils.toJsonString(result));
             return result;
         } catch (Exception e) {
             log.error("呼叫Google Map API，失敗! error msg:{}", e.getMessage());
