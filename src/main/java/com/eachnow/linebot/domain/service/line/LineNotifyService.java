@@ -1,6 +1,6 @@
 package com.eachnow.linebot.domain.service.line;
 
-import com.eachnow.linebot.common.constant.LineNotifyEnum;
+import com.eachnow.linebot.common.constant.LineNotifyConstant;
 import com.eachnow.linebot.config.LineConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,11 +24,11 @@ public class LineNotifyService {
         this.lineConfig = lineConfig;
     }
 
-    private HttpHeaders getHttpHeaders(LineNotifyEnum lineNotifyEnum) {
+    private HttpHeaders getHttpHeaders(Integer type) {
         String key = lineConfig.getLineNotifyKeyOwn();
-        if (LineNotifyEnum.OWN.equals(lineNotifyEnum)) {
+        if (LineNotifyConstant.OWN.equals(type)) {
             key = lineConfig.getLineNotifyKeyOwn();
-        } else if (LineNotifyEnum.GROUP.equals(lineNotifyEnum)) {
+        } else if (LineNotifyConstant.GROUP.equals(type)) {
             key = lineConfig.getLineNotifyKeyGroup();
         }
         HttpHeaders headers = new HttpHeaders();
@@ -37,9 +37,9 @@ public class LineNotifyService {
         return headers;
     }
 
-    public void send(LineNotifyEnum lineNotifyEnum, String message) {
+    public void send(Integer type, String message) {
         try {
-            HttpEntity<String> entity = new HttpEntity<>(null, getHttpHeaders(lineNotifyEnum));
+            HttpEntity<String> entity = new HttpEntity<>(null, getHttpHeaders(type));
             ResponseEntity<String> response = restTemplate.exchange("https://notify-api.line.me/api/notify",
                     HttpMethod.POST, entity, String.class);
             log.info("[Line Notify]發送訊息，成功。message:{}", message);
