@@ -5,6 +5,7 @@ import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
 import com.linecorp.bot.model.event.Event;
+import com.linecorp.bot.model.event.FollowEvent;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
@@ -20,6 +21,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
+/**
+ * 處理各項Line事件服務
+ * Joined:加入群組
+ * leave:離開群組
+ * MemberJoined: 有成員加入該群組
+ * MemberLeft: 有成員離開該群組
+ */
 @Slf4j
 @LineMessageHandler
 public class MessageHandler {
@@ -36,6 +44,16 @@ public class MessageHandler {
     public Message executeCommand(String text) {
         CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(text);
         return commandHandler.execute(text);
+    }
+
+    /**
+     *
+     * @param event
+     */
+    @EventMapping
+    public void handleFollowEvent(FollowEvent event) {
+        log.info("handleDefaultMessageEvent，event: " + event);
+
     }
 
     /**

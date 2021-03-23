@@ -34,7 +34,7 @@ public class ScheduledService {
 
     @Scheduled(fixedRate = 10 * 60 * 1000)
     public void preventDormancy(){
-        log.info("preventDormancy.");
+        log.info("[schedule]preventDormancy.");
     }
 
     @Scheduled(cron = "${schedule.beauty.cron}")

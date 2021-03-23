@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.util.JsonUtils;
 import com.eachnow.linebot.config.LineConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -39,13 +40,13 @@ public class MessageSender {
         this.send(pushMessagePO);
     }
 
-    public void send(PushMessagePO pushMessagePO) throws Exception {
-        try{
+    public void send(PushMessagePO pushMessagePO) {
+        try {
             HttpEntity<String> entity = new HttpEntity<>(JsonUtils.toJsonString(pushMessagePO), getHttpHeaders());
             ResponseEntity<String> response = restTemplate.exchange("https://api.line.me/v2/bot/message/push",
                     HttpMethod.POST, entity, String.class);
             log.info("發送訊息，成功。pushMessagePO:{}", pushMessagePO);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("發送訊息，失敗! pushMessagePO:{}, error msg:{}", pushMessagePO, e.getMessage());
         }
     }

@@ -13,7 +13,8 @@ public class LineConfig {
     private String channelSecret;
     @Value("${line.bot.channel-token}")
     private String channelToken;
-//    @Value("${spring.boot.admin.notify.line.to}")
-//    private String to;
-
+    @Value("${line.notify.key.own}")
+    private String lineNotifyKeyOwn;
+    @Value("${line.notify.key.group}")
+    private String lineNotifyKeyGroup;
 }
