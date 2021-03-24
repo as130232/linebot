@@ -1,5 +1,7 @@
 package com.eachnow.linebot.domain.service.line;
 
+import com.eachnow.linebot.common.db.po.LineUserPO;
+import com.eachnow.linebot.common.db.repository.LineUserRepository;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
@@ -10,9 +12,7 @@ import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.PostbackEvent;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
-import com.linecorp.bot.model.event.message.MessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
-import com.linecorp.bot.model.event.postback.PostbackContent;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  * 處理各項Line事件服務
@@ -33,12 +35,15 @@ import java.io.IOException;
 public class MessageHandler {
     private CommandHandlerFactory handlerCommandFactory;
     private LocationHandlerFactory locationHandlerFactory;
+    private LineUserRepository lineUserRepository;
 
     @Autowired
     public MessageHandler(CommandHandlerFactory handlerCommandFactory,
-                          LocationHandlerFactory locationHandlerFactory) {
+                          LocationHandlerFactory locationHandlerFactory,
+                          LineUserRepository lineUserRepository) {
         this.handlerCommandFactory = handlerCommandFactory;
         this.locationHandlerFactory = locationHandlerFactory;
+        this.lineUserRepository = lineUserRepository;
     }
 
     public Message executeCommand(String text) {
@@ -47,13 +52,16 @@ public class MessageHandler {
     }
 
     /**
+     * 處理邀請好友
      *
      * @param event
      */
     @EventMapping
     public void handleFollowEvent(FollowEvent event) {
         log.info("handleDefaultMessageEvent，event: " + event);
-
+        String userId = event.getSource().getUserId();
+        lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
+        log.info("新增line user，成功。userId:{}, senderId:{}", userId, event.getSource().getSenderId());
     }
 
     /**
