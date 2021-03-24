@@ -6,10 +6,7 @@ import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
-import com.linecorp.bot.model.event.Event;
-import com.linecorp.bot.model.event.FollowEvent;
-import com.linecorp.bot.model.event.MessageEvent;
-import com.linecorp.bot.model.event.PostbackEvent;
+import com.linecorp.bot.model.event.*;
 import com.linecorp.bot.model.event.message.ImageMessageContent;
 import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
@@ -52,13 +49,18 @@ public class MessageHandler {
     }
 
     /**
-     * 處理邀請好友
-     *
-     * @param event
+     * 當邀請好友、有成員加入該群組時，將該用戶userId新增至DB中
      */
     @EventMapping
     public void handleFollowEvent(FollowEvent event) {
-        log.info("handleDefaultMessageEvent，event: " + event);
+        log.info("handleFollowEvent，event: " + event);
+        String userId = event.getSource().getUserId();
+        lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
+        log.info("新增line user，成功。userId:{}, senderId:{}", userId, event.getSource().getSenderId());
+    }
+    @EventMapping
+    public void handleMemberJoinedEvent(MemberJoinedEvent event) {
+        log.info("handleMemberJoinedEvent，event: " + event);
         String userId = event.getSource().getUserId();
         lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
         log.info("新增line user，成功。userId:{}, senderId:{}", userId, event.getSource().getSenderId());

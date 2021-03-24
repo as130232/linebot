@@ -48,10 +48,9 @@ public class TestController {
         return beautyCrawlerService.randomPicture();
     }
 
-
     @GetMapping(value = "/insertUser")
     public String insertUser() {
-        String uuid = UUID.randomUUID().toString().substring(0, 32);
+        String uuid = UUID.randomUUID().toString().substring(0, 33);
         lineUserRepository.save(LineUserPO.builder().id(uuid).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
         return uuid;
     }
