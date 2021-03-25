@@ -48,7 +48,7 @@ public class LineTemplateUtils {
         );
         Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(footerContents).build();
         FlexContainer contents = Bubble.builder().header(null).hero(null).body(body).footer(footer)
-                .action(new URIAction("Map", uri, new URIAction.AltUri(uri))).build();
+                .action(new URIAction("Send my location", uri, new URIAction.AltUri(uri))).build();
         return new FlexMessage("Search location", contents);
     }
 

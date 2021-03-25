@@ -56,6 +56,14 @@ public class MessageHandler {
         return commandHandler.execute(text);
     }
 
+    @Transactional
+    public void saveLineGroupAndUser(String userId, String groupId) {
+        //先新增用戶
+        this.saveLineUser(userId);
+        //在新增群組關聯
+        this.saveLineGroupUser(userId, groupId);
+    }
+
     public void saveLineUser(String userId) {
         Optional<LineUserPO> optional = lineUserRepository.findById(userId);
         if (optional.isPresent()) {
@@ -100,10 +108,7 @@ public class MessageHandler {
         log.info("用戶加入群組，handleMemberJoinedEvent，event: " + event);
         GroupSource groupSource = (GroupSource) event.getSource();
         String userId = event.getJoined().getMembers().get(0).getUserId();
-        //先新增用戶
-        this.saveLineUser(userId);
-        //在新增群組關聯
-        this.saveLineGroupUser(userId, groupSource.getGroupId());
+        saveLineGroupAndUser(userId, groupSource.getGroupId());
     }
 
     @EventMapping
