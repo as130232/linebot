@@ -26,7 +26,6 @@ public class LineUserService {
         this.lineGroupUserRepository = lineGroupUserRepository;
     }
 
-    @Transactional
     public void saveLineGroupAndUser(String userId, String groupId) {
         //先新增用戶
         this.saveLineUser(userId);
