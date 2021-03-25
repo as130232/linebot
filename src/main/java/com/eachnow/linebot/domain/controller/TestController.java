@@ -4,6 +4,7 @@ import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.db.repository.LineUserRepository;
 import com.eachnow.linebot.common.po.Result;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
+import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +23,13 @@ import java.util.UUID;
 public class TestController {
     private MessageHandler messageHandler;
     private BeautyCrawlerService beautyCrawlerService;
+    private LineUserService lineUserService;
     @Autowired
-    public TestController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService) {
+    public TestController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService,
+                          LineUserService lineUserService) {
         this.messageHandler = messageHandler;
         this.beautyCrawlerService = beautyCrawlerService;
+        this.lineUserService = lineUserService;
     }
 
     @GetMapping(value = "/preventDormancy")
@@ -48,7 +52,7 @@ public class TestController {
     @GetMapping(value = "/insertUser")
     public String insertUser() {
         String uuid = UUID.randomUUID().toString().substring(0, 33);
-        messageHandler.saveLineUser(uuid);
+        lineUserService.saveLineUser(uuid);
         return uuid;
     }
 }
