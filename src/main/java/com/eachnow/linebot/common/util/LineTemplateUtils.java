@@ -4,9 +4,18 @@ import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 import com.eachnow.linebot.common.po.google.map.ResultPO;
 import com.linecorp.bot.model.action.Action;
 import com.linecorp.bot.model.action.URIAction;
+import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
-import com.linecorp.bot.model.message.TemplateMessage;
-import com.linecorp.bot.model.message.template.ButtonsTemplate;
+import com.linecorp.bot.model.message.flex.component.Box;
+import com.linecorp.bot.model.message.flex.component.Button;
+import com.linecorp.bot.model.message.flex.component.FlexComponent;
+import com.linecorp.bot.model.message.flex.component.Text;
+import com.linecorp.bot.model.message.flex.container.Bubble;
+import com.linecorp.bot.model.message.flex.container.FlexContainer;
+import com.linecorp.bot.model.message.flex.unit.FlexFontSize;
+import com.linecorp.bot.model.message.flex.unit.FlexLayout;
+import com.linecorp.bot.model.message.flex.unit.FlexMarginSize;
+import com.linecorp.bot.model.message.flex.unit.FlexOffsetSize;
 import com.linecorp.bot.model.message.template.CarouselColumn;
 import com.linecorp.bot.model.message.template.CarouselTemplate;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +38,18 @@ public class LineTemplateUtils {
         if (loaction != null)
             title = "Search: " + loaction;
         URI uri = URI.create("https://line.me/R/nv/location");
-        ButtonsTemplate template = new ButtonsTemplate(null, title, text, Arrays.asList(
-                new URIAction("Send my location", uri, new URIAction.AltUri(uri))));
-        return new TemplateMessage(text, template);
+        List<FlexComponent> bodyContents = Arrays.asList(
+                Text.builder().text(title).weight(Text.TextWeight.BOLD).size(FlexFontSize.XL).build(),  //標頭
+                Text.builder().text(text).margin(FlexMarginSize.SM).offsetTop(FlexOffsetSize.XS).build()
+        );
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).build();
+        List<FlexComponent> footerContents = Arrays.asList(
+                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(new URIAction("Map", uri, new URIAction.AltUri(uri))).build()
+        );
+        Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(footerContents).build();
+        FlexContainer contents = Bubble.builder().header(null).hero(null).body(body).footer(footer)
+                .action(new URIAction("Map", uri, new URIAction.AltUri(uri))).build();
+        return new FlexMessage("Search location", contents);
     }
 
 

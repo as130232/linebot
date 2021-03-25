@@ -22,13 +22,10 @@ import java.util.UUID;
 public class TestController {
     private MessageHandler messageHandler;
     private BeautyCrawlerService beautyCrawlerService;
-    private LineUserRepository lineUserRepository;
     @Autowired
-    public TestController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService,
-                          LineUserRepository lineUserRepository) {
+    public TestController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService) {
         this.messageHandler = messageHandler;
         this.beautyCrawlerService = beautyCrawlerService;
-        this.lineUserRepository = lineUserRepository;
     }
 
     @GetMapping(value = "/preventDormancy")
@@ -51,7 +48,7 @@ public class TestController {
     @GetMapping(value = "/insertUser")
     public String insertUser() {
         String uuid = UUID.randomUUID().toString().substring(0, 33);
-        lineUserRepository.save(LineUserPO.builder().id(uuid).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
+        messageHandler.saveLineUser(uuid);
         return uuid;
     }
 }
