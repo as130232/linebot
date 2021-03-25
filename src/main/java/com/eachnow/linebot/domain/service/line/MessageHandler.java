@@ -95,7 +95,6 @@ public class MessageHandler {
         this.saveLineUser(userId);
     }
 
-    @Transactional
     @EventMapping
     public void handleMemberJoinedEvent(MemberJoinedEvent event) {
         log.info("用戶加入群組，handleMemberJoinedEvent，event: " + event);
