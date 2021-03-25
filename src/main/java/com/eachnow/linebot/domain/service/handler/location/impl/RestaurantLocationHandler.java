@@ -86,7 +86,7 @@ public class RestaurantLocationHandler implements LocationHandler {
             List<FlexComponent> menuButtonContents = Arrays.asList(Button.builder().height(Button.ButtonHeight.SMALL).style(Button.ButtonStyle.PRIMARY).action(new URIAction("Menu", menuUrl, new URIAction.AltUri(menuUrl))).build());
             Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(menuButtonContents).build();
             Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(footer)
-                    .action(new URIAction("地圖", googleMapUrl, new URIAction.AltUri(googleMapUrl))).build();
+                    .action(new URIAction("Map", googleMapUrl, new URIAction.AltUri(googleMapUrl))).build();
             return bubble;
         }).collect(Collectors.toList());
         FlexContainer contents = Carousel.builder().contents(listBubble).build();

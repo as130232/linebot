@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * 處理各項Line事件服務
@@ -48,6 +49,16 @@ public class MessageHandler {
         return commandHandler.execute(text);
     }
 
+    private void saveLineUser(String userId) {
+        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
+        if (optional.isPresent()) {
+            log.error("該Line用戶已存在! userId:{}", userId);
+            return;
+        }
+        lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
+        log.info("新增line user，成功。userId:{}", userId);
+    }
+
     /**
      * 當邀請好友、有成員加入該群組時，將該用戶userId新增至DB中
      */
@@ -55,15 +66,14 @@ public class MessageHandler {
     public void handleFollowEvent(FollowEvent event) {
         log.info("handleFollowEvent，event: " + event);
         String userId = event.getSource().getUserId();
-        lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
-        log.info("新增line user，成功。userId:{}, senderId:{}", userId, event.getSource().getSenderId());
+        this.saveLineUser(userId);
     }
+
     @EventMapping
     public void handleMemberJoinedEvent(MemberJoinedEvent event) {
         log.info("handleMemberJoinedEvent，event: " + event);
         String userId = event.getSource().getUserId();
-        lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
-        log.info("新增line user，成功。userId:{}, senderId:{}", userId, event.getSource().getSenderId());
+        this.saveLineUser(userId);
     }
 
     /**
