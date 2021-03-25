@@ -37,60 +37,20 @@ import java.util.Optional;
 public class MessageHandler {
     private CommandHandlerFactory handlerCommandFactory;
     private LocationHandlerFactory locationHandlerFactory;
-    private LineUserRepository lineUserRepository;
-    private LineGroupUserRepository lineGroupUserRepository;
+    private LineUserService lineUserService;
 
     @Autowired
     public MessageHandler(CommandHandlerFactory handlerCommandFactory,
                           LocationHandlerFactory locationHandlerFactory,
-                          LineUserRepository lineUserRepository,
-                          LineGroupUserRepository lineGroupUserRepository) {
+                          LineUserService lineUserService) {
         this.handlerCommandFactory = handlerCommandFactory;
         this.locationHandlerFactory = locationHandlerFactory;
-        this.lineUserRepository = lineUserRepository;
-        this.lineGroupUserRepository = lineGroupUserRepository;
+        this.lineUserService = lineUserService;
     }
 
     public Message executeCommand(String text) {
         CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(text);
         return commandHandler.execute(text);
-    }
-
-    @Transactional
-    public void saveLineGroupAndUser(String userId, String groupId) {
-        //先新增用戶
-        this.saveLineUser(userId);
-        //在新增群組關聯
-        this.saveLineGroupUser(userId, groupId);
-    }
-
-    public void saveLineUser(String userId) {
-        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
-        if (optional.isPresent()) {
-            log.error("該line用戶已存在! userId:{}", userId);
-            return;
-        }
-        lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
-        log.info("新增line user，成功。userId:{}", userId);
-    }
-
-    public void saveLineGroupUser(String userId, String groupId) {
-        Optional<LineGroupUserPO> optional = lineGroupUserRepository.findByUserIdAndGroupId(userId, groupId);
-        if (optional.isPresent()) {
-            log.error("該line群組對應用戶已存在! userId:{}, groupId:{}", userId, groupId);
-            return;
-        }
-        lineGroupUserRepository.save(LineGroupUserPO.builder().userId(userId).groupId(groupId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
-        log.info("新增line group user，成功。userId:{}, groupId:{}", userId, groupId);
-    }
-
-    private void removeLineGroupUser(String userId, String groupId) {
-        Optional<LineGroupUserPO> optional = lineGroupUserRepository.findByUserIdAndGroupId(userId, groupId);
-        if (optional.isPresent()) {
-            lineGroupUserRepository.delete(optional.get());
-            log.info("移除line group user，成功。userId:{}, groupId:{}", userId, groupId);
-        }
-        log.error("找不到該line群組對應用戶! userId:{}, groupId:{}", userId, groupId);
     }
 
     /**
@@ -100,7 +60,7 @@ public class MessageHandler {
     public void handleFollowEvent(FollowEvent event) {
         log.info("用戶接受邀請，handleFollowEvent，event: " + event);
         String userId = event.getSource().getUserId();
-        this.saveLineUser(userId);
+        lineUserService.saveLineUser(userId);
     }
 
     @EventMapping
@@ -108,7 +68,7 @@ public class MessageHandler {
         log.info("用戶加入群組，handleMemberJoinedEvent，event: " + event);
         GroupSource groupSource = (GroupSource) event.getSource();
         String userId = event.getJoined().getMembers().get(0).getUserId();
-        saveLineGroupAndUser(userId, groupSource.getGroupId());
+        lineUserService.saveLineGroupAndUser(userId, groupSource.getGroupId());
     }
 
     @EventMapping
@@ -117,7 +77,7 @@ public class MessageHandler {
         GroupSource groupSource = (GroupSource) event.getSource();
         String userId = event.getLeft().getMembers().get(0).getUserId();
         //在新增群組關聯
-        this.removeLineGroupUser(userId, groupSource.getGroupId());
+        lineUserService.removeLineGroupUser(userId, groupSource.getGroupId());
     }
 
     /**
