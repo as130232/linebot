@@ -1,9 +1,5 @@
 package com.eachnow.linebot.domain.service.line;
 
-import com.eachnow.linebot.common.db.po.LineGroupUserPO;
-import com.eachnow.linebot.common.db.po.LineUserPO;
-import com.eachnow.linebot.common.db.repository.LineGroupUserRepository;
-import com.eachnow.linebot.common.db.repository.LineUserRepository;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
@@ -18,12 +14,8 @@ import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.Optional;
 
 /**
  * 處理各項Line事件服務

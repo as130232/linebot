@@ -44,7 +44,7 @@ public class LineTemplateUtils {
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).build();
         List<FlexComponent> footerContents = Arrays.asList(
-                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(new URIAction("Map", uri, new URIAction.AltUri(uri))).build()
+                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(new URIAction("Send my location", uri, new URIAction.AltUri(uri))).build()
         );
         Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(footerContents).build();
         FlexContainer contents = Bubble.builder().header(null).hero(null).body(body).footer(footer)

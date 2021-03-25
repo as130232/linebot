@@ -97,7 +97,7 @@ public class CommandHandlerFactory {
                 commandHandler = closeResidentCommandHandler;
             }
             //檢查該指令是否為常駐指令
-            Command commandClass = commandHandlerClass.getAnnotation(Command.class);
+            Command commandClass = commandHandler.getClass().getAnnotation(Command.class);
             if (commandClass.resident())
                 residentCommandHandler = commandHandler;
             return commandHandler;
