@@ -70,18 +70,12 @@ public class CurrencyHandler implements CommandHandler {
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.NONE).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
         String data = commandPO.getText();
-        List<QuickReplyItem> items = Arrays.stream(CurrencyEnum.values()).map(currencyEnum -> {
+        List<QuickReplyItem> items = CurrencyEnum.listCurrencyForQuickReply().stream().map(currencyEnum -> {
             return QuickReplyItem.builder().action(PostbackAction.builder().label(currencyEnum.getName())
                     .data(data + currencyEnum.getName()).build()).build();
         }).collect(Collectors.toList());
         QuickReply quickReply = QuickReply.builder().items(items).build();
         return FlexMessage.builder().altText("Currency即時匯率").contents(contents).quickReply(quickReply).build();
     }
-
-//    @PostConstruct
-//    private void test(){
-//        CommandPO commandPO = CommandPO.builder().command("翻譯").text("翻譯").params(new ArrayList<>()).build();
-//        this.execute(commandPO);
-//    }
 
 }

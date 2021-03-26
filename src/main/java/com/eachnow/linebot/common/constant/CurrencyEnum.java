@@ -17,8 +17,8 @@ public enum CurrencyEnum {
     KRW("USDKRW", "韓元"),
     SGD("USDSGD", "新加坡元"),
     THB("USDTHB", "泰銖"),
-    INR("USDINR", "印度盧比"),
     VND("USDVND", "越南盾"),
+    INR("USDINR", "印度盧比"),
     GBP("USDGBP", "英鎊"),
     EUR("USDEUR", "歐元"),
     CHF("USDCHF", "瑞士法郎"),
@@ -46,5 +46,11 @@ public enum CurrencyEnum {
         List<CurrencyEnum> result = Arrays.asList(TWD, CNY, JPY, KRW, GBP, EUR, BTC);
         return result;
     }
+
+    public static List<CurrencyEnum> listCurrencyForQuickReply() {
+        List<CurrencyEnum> result = Arrays.asList(USD, TWD, CNY, HKD, MOP, JPY, KRW, SGD, THB, GBP, EUR, CHF, BTC);
+        return result;
+    }
+
 
 }
