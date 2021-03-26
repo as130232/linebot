@@ -43,6 +43,9 @@ public class CommandHandlerFactory {
     @Autowired
     private BookkeepingHandler bookkeepingHandler;
     @Autowired
+    private CurrencyHandler currencyHandler;
+
+    @Autowired
     private DefaultHandler defaultHandler;
 
     @Autowired
@@ -79,6 +82,8 @@ public class CommandHandlerFactory {
                 commandHandler = instagramHandler;
             } else if (BookkeepingHandler.class.equals(commandHandlerClass)) {
                 commandHandler = bookkeepingHandler;
+            } else if (CurrencyHandler.class.equals(commandHandlerClass)) {
+                commandHandler = currencyHandler;
             } else if (WeatherHandler.class.equals(commandHandlerClass)) {
                 commandHandler = weatherHandler;
             } else if (EatWhatHandler.class.equals(commandHandlerClass)) {

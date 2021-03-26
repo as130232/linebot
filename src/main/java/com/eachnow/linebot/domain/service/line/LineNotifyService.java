@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 public class LineNotifyService {
     private RestTemplate restTemplate;
     private LineConfig lineConfig;
-
+    private final String BASE_URL = "https://notify-api.line.me/api/notify";
     @Autowired
     public LineNotifyService(RestTemplate restTemplate, LineConfig lineConfig) {
         this.restTemplate = restTemplate;
@@ -40,7 +40,7 @@ public class LineNotifyService {
     public void send(Integer type, String message) {
         try {
             HttpEntity<String> entity = new HttpEntity<>(null, getHttpHeaders(type));
-            ResponseEntity<String> response = restTemplate.exchange("https://notify-api.line.me/api/notify",
+            ResponseEntity<String> response = restTemplate.exchange(BASE_URL + "?message=" + message,
                     HttpMethod.POST, entity, String.class);
             log.info("[Line Notify]發送訊息，成功。message:{}", message);
         } catch (Exception e) {
