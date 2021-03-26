@@ -43,7 +43,6 @@ public class BeautyHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         String text = commandPO.getText();
-        log.info("表特commandPO:{}", commandPO);
         if (text.contains("存")) {
             //TODO currentPicture新增至DB
             //return new TextMessage("儲存成功。");

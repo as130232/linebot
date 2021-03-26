@@ -12,7 +12,7 @@ public class ParamterUtils {
 
     public static List<String> parse(String text) {
         String[] paramArr = text.split(" ");
-        return Arrays.asList(paramArr);
+        return new ArrayList<>(Arrays.asList(paramArr));
     }
 
     /**
