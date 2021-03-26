@@ -2,9 +2,9 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.InstagramParamEnum;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.ig.Graphql;
 import com.eachnow.linebot.common.po.ig.User;
-import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.crawler.WebDriverFactory;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -53,8 +53,10 @@ public class InstagramHandler implements CommandHandler {
 //    }
 
     @Override
-    public Message execute(String parameters) {
-        String account = ParamterUtils.getParameter(parameters);
+    public Message execute(CommandPO commandPO) {
+        String account = null;
+        if (commandPO.getParams().size() > 0)
+            account = commandPO.getParams().get(0);
         User user = getAccountInfo(account);
         if (user == null)
             return null;
@@ -118,7 +120,7 @@ public class InstagramHandler implements CommandHandler {
         }
     }
 
-//    @PostConstruct
+    //    @PostConstruct
     private void login() {
         log.info("準備登入IG");
         WebDriver driver = webDriverFactory.bulidDriver(INSTAGRAM_BASE_URI, false);

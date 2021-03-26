@@ -2,6 +2,7 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.LineTemplateUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandlerFactory;
@@ -18,7 +19,7 @@ public class BarHandler implements CommandHandler {
     }
 
     @Override
-    public Message execute(String parameters) {
+    public Message execute(CommandPO commandPO) {
         LocationHandlerFactory.type = GooglePlaceTypeEnum.BAR;
         return LineTemplateUtils.getLocationButtonsTemplate(LocationHandlerFactory.type.getName());
     }

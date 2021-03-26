@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 public class GoogleApiServiceImpl implements GoogleApiService {
     @Value("${google.api.key}")
     private String GOOGLE_API_KEY;
+    private final String BASE_URL = "https://translation.googleapis.com/language/translate/v2";
     private RestTemplate restTemplate;
 
     @Autowired
@@ -38,7 +39,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
     @Override
     public String translate(String text, String lang) {
         try {
-            String url = "https://translation.googleapis.com/language/translate/v2?key=" + GOOGLE_API_KEY;
+            String url = BASE_URL + "?key=" + GOOGLE_API_KEY;
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");

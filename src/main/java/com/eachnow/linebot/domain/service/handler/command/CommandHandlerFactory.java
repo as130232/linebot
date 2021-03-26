@@ -1,7 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.command;
 
 import com.eachnow.linebot.common.annotation.Command;
-import com.eachnow.linebot.common.util.ParamterUtils;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.domain.service.handler.DefaultHandler;
 import com.eachnow.linebot.domain.service.handler.command.impl.*;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,8 @@ public class CommandHandlerFactory {
     private PlaceHandler placeHandler;
     @Autowired
     private HelloHandler helloHandler;
-
+    @Autowired
+    private BookkeepingHandler bookkeepingHandler;
     @Autowired
     private DefaultHandler defaultHandler;
 
@@ -53,12 +54,13 @@ public class CommandHandlerFactory {
         this.handlerMap = handlerMap;
     }
 
-    public CommandHandler getCommandHandler(String text) {
-        String command = ParamterUtils.parseCommand(text);
-        log.info("command:{}", text);
+    public CommandHandler getCommandHandler(CommandPO commandPO) {
+        String command = commandPO.getCommand();
+        String paramters = commandPO.getText();
+        log.info("command:{}, paramters", command);
         CommandHandler commandHandler = defaultHandler;
         //若已下達常駐指令，則直到關閉為止
-        if (residentCommandHandler != null && !text.contains("@close"))
+        if (residentCommandHandler != null && !paramters.contains("@close"))
             return residentCommandHandler;
         if (command == null || "".equals(command))
             return commandHandler;
@@ -75,6 +77,8 @@ public class CommandHandlerFactory {
                 commandHandler = actressHandler;
             } else if (InstagramHandler.class.equals(commandHandlerClass)) {
                 commandHandler = instagramHandler;
+            } else if (BookkeepingHandler.class.equals(commandHandlerClass)) {
+                commandHandler = bookkeepingHandler;
             } else if (WeatherHandler.class.equals(commandHandlerClass)) {
                 commandHandler = weatherHandler;
             } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
@@ -89,9 +93,9 @@ public class CommandHandlerFactory {
                 commandHandler = helloHandler;
             } else if (TranslationButtonHandler.class.equals(commandHandlerClass)) {
                 commandHandler = translationButtonHandler;
-            }else if (TranslationHandler.class.equals(commandHandlerClass)) {
+            } else if (TranslationHandler.class.equals(commandHandlerClass)) {
                 commandHandler = translationHandler;
-                translationHandler.setCurrentLang(text);    //設定翻譯語言
+                translationHandler.setCurrentLang(paramters);    //設定翻譯語言
             } else if (CloseResidentCommandHandler.class.equals(commandHandlerClass) && residentCommandHandler != null) {
                 residentCommandHandler = null;   //關閉常駐指令
                 commandHandler = closeResidentCommandHandler;

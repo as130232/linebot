@@ -2,6 +2,7 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.annotation.Description;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.URIAction;
@@ -40,22 +41,23 @@ public class BeautyHandler implements CommandHandler {
     }
 
     @Override
-    public Message execute(String parameters) {
-        if (parameters.contains("存")) {
+    public Message execute(CommandPO commandPO) {
+        String text = commandPO.getText();
+        if (text.contains("存")) {
             //TODO currentPicture新增至DB
             //return new TextMessage("儲存成功。");
         }
-        if (parameters.contains("size")) {
+        if (text.contains("size")) {
             return new TextMessage("圖片資源size:" + beautyCrawlerService.listPicture.size());
         }
-        if (parameters.contains("上一張") && currentPicture != null) {
+        if (text.contains("上一張") && currentPicture != null) {
             URI uri = URI.create(currentPicture);
             return new ImageMessage(uri, uri);
         }
-        if (parameters.contains("爬")) {
+        if (text.contains("爬")) {
             beautyCrawlerService.crawler(1);
         }
-        if (parameters.contains("多") || parameters.contains("more")) {
+        if (text.contains("多") || text.contains("more")) {
             Set<String> pictures = randomListPicture(10);
             if (pictures.size() == 0) {
                 beautyCrawlerService.crawler(2);
@@ -72,7 +74,7 @@ public class BeautyHandler implements CommandHandler {
             FlexContainer contents = Carousel.builder().contents(listBubble).build();
             return new FlexMessage("表特精選", contents);
         }
-        if (parameters.contains("refresh"))
+        if (text.contains("refresh"))
             beautyCrawlerService.init(); //重新取得圖片資源
         if (beautyCrawlerService.listPicture.size() == 0) {
             beautyCrawlerService.crawler(2);

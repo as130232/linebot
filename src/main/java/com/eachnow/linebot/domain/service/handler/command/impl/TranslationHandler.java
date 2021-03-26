@@ -2,6 +2,7 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.LanguageEnum;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -22,15 +23,17 @@ public class TranslationHandler implements CommandHandler {
     }
 
     @Override
-    public Message execute(String parameters) {
+    public Message execute(CommandPO commandPO) {
+        String parameters = commandPO.getText();
         if (parameters.contains("@translate") || parameters.contains("@翻譯"))
             return new TextMessage("[Translate mode已開啟翻譯模式]");
+        //當已開啟翻譯模式時，commandHandlerFactory則會一直回傳該TranslationHandler，即使text中不含"@translate"字眼，值到用戶輸入@close後關閉該常駐程式
         String result = googleApiService.translate(parameters, lang.getLang());
         return new TextMessage(result);
     }
 
     public void setCurrentLang(String text) {
-        this.lang = LanguageEnum.parse(ParamterUtils.getParameter(text));
+        this.lang = LanguageEnum.parse(ParamterUtils.getIndexOneParameter(text));
     }
 
 }

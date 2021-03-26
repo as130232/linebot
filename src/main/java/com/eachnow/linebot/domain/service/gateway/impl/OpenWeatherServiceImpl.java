@@ -9,13 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-
 @Slf4j
 @Component
 public class OpenWeatherServiceImpl implements OpenWeatherService {
     @Value("${open.weather.auth.code}")
     private String AUTH_CODE;
+    private final String BASE_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001";
     private RestTemplate restTemplate;
 
 
@@ -26,7 +25,7 @@ public class OpenWeatherServiceImpl implements OpenWeatherService {
 
     @Override
     public WeatherResultPO getWeatherInfo(String locationName, String elementName) {
-        String url = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001?Authorization=" + AUTH_CODE;
+        String url = BASE_URL + "?Authorization=" + AUTH_CODE;
         if (locationName != null)
             url = url + "&locationName=" + locationName;
         if (elementName != null)

@@ -3,6 +3,7 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.constant.LanguageEnum;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.PostbackAction;
@@ -17,7 +18,7 @@ import java.util.Arrays;
 
 @Slf4j
 @Description("翻譯(選擇對應語系按鈕)")
-@Command(value = {"translate", "翻譯"})
+@Command(value = {"translate", "翻譯", "@translate"})
 public class TranslationButtonHandler implements CommandHandler {
     private GoogleApiService googleApiService;
     private LanguageEnum lang;
@@ -28,7 +29,7 @@ public class TranslationButtonHandler implements CommandHandler {
     }
 
     @Override
-    public Message execute(String parameters) {
+    public Message execute(CommandPO commandPO) {
         String translateKey = "@translate ";
         QuickReply quickReply = QuickReply.builder().items(
                 Arrays.asList(

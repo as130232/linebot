@@ -3,9 +3,9 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.constant.WeatherElementEnum;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
-import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.message.Message;
@@ -33,13 +33,15 @@ public class WeatherHandler implements CommandHandler {
     }
 
     @Override
-    public Message execute(String parameters) {
-        parameters = parameters.replace("台", "臺");
-        List<String> params = ParamterUtils.parse(parameters);
-        String locationName = params.size() > 1 ? params.get(1) : null;
-        String elementName = params.size() > 2 ? WeatherElementEnum.getElement(params.get(2)) : null;
+    public Message execute(CommandPO commandPO) {
+        String text = commandPO.getText();
+        text = text.replace("台", "臺");
+        List<String> params = commandPO.getParams();
+        String locationName = params.size() > 0 ? params.get(0) : null;
+        String elementName = params.size() > 1 ? WeatherElementEnum.getElement(params.get(1)) : null;
         WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, elementName);
-
+        if (weatherResultPO.getRecords().getLocation().size() == 0)
+            return new TextMessage("查無此地:" + locationName);
         StringBuilder sb = new StringBuilder();
         sb.append(" - " + weatherResultPO.getRecords().getDatasetDescription() + " - ");
         sb.append("\n");

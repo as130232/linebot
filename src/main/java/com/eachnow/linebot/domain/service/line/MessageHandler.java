@@ -1,5 +1,7 @@
 package com.eachnow.linebot.domain.service.line;
 
+import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
 import com.eachnow.linebot.domain.service.handler.location.LocationHandler;
@@ -40,9 +42,11 @@ public class MessageHandler {
         this.lineUserService = lineUserService;
     }
 
-    public Message executeCommand(String text) {
-        CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(text);
-        return commandHandler.execute(text);
+    public Message executeCommand(String userId, String text) {
+        CommandPO commandPO = CommandPO.builder().userId(userId).text(text)
+                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+        CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(commandPO);
+        return commandHandler.execute(commandPO);
     }
 
     /**
@@ -80,7 +84,7 @@ public class MessageHandler {
         log.info("userId:{}, event:{}", event.getSource().getUserId(), event);
         final String text = event.getMessage().getText();
         //根據指令取得對應指令處理服務
-        return executeCommand(text);
+        return executeCommand(event.getSource().getUserId(), text);
     }
 
     /**
@@ -98,7 +102,7 @@ public class MessageHandler {
         log.info("handlePostbackEvent，event: " + event);
         final String text = event.getPostbackContent().getData();
         //根據指令取得對應指令處理服務
-        return executeCommand(text);
+        return executeCommand(event.getSource().getUserId(), text);
     }
 
     @EventMapping

@@ -1,0 +1,87 @@
+package com.eachnow.linebot.domain.service.handler.command.impl;
+
+import com.eachnow.linebot.common.annotation.Command;
+import com.eachnow.linebot.common.constant.CurrencyEnum;
+import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.util.CurrencyUtils;
+import com.eachnow.linebot.domain.service.gateway.CurrencyService;
+import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
+import com.linecorp.bot.model.action.PostbackAction;
+import com.linecorp.bot.model.message.FlexMessage;
+import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.flex.component.Box;
+import com.linecorp.bot.model.message.flex.component.FlexComponent;
+import com.linecorp.bot.model.message.flex.component.Separator;
+import com.linecorp.bot.model.message.flex.component.Text;
+import com.linecorp.bot.model.message.flex.container.Bubble;
+import com.linecorp.bot.model.message.flex.container.FlexContainer;
+import com.linecorp.bot.model.message.flex.unit.*;
+import com.linecorp.bot.model.message.quickreply.QuickReply;
+import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Slf4j
+@Command({"currency", "幣", "匯率"})
+public class CurrencyHandler implements CommandHandler {
+    private CurrencyService currencyService;
+
+    @Autowired
+    public CurrencyHandler(CurrencyService currencyService) {
+        this.currencyService = currencyService;
+    }
+
+    @Override
+    public Message execute(CommandPO commandPO) {
+        JSONObject jsonObject = currencyService.getCurrency();
+        CurrencyEnum from = commandPO.getParams().size() > 0 ? CurrencyEnum.parse(commandPO.getParams().get(0)) : null;
+        CurrencyEnum to = commandPO.getParams().size() > 1 ? CurrencyEnum.parse(commandPO.getParams().get(1)) : null;
+        String amount = commandPO.getParams().size() > 2 ? commandPO.getParams().get(2) : null;
+
+        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("即時匯率").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#27ACB2").build();
+
+        List<CurrencyEnum> listCommonCurrencyEnum = CurrencyEnum.commonCurrency();
+        List<FlexComponent> bodyContents = new ArrayList<>();
+        Text usdText = Text.builder().text("1 美金(USD) = ").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).offsetBottom(FlexOffsetSize.SM).build();
+        bodyContents.add(usdText);
+        listCommonCurrencyEnum.stream().forEach(currencyEnum -> {
+            BigDecimal exrate = CurrencyUtils.getExrate(jsonObject, currencyEnum.getKey());
+            List<FlexComponent> currencyContents = Arrays.asList(
+                    //幣值名稱
+                    Text.builder().text(currencyEnum.getName() + "({code})".replace("{code}", currencyEnum.toString()))
+                            .size(FlexFontSize.SM).color("#555555").flex(0).build(),
+                    //匯率
+                    Text.builder().text("${exrate}".replace("{exrate}", exrate.toString())).size(FlexFontSize.SM).color("#111111").align(FlexAlign.END).build()
+            );
+            Box currencyBody = Box.builder().layout(FlexLayout.HORIZONTAL).contents(currencyContents).margin(FlexMarginSize.SM).build();
+            bodyContents.add(currencyBody);
+            Separator separator = Separator.builder().margin(FlexMarginSize.XS).color("#666666").build();
+            bodyContents.add(separator);
+        });
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.NONE).build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
+        String data = commandPO.getText();
+        List<QuickReplyItem> items = Arrays.stream(CurrencyEnum.values()).map(currencyEnum -> {
+            return QuickReplyItem.builder().action(PostbackAction.builder().label(currencyEnum.getName())
+                    .data(data + currencyEnum.getName()).build()).build();
+        }).collect(Collectors.toList());
+        QuickReply quickReply = QuickReply.builder().items(items).build();
+        return FlexMessage.builder().altText("Currency即時匯率").contents(contents).quickReply(quickReply).build();
+    }
+
+//    @PostConstruct
+//    private void test(){
+//        CommandPO commandPO = CommandPO.builder().command("翻譯").text("翻譯").params(new ArrayList<>()).build();
+//        this.execute(commandPO);
+//    }
+
+}

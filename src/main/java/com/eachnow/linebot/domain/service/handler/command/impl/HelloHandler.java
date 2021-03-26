@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
+import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.RandomUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.message.Message;
@@ -15,8 +16,8 @@ import java.util.List;
 public class HelloHandler implements CommandHandler {
 
     @Override
-    public Message execute(String parameters) {
-        List<String> list = Arrays.asList("哈囉", "安安", "你好呀魯蛇", "別吵我還沒睡醒",
+    public Message execute(CommandPO commandPO) {
+        List<String> list = Arrays.asList("Hello", "哈囉", "安安", "你好呀魯蛇", "別吵我還沒睡醒",
                 "你是天線寶寶嗎？太陽出來囉～", "好個屁今天又不是星期五");
         String text = (String) RandomUtils.randomElement(list);
         return new TextMessage(text);
