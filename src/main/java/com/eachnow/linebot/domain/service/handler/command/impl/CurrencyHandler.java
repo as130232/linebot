@@ -67,7 +67,7 @@ public class CurrencyHandler implements CommandHandler {
             Separator separator = Separator.builder().margin(FlexMarginSize.XS).color("#666666").build();
             bodyContents.add(separator);
         });
-        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.NONE).build();
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
         String data = commandPO.getText();
         List<QuickReplyItem> items = CurrencyEnum.listCurrencyForQuickReply().stream().map(currencyEnum -> {
