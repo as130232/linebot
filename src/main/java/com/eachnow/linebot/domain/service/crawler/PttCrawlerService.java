@@ -1,5 +1,7 @@
 package com.eachnow.linebot.domain.service.crawler;
 
+import com.eachnow.linebot.common.constant.LineNotifyConstant;
+import com.eachnow.linebot.domain.service.line.LineNotifyService;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -15,10 +17,13 @@ import java.util.stream.Collectors;
 @Component
 public class PttCrawlerService {
     private WebDriverFactory webDriverFactory;
+    private LineNotifyService lineNotifyService;
 
     @Autowired
-    public PttCrawlerService(WebDriverFactory webDriverFactory) {
+    public PttCrawlerService(WebDriverFactory webDriverFactory,
+                             LineNotifyService lineNotifyService) {
         this.webDriverFactory = webDriverFactory;
+        this.lineNotifyService = lineNotifyService;
     }
 
     public List<String> crawler(String url, int pageSize) {
@@ -34,6 +39,8 @@ public class PttCrawlerService {
         }
         driver.quit();
         log.info("爬取PTT版，完成。url:{}", url);
+        //發送訊息通知
+        lineNotifyService.send(LineNotifyConstant.OWN, "爬取PTT版，完成。url:" + url);
         return result;
     }
 
