@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +65,12 @@ public class CurrencyHandler implements CommandHandler {
             bodyContents.add(currencyBody);
             Separator separator = Separator.builder().margin(FlexMarginSize.XS).color("#666666").build();
             bodyContents.add(separator);
+
         });
+        //最後更新時間
+        String utc = CurrencyUtils.getUtc(jsonObject, CurrencyEnum.TWD.getKey());
+        Text utcText = Text.builder().text(utc).size(FlexFontSize.XS).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.REGULAR).align(FlexAlign.END).margin(FlexMarginSize.XS).offsetTop(FlexOffsetSize.MD).build();
+        bodyContents.add(utcText);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
         String data = commandPO.getText();
