@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 @Slf4j
 @Description("翻譯(選擇對應語系按鈕)")
-@Command(value = {"translate", "翻譯", "@translate"})
+@Command(value = {"translate", "翻譯"})
 public class TranslationButtonHandler implements CommandHandler {
     private GoogleApiService googleApiService;
     private LanguageEnum lang;
