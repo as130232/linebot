@@ -9,6 +9,7 @@ import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
 import com.linecorp.bot.model.message.flex.component.FlexComponent;
 import com.linecorp.bot.model.message.flex.component.Separator;
@@ -44,6 +45,23 @@ public class CurrencyHandler implements CommandHandler {
         CurrencyEnum from = commandPO.getParams().size() > 0 ? CurrencyEnum.parse(commandPO.getParams().get(0)) : null;
         CurrencyEnum to = commandPO.getParams().size() > 1 ? CurrencyEnum.parse(commandPO.getParams().get(1)) : null;
         String amount = commandPO.getParams().size() > 2 ? commandPO.getParams().get(2) : null;
+        if (commandPO.getText().equals(commandPO.getCommand()) && to == null) {
+            QuickReply quickReply = getQuickReply(commandPO.getText() + " ");
+            return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 請選擇欲轉換貨幣。").quickReply(quickReply).build();
+        }
+        if (commandPO.getText().equals(commandPO.getCommand()) && amount == null) {
+            QuickReply quickReply = getQuickReply(commandPO.getText() + " ");
+            return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 欲轉換貨幣為: " + to.getName() + ", 請輸入轉換金額。").build();
+        }
+        //轉換匯率
+        if (from != null && to != null && amount != null) {
+            BigDecimal fromExrate = CurrencyUtils.getExrate(jsonObject, from.getKey());
+            BigDecimal toExrate = CurrencyUtils.getExrate(jsonObject, from.getKey());
+            //公式 = 1美金 除 原貨幣 乘 轉換貨幣 乘 金額(在四捨五入)
+            BigDecimal result = (BigDecimal.valueOf(1l).divide(fromExrate).multiply(toExrate).multiply(new BigDecimal(amount)));
+            result = result.setScale(2, BigDecimal.ROUND_HALF_UP);
+            return TextMessage.builder().text(from.getName() + ":" + amount + " = " + to.getName() + ":" + result).build();
+        }
 
         List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("即時匯率").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#27ACB2").build();
@@ -73,13 +91,23 @@ public class CurrencyHandler implements CommandHandler {
         bodyContents.add(utcText);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
-        String data = commandPO.getText();
+        String data = this.getClass().getAnnotation(Command.class).value()[0];  //取得該指令，讓Postback再回到該command handler
+        QuickReply quickReply = getQuickReply(data);
+        return FlexMessage.builder().altText("Currency即時匯率").contents(contents).quickReply(quickReply).build();
+    }
+
+
+    private QuickReply getQuickReply(String data) {
         List<QuickReplyItem> items = CurrencyEnum.listCurrencyForQuickReply().stream().map(currencyEnum -> {
             return QuickReplyItem.builder().action(PostbackAction.builder().label(currencyEnum.getName())
                     .data(data + currencyEnum.getName()).build()).build();
         }).collect(Collectors.toList());
         QuickReply quickReply = QuickReply.builder().items(items).build();
-        return FlexMessage.builder().altText("Currency即時匯率").contents(contents).quickReply(quickReply).build();
+        return quickReply;
+    }
+
+    private String getFormat() {
+        return "貨幣 {原始幣值} {轉換幣值} {金額}";
     }
 
 }
