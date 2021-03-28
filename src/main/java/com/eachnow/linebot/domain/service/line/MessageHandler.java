@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,7 +34,7 @@ public class MessageHandler {
     private CommandHandlerFactory handlerCommandFactory;
     private LocationHandlerFactory locationHandlerFactory;
     private LineUserService lineUserService;
-    public static Map<String, String> userAndCacheCommand = null;   //緩存command通常用於command handler持續性，即使沒有包含該command字眼
+    public static Map<String, String> userAndCacheCommand = new HashMap<>();   //緩存command通常用於command handler持續性，即使沒有包含該command字眼
 
     @Autowired
     public MessageHandler(CommandHandlerFactory handlerCommandFactory,
