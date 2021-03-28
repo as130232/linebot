@@ -45,11 +45,11 @@ public class CurrencyHandler implements CommandHandler {
         CurrencyEnum from = commandPO.getParams().size() > 0 ? CurrencyEnum.parse(commandPO.getParams().get(0)) : null;
         CurrencyEnum to = commandPO.getParams().size() > 1 ? CurrencyEnum.parse(commandPO.getParams().get(1)) : null;
         String amount = commandPO.getParams().size() > 2 ? commandPO.getParams().get(2) : null;
-        if (commandPO.getText().equals(commandPO.getCommand()) && to == null) {
+        if (!commandPO.getText().equals(commandPO.getCommand()) && to == null) {
             QuickReply quickReply = getQuickReply(commandPO.getText() + " ");
             return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 請選擇欲轉換貨幣。").quickReply(quickReply).build();
         }
-        if (commandPO.getText().equals(commandPO.getCommand()) && amount == null) {
+        if (!commandPO.getText().equals(commandPO.getCommand()) && amount == null) {
             QuickReply quickReply = getQuickReply(commandPO.getText() + " ");
             return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 欲轉換貨幣為: " + to.getName() + ", 請輸入轉換金額。").build();
         }
