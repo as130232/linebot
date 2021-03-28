@@ -18,8 +18,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Component
 public class ActressCrawlerService {
 
-    private PttCrawlerService pttCrawlerService;
     private final ThreadPoolExecutor pttCrawlerExecutor;
+    private PttCrawlerService pttCrawlerService;
 
     public final Integer MAX_SIZE = 500;
     public List<String> listPicture = new ArrayList<>(MAX_SIZE);
@@ -54,7 +54,7 @@ public class ActressCrawlerService {
         listPicture.addAll(listPictureOnPage);
         if (listPicture.size() > MAX_SIZE) {
             int i = 0;
-            while (listPicture.size() == MAX_SIZE) {
+            while (listPicture.size() > MAX_SIZE) {
                 listPicture.remove(i);
                 i++;
             }
