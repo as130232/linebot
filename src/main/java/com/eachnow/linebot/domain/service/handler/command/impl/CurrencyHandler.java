@@ -4,6 +4,7 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.CurrencyEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.CurrencyUtils;
+import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.CurrencyService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.PostbackAction;
@@ -23,11 +24,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.math.BigDecimal.ROUND_HALF_DOWN;
 
 @Slf4j
 @Command({"currency", "幣", "匯率"})
@@ -56,9 +60,9 @@ public class CurrencyHandler implements CommandHandler {
         //轉換匯率
         if (from != null && to != null && amount != null) {
             BigDecimal fromExrate = CurrencyUtils.getExrate(jsonObject, from.getKey());
-            BigDecimal toExrate = CurrencyUtils.getExrate(jsonObject, from.getKey());
+            BigDecimal toExrate = CurrencyUtils.getExrate(jsonObject, to.getKey());
             //公式 = 1美金 除 原貨幣 乘 轉換貨幣 乘 金額(在四捨五入)
-            BigDecimal result = (BigDecimal.valueOf(1l).divide(fromExrate).multiply(toExrate).multiply(new BigDecimal(amount)));
+            BigDecimal result = (BigDecimal.valueOf(1l).divide(fromExrate, 4, ROUND_HALF_DOWN).multiply(toExrate).multiply(new BigDecimal(amount)));
             result = result.setScale(2, BigDecimal.ROUND_HALF_UP);
             return TextMessage.builder().text(from.getName() + ":" + amount + " = " + to.getName() + ":" + result).build();
         }
