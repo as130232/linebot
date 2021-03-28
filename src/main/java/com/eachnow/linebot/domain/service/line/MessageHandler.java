@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * 處理各項Line事件服務
@@ -32,7 +33,7 @@ public class MessageHandler {
     private CommandHandlerFactory handlerCommandFactory;
     private LocationHandlerFactory locationHandlerFactory;
     private LineUserService lineUserService;
-    public static String cacheCommand = null;   //緩存command通常用於command handler持續性，即使沒有包含該command字眼
+    public static Map<String, String> userAndCacheCommand = null;   //緩存command通常用於command handler持續性，即使沒有包含該command字眼
 
     @Autowired
     public MessageHandler(CommandHandlerFactory handlerCommandFactory,
@@ -43,9 +44,18 @@ public class MessageHandler {
         this.lineUserService = lineUserService;
     }
 
+    public static void setUserAndCacheCommand(String userId, String text){
+        userAndCacheCommand.put(userId, text);
+    }
+
+    public static void removeUserAndCacheCommand(String userId){
+        userAndCacheCommand.remove(userId);
+    }
+
+
     public Message executeCommand(String userId, String text) {
-        if (cacheCommand != null)
-            text = cacheCommand + text;
+        if (userAndCacheCommand.get(userId) != null)
+            text = userAndCacheCommand.get(userId) + text;
         
         CommandPO commandPO = CommandPO.builder().userId(userId).text(text)
                 .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();

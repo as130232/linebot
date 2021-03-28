@@ -58,12 +58,12 @@ public class CommandHandlerFactory {
     }
 
     public CommandHandler getCommandHandler(CommandPO commandPO) {
+        String text = commandPO.getText();
         String command = commandPO.getCommand();
-        String paramters = commandPO.getText();
-        log.info("command:{}, paramters", command);
+        log.info("text:{}", text);
         CommandHandler commandHandler = defaultHandler;
         //若已下達常駐指令，則直到關閉為止
-        if (residentCommandHandler != null && !paramters.contains("@close"))
+        if (residentCommandHandler != null && !text.contains("@close"))
             return residentCommandHandler;
         if (command == null || "".equals(command))
             return commandHandler;
@@ -100,7 +100,7 @@ public class CommandHandlerFactory {
                 commandHandler = translationButtonHandler;
             } else if (TranslationHandler.class.equals(commandHandlerClass)) {
                 commandHandler = translationHandler;
-                translationHandler.setCurrentLang(paramters);    //設定翻譯語言
+                translationHandler.setCurrentLang(text);    //設定翻譯語言
             } else if (CloseResidentCommandHandler.class.equals(commandHandlerClass) && residentCommandHandler != null) {
                 residentCommandHandler = null;   //關閉常駐指令
                 commandHandler = closeResidentCommandHandler;
