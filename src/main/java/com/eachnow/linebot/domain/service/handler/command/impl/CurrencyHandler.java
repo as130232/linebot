@@ -91,7 +91,7 @@ public class CurrencyHandler implements CommandHandler {
         bodyContents.add(utcText);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
-        String data = this.getClass().getAnnotation(Command.class).value()[0];  //取得該指令，讓Postback再回到該command handler
+        String data = this.getClass().getAnnotation(Command.class).value()[0] + " ";  //取得該指令，讓Postback再回到該command handler
         QuickReply quickReply = getQuickReply(data);
         return FlexMessage.builder().altText("Currency即時匯率").contents(contents).quickReply(quickReply).build();
     }
