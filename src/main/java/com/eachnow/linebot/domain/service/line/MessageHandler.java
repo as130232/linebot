@@ -32,6 +32,7 @@ public class MessageHandler {
     private CommandHandlerFactory handlerCommandFactory;
     private LocationHandlerFactory locationHandlerFactory;
     private LineUserService lineUserService;
+    public static String cacheCommand = null;   //緩存command通常用於command handler持續性，即使沒有包含該command字眼
 
     @Autowired
     public MessageHandler(CommandHandlerFactory handlerCommandFactory,
@@ -43,6 +44,9 @@ public class MessageHandler {
     }
 
     public Message executeCommand(String userId, String text) {
+        if (cacheCommand != null)
+            text = cacheCommand + text;
+        
         CommandPO commandPO = CommandPO.builder().userId(userId).text(text)
                 .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
         CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(commandPO);

@@ -7,6 +7,7 @@ import com.eachnow.linebot.common.util.CurrencyUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.CurrencyService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
+import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
@@ -54,11 +55,12 @@ public class CurrencyHandler implements CommandHandler {
             return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 請選擇欲轉換貨幣。").quickReply(quickReply).build();
         }
         if (!commandPO.getText().equals(commandPO.getCommand()) && amount == null) {
-            QuickReply quickReply = getQuickReply(commandPO.getText() + " ");
+            MessageHandler.cacheCommand = commandPO.getText() + " ";
             return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 欲轉換貨幣為: " + to.getName() + ", 請輸入轉換金額。").build();
         }
         //轉換匯率
         if (from != null && to != null && amount != null) {
+            MessageHandler.cacheCommand = null; //清除cacheCommand
             BigDecimal fromExrate = CurrencyUtils.getExrate(jsonObject, from.getKey());
             BigDecimal toExrate = CurrencyUtils.getExrate(jsonObject, to.getKey());
             //公式 = 1美金 除 原貨幣 乘 轉換貨幣 乘 金額(在四捨五入)
