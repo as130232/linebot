@@ -33,7 +33,7 @@ public class LineNotifyService {
         }
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", key);
+        headers.set("Authorization", "Bearer " + key);
         return headers;
     }
 
