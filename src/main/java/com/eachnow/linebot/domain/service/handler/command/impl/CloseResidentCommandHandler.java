@@ -9,7 +9,7 @@ import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Command({"@close"})
+@Command({"@close", "@關"})
 public class CloseResidentCommandHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {

@@ -59,7 +59,7 @@ public class CommandHandlerFactory {
         log.info("text:{}", text);
         CommandHandler commandHandler = defaultHandler;
         //若已下達常駐指令，則直到下達關閉為止
-        if (command.contains("@close"))
+        if (text.contains("@close") || text.contains("@關"))
             return closeResidentCommandHandler;
         if (command == null || "".equals(command))
             return commandHandler;
