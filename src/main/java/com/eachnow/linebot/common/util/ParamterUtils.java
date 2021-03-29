@@ -5,13 +5,14 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ParamterUtils {
-
+    //串接參數的字串
+    public static String CONTACT = " ";
     public static String parseCommand(String text) {
-        return text.split(" ")[0];
+        return text.split(CONTACT)[0];
     }
 
     public static List<String> parse(String text) {
-        String[] paramArr = text.split(" ");
+        String[] paramArr = text.split(CONTACT);
         return new ArrayList<>(Arrays.asList(paramArr));
     }
 

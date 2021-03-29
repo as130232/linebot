@@ -25,8 +25,6 @@ public class CommandHandlerFactory {
     @Autowired
     private InstagramHandler instagramHandler;
     @Autowired
-    private TranslationHandler translationHandler;
-    @Autowired
     private TranslationButtonHandler translationButtonHandler;
     @Autowired
     private WeatherHandler weatherHandler;
@@ -98,9 +96,6 @@ public class CommandHandlerFactory {
                 commandHandler = helloHandler;
             } else if (TranslationButtonHandler.class.equals(commandHandlerClass)) {
                 commandHandler = translationButtonHandler;
-            } else if (TranslationHandler.class.equals(commandHandlerClass)) {
-                commandHandler = translationHandler;
-                translationHandler.setCurrentLang(text);    //設定翻譯語言
             } else if (CloseResidentCommandHandler.class.equals(commandHandlerClass) && residentCommandHandler != null) {
                 residentCommandHandler = null;   //關閉常駐指令
                 commandHandler = closeResidentCommandHandler;
@@ -110,7 +105,7 @@ public class CommandHandlerFactory {
             if (commandClass.resident())
                 residentCommandHandler = commandHandler;
             return commandHandler;
-//            result = applicationContext.getBean(commandHandlerClass);
+//            return applicationContext.getBean(commandHandlerClass);
 //            result = commandHandlerClass.newInstance();
         } catch (Exception e) {
             log.warn("CommandHandler newInstance failed! command:{}", command);

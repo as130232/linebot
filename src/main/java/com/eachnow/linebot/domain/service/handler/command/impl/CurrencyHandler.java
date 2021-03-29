@@ -4,6 +4,7 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.CurrencyEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.CurrencyUtils;
+import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.CurrencyService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
@@ -53,7 +54,7 @@ public class CurrencyHandler implements CommandHandler {
             return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 請選擇欲轉換貨幣。").quickReply(quickReply).build();
         }
         if (!commandPO.getText().equals(commandPO.getCommand()) && amount == null) {
-            MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), commandPO.getText() + " ");
+            MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), commandPO.getText() + ParamterUtils.CONTACT);
             return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 欲轉換貨幣為: " + to.getName() + ", 請輸入轉換金額。").build();
         }
         //轉換匯率
@@ -95,7 +96,7 @@ public class CurrencyHandler implements CommandHandler {
         bodyContents.add(utcText);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
-        String data = this.getClass().getAnnotation(Command.class).value()[0] + " ";  //取得該指令，讓Postback再回到該command handler
+        String data = this.getClass().getAnnotation(Command.class).value()[0] + ParamterUtils.CONTACT;  //取得該指令，讓Postback再回到該command handler
         QuickReply quickReply = getQuickReply(data);
         return FlexMessage.builder().altText("Currency即時匯率").contents(contents).quickReply(quickReply).build();
     }
