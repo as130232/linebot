@@ -5,24 +5,21 @@ import com.eachnow.linebot.common.constant.CurrencyEnum;
 import com.eachnow.linebot.common.db.po.BookkeepingPO;
 import com.eachnow.linebot.common.db.repository.BookkeepingRepository;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
-import com.linecorp.bot.model.action.PostbackAction;
-import com.linecorp.bot.model.message.FlexMessage;
+import com.linecorp.bot.model.action.Action;
+import com.linecorp.bot.model.action.MessageAction;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
-import com.linecorp.bot.model.message.flex.component.Box;
-import com.linecorp.bot.model.message.flex.component.Button;
-import com.linecorp.bot.model.message.flex.component.FlexComponent;
-import com.linecorp.bot.model.message.flex.component.Text;
-import com.linecorp.bot.model.message.flex.container.Bubble;
-import com.linecorp.bot.model.message.flex.container.FlexContainer;
-import com.linecorp.bot.model.message.flex.unit.*;
+import com.linecorp.bot.model.message.template.ConfirmTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -50,32 +47,35 @@ public class BookkeepingHandler implements CommandHandler {
         if (commandPO.getParams().size() < 2 || !isNumber(amount)) {
             return new TextMessage("請輸入正確格式:" + getFormat() + "，例:記 晚餐 180，注意需空格隔開！");
         }
-
         if (text.contains(CONFIRM)) {
-            BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString()).build();
+            BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
+                    .createTime(new Timestamp((DateUtils.getCurrentEpochMilli()))).build();
             bookkeepingRepository.save(po);
             log.info("記帳成功。BookkeepingPO:{}", po);
             return new TextMessage("記帳成功。");
         } else if (text.contains(CANCEL)) {
             return new TextMessage("記帳已取消。");
         }
-        List<FlexComponent> bodyContents = Arrays.asList(
-                Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
-                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
-                Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build()
-        );
-        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).build();
         String data = commandPO.getCommand() + ParamterUtils.CONTACT + typeName + ParamterUtils.CONTACT +
                 amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT;
-        List<FlexComponent> footerContents = Arrays.asList(
-                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(data + CONFIRM).build()).build(),
-                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(data + CANCEL).build()).build()
-        );
-        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("請問輸入正確嗎?").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
-        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#29bae6").build();
-        Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).build();
-        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
-        return new FlexMessage("記帳確認", contents);
+//        List<FlexComponent> bodyContents = Arrays.asList(
+//                Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
+//                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
+//                Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build()
+//        );
+//        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).build();
+//        List<FlexComponent> footerContents = Arrays.asList(
+//                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(data + CONFIRM).build()).build(),
+//                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(data + CANCEL).build()).build()
+//        );
+//        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("請問輸入正確嗎?").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
+//        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#29bae6").build();
+//        Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).spacing(FlexMarginSize.MD).build();
+//        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
+//        return new FlexMessage("記帳確認", contents);
+        List<Action> actions = Arrays.asList(new MessageAction("確定", data + CONFIRM), new MessageAction("取消", data + CANCEL));
+        ConfirmTemplate confirmTemplate = new ConfirmTemplate("請問輸入正確嗎?\n金額: " + amount + "\n幣值: " + currencyEnum.getName() + "\n類型: " + typeName, actions);
+        return new TemplateMessage("記帳確認", confirmTemplate);
     }
 
     public String getFormat() {

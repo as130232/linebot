@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.constant.WeatherElementEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
+import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -24,9 +25,6 @@ import java.util.List;
 @Command({"天氣"})
 public class WeatherHandler implements CommandHandler {
     private OpenWeatherService openWeatherService;
-    public static final ZoneId CST_ZONE_ID = ZoneId.of("Asia/Taipei");
-    public static final DateTimeFormatter yyyyMMddHHmmssDash = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(CST_ZONE_ID);
-    public static final DateTimeFormatter yyyyMMddHHmmDash = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(CST_ZONE_ID);
 
     @Autowired
     public WeatherHandler(OpenWeatherService openWeatherService) {
@@ -70,8 +68,8 @@ public class WeatherHandler implements CommandHandler {
     }
 
     private String parseDate(String time) {
-        ZonedDateTime zonetime = ZonedDateTime.parse(time, yyyyMMddHHmmssDash);
-        return zonetime.format(yyyyMMddHHmmDash);
+        ZonedDateTime zonetime = ZonedDateTime.parse(time, DateUtils.yyyyMMddHHmmssDash);
+        return zonetime.format(DateUtils.yyyyMMddHHmmDash);
     }
 
 }
