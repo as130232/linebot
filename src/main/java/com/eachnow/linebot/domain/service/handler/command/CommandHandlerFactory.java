@@ -25,7 +25,7 @@ public class CommandHandlerFactory {
     @Autowired
     private InstagramHandler instagramHandler;
     @Autowired
-    private TranslationButtonHandler translationButtonHandler;
+    private TranslationHandler translationHandler;
     @Autowired
     private WeatherHandler weatherHandler;
     @Autowired
@@ -94,8 +94,8 @@ public class CommandHandlerFactory {
                 commandHandler = placeHandler;
             } else if (HelloHandler.class.equals(commandHandlerClass)) {
                 commandHandler = helloHandler;
-            } else if (TranslationButtonHandler.class.equals(commandHandlerClass)) {
-                commandHandler = translationButtonHandler;
+            } else if (TranslationHandler.class.equals(commandHandlerClass)) {
+                commandHandler = translationHandler;
             } else if (CloseResidentCommandHandler.class.equals(commandHandlerClass) && residentCommandHandler != null) {
                 residentCommandHandler = null;   //關閉常駐指令
                 commandHandler = closeResidentCommandHandler;
