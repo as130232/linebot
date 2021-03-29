@@ -39,8 +39,8 @@ public class PttCrawlerService {
         }
         driver.quit();
         log.info("爬取PTT版，完成。url:{}", url);
-        //發送訊息通知
-        lineNotifyService.send(LineNotifyConstant.OWN, "爬取PTT版，完成。url:" + url);
+//        //發送訊息通知
+//        lineNotifyService.send(LineNotifyConstant.OWN, "爬取PTT版，完成。url:" + url);
         return result;
     }
 
