@@ -27,6 +27,8 @@ public enum WeatherElementEnum {
     }
 
     public static String getElement(String name) {
+        if (name == null)
+            return null;
         Optional<WeatherElementEnum> optional = Arrays.stream(WeatherElementEnum.values())
                 .filter(langEnum -> langEnum.getName().contains(name)).findFirst();
         if (optional.isPresent()) {
@@ -36,6 +38,8 @@ public enum WeatherElementEnum {
     }
 
     public static String getName(String element) {
+        if (element == null)
+        return null;
         Optional<WeatherElementEnum> optional = Arrays.stream(WeatherElementEnum.values())
                 .filter(langEnum -> langEnum.getElement().contains(element)).findFirst();
         if (optional.isPresent()) {

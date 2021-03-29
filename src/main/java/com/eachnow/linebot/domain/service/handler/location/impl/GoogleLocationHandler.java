@@ -96,11 +96,4 @@ public class GoogleLocationHandler implements LocationHandler {
         return new FlexMessage(typeEnum.getName() + "精選", contents);
     }
 
-//    @PostConstruct
-//    private void test() {
-//        LocationHandlerFactory.type = GooglePlaceTypeEnum.BAR;
-//        LocationMessageContent content = LocationMessageContent.builder()
-//                .latitude(25.07329493386349).longitude(121.5843254327774).build();
-//        this.execute(content);
-//    }
 }
