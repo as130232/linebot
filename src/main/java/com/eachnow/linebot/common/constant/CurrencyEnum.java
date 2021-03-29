@@ -35,6 +35,8 @@ public enum CurrencyEnum {
     }
 
     public static CurrencyEnum parse(String name) {
+        if (name == null || "".equals(name))
+            return null;
         Optional<CurrencyEnum> optional = Arrays.stream(CurrencyEnum.values()).filter(langEnum -> langEnum.getName().contains(name)).findFirst();
         if (optional.isPresent()) {
             return optional.get();
@@ -42,6 +44,15 @@ public enum CurrencyEnum {
         return null; //default
     }
 
+    public static CurrencyEnum parseByEnumName(String enumName) {
+        if (enumName == null || "".equals(enumName))
+            return null;
+        Optional<CurrencyEnum> optional = Arrays.stream(CurrencyEnum.values()).filter(langEnum -> langEnum.toString().contains(enumName.toUpperCase())).findFirst();
+        if (optional.isPresent()) {
+            return optional.get();
+        }
+        return null; //default
+    }
     public static List<CurrencyEnum> commonCurrency() {
         List<CurrencyEnum> result = Arrays.asList(TWD, CNY, JPY, KRW, GBP, EUR, BTC);
         return result;
