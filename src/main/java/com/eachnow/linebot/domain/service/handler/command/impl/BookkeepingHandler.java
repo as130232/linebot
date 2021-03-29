@@ -95,11 +95,11 @@ public class BookkeepingHandler implements CommandHandler {
         return Pattern.matches("[0-9]*(\\.?)[0-9]*", input);
     }
 
-    @PostConstruct
-    private void test() {
-        String text = "記 晚餐 180";
-        CommandPO commandPO = CommandPO.builder().userId("userId").text(text)
-                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-        this.execute(commandPO);
-    }
+//    @PostConstruct
+//    private void test() {
+//        String text = "記 晚餐 180";
+//        CommandPO commandPO = CommandPO.builder().userId("userId").text(text)
+//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+//        this.execute(commandPO);
+//    }
 }
