@@ -20,7 +20,7 @@ import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.FlexAlign;
 import com.linecorp.bot.model.message.flex.unit.FlexFontSize;
 import com.linecorp.bot.model.message.flex.unit.FlexLayout;
-import com.linecorp.bot.model.message.flex.unit.FlexOffsetSize;
+import com.linecorp.bot.model.message.flex.unit.FlexPaddingSize;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -59,14 +59,13 @@ public class BookkeepingHandler implements CommandHandler {
             bookkeepingRepository.save(po);
             log.info("記帳成功。BookkeepingPO:{}", po);
             return new TextMessage("記帳成功。");
-        }else if (text.contains(CANCEL)){
+        } else if (text.contains(CANCEL)) {
             return new TextMessage("記帳已取消。");
         }
         List<FlexComponent> bodyContents = Arrays.asList(
-                Text.builder().text("請問輸入正確嗎?").weight(Text.TextWeight.BOLD).size(FlexFontSize.LG).align(FlexAlign.CENTER).build(),  //標頭
-                Text.builder().text("金額: " + amount).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).build(),
-                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).build(),
-                Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.MD).build()
+                Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
+                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
+                Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).build();
         String data = commandPO.getCommand() + ParamterUtils.CONTACT + typeName + ParamterUtils.CONTACT +
@@ -75,8 +74,10 @@ public class BookkeepingHandler implements CommandHandler {
                 Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(data + CONFIRM).build()).build(),
                 Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(data + CANCEL).build()).build()
         );
-        Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(footerContents).build();
-        FlexContainer contents = Bubble.builder().header(null).hero(null).body(body).footer(footer).build();
+        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("請問輸入正確嗎?").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#29bae6").build());
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#27ACB2").build();
+        Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
         return new FlexMessage("記帳確認", contents);
     }
 
