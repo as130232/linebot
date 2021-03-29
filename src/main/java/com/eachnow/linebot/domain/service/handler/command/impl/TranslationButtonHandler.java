@@ -16,6 +16,7 @@ import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 
 @Slf4j
@@ -50,7 +51,7 @@ public class TranslationButtonHandler implements CommandHandler {
                     )).build();
             return new TextMessage("Choose translation language.\nPlease input @close when you end. 結束時請輸入@close關閉翻譯模式.", quickReply);
         }
-        LanguageEnum lang = commandPO.getParams().size() > 0 ? LanguageEnum.parse(ParamterUtils.getIndexOneParameter(commandPO.getParams().get(0))) : null;
+        LanguageEnum lang = commandPO.getParams().size() > 0 ? LanguageEnum.parse(commandPO.getParams().get(0)) : null;
         String word = commandPO.getParams().size() > 1 ? commandPO.getParams().get(1) : null;
         //設置緩存
         if (lang != null)

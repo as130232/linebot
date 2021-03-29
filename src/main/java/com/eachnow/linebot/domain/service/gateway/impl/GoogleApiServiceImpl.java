@@ -38,6 +38,8 @@ public class GoogleApiServiceImpl implements GoogleApiService {
 
     @Override
     public String translate(String text, String lang) {
+        if (text == null || "".equals(text) || lang == null)
+            return "";
         try {
             String url = BASE_URL + "?key=" + GOOGLE_API_KEY;
             HttpHeaders headers = new HttpHeaders();
