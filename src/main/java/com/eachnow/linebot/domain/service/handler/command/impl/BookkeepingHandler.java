@@ -70,7 +70,7 @@ public class BookkeepingHandler implements CommandHandler {
                 amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT + CONFIRM;
         List<FlexComponent> footerContents = Arrays.asList(
                 Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(confirm).build()).build(),
-                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").build()).build()
+                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(null).build()).build()
         );
         Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(footerContents).build();
         FlexContainer contents = Bubble.builder().header(null).hero(null).body(body).footer(footer).build();
