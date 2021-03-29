@@ -48,8 +48,6 @@ public class CommandHandlerFactory {
 
     @Autowired
     private CloseResidentCommandHandler closeResidentCommandHandler;
-    //常駐指令，直到下達關閉才結束
-    private CommandHandler residentCommandHandler;
 
     public CommandHandlerFactory(Map<String, Class<? extends CommandHandler>> handlerMap) {
         this.handlerMap = handlerMap;
@@ -60,9 +58,9 @@ public class CommandHandlerFactory {
         String command = commandPO.getCommand();
         log.info("text:{}", text);
         CommandHandler commandHandler = defaultHandler;
-        //若已下達常駐指令，則直到關閉為止
-        if (residentCommandHandler != null && !text.contains("@close"))
-            return residentCommandHandler;
+        //若已下達常駐指令，則直到下達關閉為止
+        if (command.contains("@close"))
+            return closeResidentCommandHandler;
         if (command == null || "".equals(command))
             return commandHandler;
 
@@ -96,14 +94,7 @@ public class CommandHandlerFactory {
                 commandHandler = helloHandler;
             } else if (TranslationHandler.class.equals(commandHandlerClass)) {
                 commandHandler = translationHandler;
-            } else if (CloseResidentCommandHandler.class.equals(commandHandlerClass) && residentCommandHandler != null) {
-                residentCommandHandler = null;   //關閉常駐指令
-                commandHandler = closeResidentCommandHandler;
             }
-            //檢查該指令是否為常駐指令
-            Command commandClass = commandHandler.getClass().getAnnotation(Command.class);
-            if (commandClass.resident())
-                residentCommandHandler = commandHandler;
             return commandHandler;
 //            return applicationContext.getBean(commandHandlerClass);
 //            result = commandHandlerClass.newInstance();

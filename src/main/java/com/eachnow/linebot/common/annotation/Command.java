@@ -12,5 +12,4 @@ import java.lang.annotation.Target;
 @Component
 public @interface Command {
     String[] value();
-    boolean resident() default false;
 }
