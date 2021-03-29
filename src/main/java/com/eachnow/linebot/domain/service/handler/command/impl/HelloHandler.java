@@ -18,7 +18,7 @@ public class HelloHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         List<String> list = Arrays.asList("Hello", "哈囉", "安安", "你好呀魯蛇", "別吵我還沒睡醒",
-                "你是天線寶寶嗎？太陽出來囉～", "好個屁今天又不是星期五");
+                "你是天線寶寶嗎？太陽出來囉～", "好個屁今天又不是星期五", "I wanna know~ Are you OK.");
         String text = (String) RandomUtils.randomElement(list);
         return new TextMessage(text);
     }

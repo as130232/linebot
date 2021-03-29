@@ -46,7 +46,7 @@ public class CommandHandlerFactory {
     private DefaultHandler defaultHandler;
 
     @Autowired
-    private CloseResidentCommandHandler closeResidentCommandHandler;
+    private CloseCommandHandler closeCommandHandler;
 
     public CommandHandlerFactory(Map<String, Class<? extends CommandHandler>> handlerMap) {
         this.handlerMap = handlerMap;
@@ -59,7 +59,7 @@ public class CommandHandlerFactory {
         CommandHandler commandHandler = defaultHandler;
         //若已下達常駐指令，則直到下達關閉為止
         if (text.contains("@close") || text.contains("@關"))
-            return closeResidentCommandHandler;
+            return closeCommandHandler;
         if (command == null || "".equals(command))
             return commandHandler;
 
