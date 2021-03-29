@@ -41,4 +41,11 @@ public class ParamterUtils {
         }
         return new ArrayList<>();
     }
+
+    public static String getValueByIndex(List<String> params, int index){
+        if (params != null && params.size() > index){
+            return params.get(index);
+        }
+        return null;
+    }
 }

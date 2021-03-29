@@ -46,9 +46,9 @@ public class CurrencyHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         JSONObject jsonObject = currencyService.getCurrency();
-        CurrencyEnum from = commandPO.getParams().size() > 0 ? CurrencyEnum.parse(commandPO.getParams().get(0)) : null;
-        CurrencyEnum to = commandPO.getParams().size() > 1 ? CurrencyEnum.parse(commandPO.getParams().get(1)) : null;
-        String amount = commandPO.getParams().size() > 2 ? commandPO.getParams().get(2) : null;
+        CurrencyEnum from = CurrencyEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 0));
+        CurrencyEnum to = CurrencyEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 1));
+        String amount = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
         if (!commandPO.getText().equals(commandPO.getCommand()) && to == null) {
             QuickReply quickReply = getQuickReply(commandPO.getText() + " ");
             return TextMessage.builder().text("原貨幣為: " + from.getName() + ", 請選擇欲轉換貨幣。").quickReply(quickReply).build();

@@ -18,6 +18,7 @@ import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.FlexFontSize;
 import com.linecorp.bot.model.message.flex.unit.FlexLayout;
 import com.linecorp.bot.model.message.flex.unit.FlexMarginSize;
+import com.linecorp.bot.model.message.flex.unit.FlexOffsetSize;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -86,7 +87,7 @@ public class GoogleLocationHandler implements LocationHandler {
             //Menu
             URI menuUrl = googleMapUrl; //Todo 查詢Meun api
             List<FlexComponent> menuButtonContents = Arrays.asList(Button.builder().height(Button.ButtonHeight.SMALL).style(Button.ButtonStyle.PRIMARY).action(new URIAction("Menu", menuUrl, new URIAction.AltUri(menuUrl))).build());
-            Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(menuButtonContents).build();
+            Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(menuButtonContents).offsetBottom(FlexOffsetSize.LG).build();
             Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(footer)
                     .action(new URIAction("Map", googleMapUrl, new URIAction.AltUri(googleMapUrl))).build();
             return bubble;

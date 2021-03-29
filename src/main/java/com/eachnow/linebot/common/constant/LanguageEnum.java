@@ -3,7 +3,6 @@ package com.eachnow.linebot.common.constant;
 import lombok.Getter;
 
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.Optional;
 
 @Getter
@@ -33,6 +32,6 @@ public enum LanguageEnum {
         if (optional.isPresent()) {
             return optional.get();
         }
-        return LanguageEnum.EN; //default
+        return null;
     }
 }

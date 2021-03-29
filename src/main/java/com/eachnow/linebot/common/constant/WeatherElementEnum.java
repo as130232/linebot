@@ -32,7 +32,7 @@ public enum WeatherElementEnum {
         if (optional.isPresent()) {
             return optional.get().getElement();
         }
-        return WeatherElementEnum.WX.getElement(); //default
+        return null;
     }
 
     public static String getName(String element) {

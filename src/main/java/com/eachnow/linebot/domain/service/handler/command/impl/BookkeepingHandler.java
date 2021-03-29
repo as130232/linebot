@@ -2,7 +2,6 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
-import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
@@ -31,7 +30,7 @@ public class BookkeepingHandler implements CommandHandler {
     public Message execute(CommandPO commandPO) {
         String text = commandPO.getText();
         if (commandPO.getParams().size() < 2)
-            return new TextMessage("請輸入正確格式:記 {類型} {金額}，例:記 晚餐 180，注意需空格隔開！");
+            return new TextMessage("請輸入正確格式:" + getFormat() + "，例:記 晚餐 180，注意需空格隔開！");
         String type = commandPO.getParams().get(0);
         String amount = commandPO.getParams().get(1);
         if (text.contains("@confirm")) {
@@ -53,4 +52,7 @@ public class BookkeepingHandler implements CommandHandler {
         return new FlexMessage("記帳確認", contents);
     }
 
+    public String getFormat() {
+        return "記 {類型} {金額}";
+    }
 }

@@ -1,6 +1,5 @@
 package com.eachnow.linebot.domain.service.handler.command;
 
-import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.domain.service.handler.DefaultHandler;
 import com.eachnow.linebot.domain.service.handler.command.impl.*;
@@ -69,38 +68,37 @@ public class CommandHandlerFactory {
             log.warn("Can not get the Class of CommandHandler, command:{}", command);
             return commandHandler;
         }
-        try {
-            if (BeautyHandler.class.equals(commandHandlerClass)) {
-                commandHandler = beautyHandler;
-            } else if (ActressHandler.class.equals(commandHandlerClass)) {
-                commandHandler = actressHandler;
-            } else if (InstagramHandler.class.equals(commandHandlerClass)) {
-                commandHandler = instagramHandler;
-            } else if (BookkeepingHandler.class.equals(commandHandlerClass)) {
-                commandHandler = bookkeepingHandler;
-            } else if (CurrencyHandler.class.equals(commandHandlerClass)) {
-                commandHandler = currencyHandler;
-            } else if (WeatherHandler.class.equals(commandHandlerClass)) {
-                commandHandler = weatherHandler;
-            } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
-                commandHandler = eatWhatHandler;
-            } else if (RestaurantHandler.class.equals(commandHandlerClass)) {
-                commandHandler = restaurantHandler;
-            } else if (BarHandler.class.equals(commandHandlerClass)) {
-                commandHandler = barHandler;
-            } else if (PlaceHandler.class.equals(commandHandlerClass)) {
-                commandHandler = placeHandler;
-            } else if (HelloHandler.class.equals(commandHandlerClass)) {
-                commandHandler = helloHandler;
-            } else if (TranslationHandler.class.equals(commandHandlerClass)) {
-                commandHandler = translationHandler;
-            }
-            return commandHandler;
-//            return applicationContext.getBean(commandHandlerClass);
-//            result = commandHandlerClass.newInstance();
-        } catch (Exception e) {
-            log.warn("CommandHandler newInstance failed! command:{}", command);
+        if (BeautyHandler.class.equals(commandHandlerClass)) {
+            commandHandler = beautyHandler;
+        } else if (ActressHandler.class.equals(commandHandlerClass)) {
+            commandHandler = actressHandler;
+        } else if (InstagramHandler.class.equals(commandHandlerClass)) {
+            commandHandler = instagramHandler;
+        } else if (BookkeepingHandler.class.equals(commandHandlerClass)) {
+            commandHandler = bookkeepingHandler;
+        } else if (CurrencyHandler.class.equals(commandHandlerClass)) {
+            commandHandler = currencyHandler;
+        } else if (WeatherHandler.class.equals(commandHandlerClass)) {
+            commandHandler = weatherHandler;
+        } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
+            commandHandler = eatWhatHandler;
+        } else if (RestaurantHandler.class.equals(commandHandlerClass)) {
+            commandHandler = restaurantHandler;
+        } else if (BarHandler.class.equals(commandHandlerClass)) {
+            commandHandler = barHandler;
+        } else if (PlaceHandler.class.equals(commandHandlerClass)) {
+            commandHandler = placeHandler;
+        } else if (HelloHandler.class.equals(commandHandlerClass)) {
+            commandHandler = helloHandler;
+        } else if (TranslationHandler.class.equals(commandHandlerClass)) {
+            commandHandler = translationHandler;
         }
         return commandHandler;
+//        try {
+//            return applicationContext.getBean(commandHandlerClass);
+//            result = commandHandlerClass.newInstance();
+//        } catch (Exception e) {
+//            log.warn("CommandHandler newInstance failed! command:{}", command);
+//        }
     }
 }

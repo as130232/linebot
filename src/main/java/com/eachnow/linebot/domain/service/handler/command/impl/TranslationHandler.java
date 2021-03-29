@@ -50,8 +50,8 @@ public class TranslationHandler implements CommandHandler {
                     )).build();
             return new TextMessage("Choose translation language.\nPlease input @close when you end. 結束時請輸入@close關閉翻譯模式.", quickReply);
         }
-        LanguageEnum lang = commandPO.getParams().size() > 0 ? LanguageEnum.parse(commandPO.getParams().get(0)) : null;
-        String word = commandPO.getParams().size() > 1 ? commandPO.getParams().get(1) : null;
+        LanguageEnum lang = LanguageEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 0));
+        String word = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         //設置緩存
         if (lang != null)
             MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), commandPO.getCommand() + ParamterUtils.CONTACT + lang.getCode() + ParamterUtils.CONTACT);

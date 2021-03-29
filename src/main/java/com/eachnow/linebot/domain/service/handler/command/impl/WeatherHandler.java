@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.constant.WeatherElementEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
+import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.message.Message;
@@ -34,11 +35,9 @@ public class WeatherHandler implements CommandHandler {
 
     @Override
     public Message execute(CommandPO commandPO) {
-        String text = commandPO.getText();
-        text = text.replace("台", "臺");
         List<String> params = commandPO.getParams();
-        String locationName = params.size() > 0 ? params.get(0) : null;
-        String elementName = params.size() > 1 ? WeatherElementEnum.getElement(params.get(1)) : null;
+        String locationName = ParamterUtils.getValueByIndex(params, 0).replace("台", "臺");
+        String elementName = WeatherElementEnum.getElement(ParamterUtils.getValueByIndex(params, 1));
         WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, elementName);
         if (weatherResultPO.getRecords().getLocation().size() == 0)
             return new TextMessage("查無此地:" + locationName);
