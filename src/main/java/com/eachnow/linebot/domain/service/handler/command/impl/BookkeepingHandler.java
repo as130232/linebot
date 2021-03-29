@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 public class BookkeepingHandler implements CommandHandler {
     private BookkeepingRepository bookkeepingRepository;
     private final String CONFIRM = "@confirm";
+    private final String CANCEL = "@cancel";
 
     @Autowired
     private BookkeepingHandler(BookkeepingRepository bookkeepingRepository) {
@@ -58,6 +59,8 @@ public class BookkeepingHandler implements CommandHandler {
             bookkeepingRepository.save(po);
             log.info("記帳成功。BookkeepingPO:{}", po);
             return new TextMessage("記帳成功。");
+        }else if (text.contains(CANCEL)){
+            return new TextMessage("記帳已取消。");
         }
         List<FlexComponent> bodyContents = Arrays.asList(
                 Text.builder().text("請問輸入正確嗎?").weight(Text.TextWeight.BOLD).size(FlexFontSize.LG).align(FlexAlign.CENTER).build(),  //標頭
@@ -66,11 +69,11 @@ public class BookkeepingHandler implements CommandHandler {
                 Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.MD).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).build();
-        String confirm = commandPO.getCommand() + ParamterUtils.CONTACT + typeName + ParamterUtils.CONTACT +
-                amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT + CONFIRM;
+        String data = commandPO.getCommand() + ParamterUtils.CONTACT + typeName + ParamterUtils.CONTACT +
+                amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT;
         List<FlexComponent> footerContents = Arrays.asList(
-                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(confirm).build()).build(),
-                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(null).build()).build()
+                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(data + CONFIRM).build()).build(),
+                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(data + CANCEL).build()).build()
         );
         Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(footerContents).build();
         FlexContainer contents = Bubble.builder().header(null).hero(null).body(body).footer(footer).build();
