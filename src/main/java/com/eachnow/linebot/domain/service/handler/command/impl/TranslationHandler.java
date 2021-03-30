@@ -1,7 +1,6 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
-import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.constant.LanguageEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.ParamterUtils;
@@ -9,15 +8,25 @@ import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.linecorp.bot.model.action.PostbackAction;
+import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.flex.component.Box;
+import com.linecorp.bot.model.message.flex.component.FlexComponent;
+import com.linecorp.bot.model.message.flex.component.Text;
+import com.linecorp.bot.model.message.flex.container.Bubble;
+import com.linecorp.bot.model.message.flex.container.FlexContainer;
+import com.linecorp.bot.model.message.flex.unit.FlexAlign;
+import com.linecorp.bot.model.message.flex.unit.FlexFontSize;
+import com.linecorp.bot.model.message.flex.unit.FlexLayout;
+import com.linecorp.bot.model.message.flex.unit.FlexPaddingSize;
 import com.linecorp.bot.model.message.quickreply.QuickReply;
 import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @Command(value = {"translate", "翻譯"})
@@ -48,7 +57,15 @@ public class TranslationHandler implements CommandHandler {
                             QuickReplyItem.builder().action(PostbackAction.builder().label("French(法)").data(translateKey + "法").build()).build(),
                             QuickReplyItem.builder().action(PostbackAction.builder().label("Russian(俄)").data(translateKey + "俄").build()).build()
                     )).build();
-            return new TextMessage("Choose translation language.\nPlease input @close when you end. 結束時請輸入@close關閉翻譯模式.", quickReply);
+            List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("翻譯").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
+            Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#A17DF5").build();
+            List<FlexComponent> bodyContents = Arrays.asList(
+                    Text.builder().text("請選擇翻譯語言(按鈕):").weight(Text.TextWeight.BOLD).build(),
+                    Text.builder().text("結束時請輸入@close關閉翻譯模式").build()
+            );
+            Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
+            FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
+            return FlexMessage.builder().altText("Translate翻譯").contents(contents).quickReply(quickReply).build();
         }
         LanguageEnum lang = LanguageEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 0));
         String word = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
