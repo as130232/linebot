@@ -73,7 +73,15 @@ public class TranslationHandler implements CommandHandler {
         if (lang != null)
             MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), commandPO.getCommand() + ParamterUtils.CONTACT + lang.getCode() + ParamterUtils.CONTACT);
         if (lang != null && word == null) {
-            return new TextMessage("[Translate mode已開啟翻譯模式]\n翻譯語言:" + lang.getCode() + ", 請輸入欲翻譯文字。");
+            List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("[已開啟翻譯模式]").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
+            Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#A17DF5").build();
+            List<FlexComponent> bodyContents = Arrays.asList(
+                    Text.builder().text("翻譯語言: " + lang.getCode()).build(),
+                    Text.builder().text("請輸入欲翻譯文字。").build()
+            );
+            Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
+            FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
+            return FlexMessage.builder().altText("[已開啟翻譯模式]").contents(contents).build();
         }
         String result = googleApiService.translate(word, lang.getLang());
         return new TextMessage(result);
