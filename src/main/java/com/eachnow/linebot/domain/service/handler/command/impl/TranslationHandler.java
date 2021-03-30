@@ -60,8 +60,8 @@ public class TranslationHandler implements CommandHandler {
             List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("翻譯").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
             Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#A17DF5").build();
             List<FlexComponent> bodyContents = Arrays.asList(
-                    Text.builder().text("請選擇翻譯語言(按鈕):").weight(Text.TextWeight.BOLD).build(),
-                    Text.builder().text("結束時請輸入@close關閉翻譯模式").build()
+                    Text.builder().text("請選擇翻譯語言(按鈕)").weight(Text.TextWeight.BOLD).build(),
+                    Text.builder().text("結束時請輸入 @close 關閉翻譯模式").build()
             );
             Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
             FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
@@ -73,7 +73,7 @@ public class TranslationHandler implements CommandHandler {
         if (lang != null)
             MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), commandPO.getCommand() + ParamterUtils.CONTACT + lang.getCode() + ParamterUtils.CONTACT);
         if (lang != null && word == null) {
-            List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("[已開啟翻譯模式]").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
+            List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("已開啟翻譯模式").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
             Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#A17DF5").build();
             List<FlexComponent> bodyContents = Arrays.asList(
                     Text.builder().text("翻譯語言: " + lang.getCode()).build(),
@@ -81,7 +81,7 @@ public class TranslationHandler implements CommandHandler {
             );
             Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.XL).build();
             FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
-            return FlexMessage.builder().altText("[已開啟翻譯模式]").contents(contents).build();
+            return FlexMessage.builder().altText("已開啟翻譯模式").contents(contents).build();
         }
         String result = googleApiService.translate(word, lang.getLang());
         return new TextMessage(result);

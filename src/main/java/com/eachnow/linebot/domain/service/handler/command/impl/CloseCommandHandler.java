@@ -26,10 +26,10 @@ public class CloseCommandHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());
-        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("[已關閉常駐指令模式]").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
+        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("已關閉常駐指令模式").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#FF6B6E").build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(null).footer(null).build();
-        return FlexMessage.builder().altText("[已關閉常駐指令模式]").contents(contents).build();
+        return FlexMessage.builder().altText("已關閉常駐指令模式").contents(contents).build();
 
 //        return new TextMessage("[Shut down mode.已關閉常駐指令模式]");
     }
