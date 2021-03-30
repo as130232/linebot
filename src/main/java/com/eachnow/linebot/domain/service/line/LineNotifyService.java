@@ -37,6 +37,11 @@ public class LineNotifyService {
         return headers;
     }
 
+    /**
+     * 藉由lineNotify發送訊息通知
+     * @param type LineNotifyConstant
+     * @param message 訊息
+     */
     public void send(Integer type, String message) {
         try {
             HttpEntity<String> entity = new HttpEntity<>(null, getHttpHeaders(type));

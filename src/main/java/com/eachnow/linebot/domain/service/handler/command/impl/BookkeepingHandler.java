@@ -33,8 +33,8 @@ import java.util.regex.Pattern;
 @Command({"記", "記帳"})
 public class BookkeepingHandler implements CommandHandler {
     private BookkeepingRepository bookkeepingRepository;
-    private final String CONFIRM = "@confirm";
-    private final String CANCEL = "@cancel";
+    private final String CONFIRM = "@bookkeepingConfirm";
+    private final String CANCEL = "@bookkeepingCancel";
 
     @Autowired
     private BookkeepingHandler(BookkeepingRepository bookkeepingRepository) {
@@ -67,9 +67,9 @@ public class BookkeepingHandler implements CommandHandler {
                 amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT;
         MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), data); //新增緩存
         List<FlexComponent> bodyContents = Arrays.asList(
+                Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build(),
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
-                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
-                Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build()
+                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).build();
         List<FlexComponent> footerContents = Arrays.asList(

@@ -18,13 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Description("地點 {地點}")
 @Command({"place", "location", "地點", "地方"})
 public class PlaceHandler implements CommandHandler {
-    private ActressCrawlerService actressCrawlerService;
-    private String currentPicture;
-
-    @Autowired
-    public PlaceHandler(ActressCrawlerService actressCrawlerService) {
-        this.actressCrawlerService = actressCrawlerService;
-    }
 
     @Override
     public Message execute(CommandPO commandPO) {
