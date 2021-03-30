@@ -8,6 +8,7 @@ import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
+import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
@@ -52,16 +53,19 @@ public class BookkeepingHandler implements CommandHandler {
             return new TextMessage("請輸入正確格式:" + getFormat() + "，例:記 晚餐 180，注意需空格隔開！");
         }
         if (text.contains(CONFIRM)) {
+            MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
                     .createTime(new Timestamp((DateUtils.getCurrentEpochMilli()))).build();
             bookkeepingRepository.save(po);
             log.info("記帳成功。BookkeepingPO:{}", po);
             return new TextMessage("記帳成功。");
         } else if (text.contains(CANCEL)) {
+            MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             return new TextMessage("記帳已取消。");
         }
         String data = commandPO.getCommand() + ParamterUtils.CONTACT + typeName + ParamterUtils.CONTACT +
                 amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT;
+        MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), data); //新增緩存
         List<FlexComponent> bodyContents = Arrays.asList(
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
                 Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
@@ -69,8 +73,8 @@ public class BookkeepingHandler implements CommandHandler {
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).build();
         List<FlexComponent> footerContents = Arrays.asList(
-                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(data + CONFIRM).build()).build(),
-                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(data + CANCEL).build()).build()
+                Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(CONFIRM).build()).build(),
+                Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(CANCEL).build()).build()
         );
         List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("請問輸入正確嗎?").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#29bae6").build();
