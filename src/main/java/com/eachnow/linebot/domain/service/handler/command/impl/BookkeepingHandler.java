@@ -20,7 +20,6 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -137,7 +136,7 @@ public class BookkeepingHandler implements CommandHandler {
                     //日期
                     Text.builder().text(date.replace("-", "/")).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
                     //該天總金額
-                    Text.builder().text("$" + totalOnOneDay).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
+                    Text.builder().text("$" + totalOnOneDay).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
             )).paddingAll(FlexPaddingSize.XS).build();
             oneDateContents.add(oneDateAndTotal);
 
@@ -146,7 +145,7 @@ public class BookkeepingHandler implements CommandHandler {
                         //類型名稱
                         Text.builder().text(po.getTypeName()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
                         //金額
-                        Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#111111").align(FlexAlign.END).build()
+                        Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build()
                 )).build();
                 oneDateContents.add(typeAndAmount);
             });
@@ -155,6 +154,7 @@ public class BookkeepingHandler implements CommandHandler {
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
             bodyContents.add(separator);
         });
+        bodyContents.remove(bodyContents.size() - 1);   //移除掉最後一個separator
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.MD).build();
 
         //標頭
@@ -169,7 +169,7 @@ public class BookkeepingHandler implements CommandHandler {
 
         //footer total amount
         List<FlexComponent> footerContents = Arrays.asList(
-                Text.builder().text("Total").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).style(Text.TextStyle.ITALIC).build(),
+                Text.builder().text("Total").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).build(),
                 Text.builder().text("$" + total.setScale(2, BigDecimal.ROUND_HALF_UP)).size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.END).build()
         );
         Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
