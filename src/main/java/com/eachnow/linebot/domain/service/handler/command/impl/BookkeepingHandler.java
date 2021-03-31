@@ -13,21 +13,22 @@ import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
-import com.linecorp.bot.model.message.flex.component.Box;
-import com.linecorp.bot.model.message.flex.component.Button;
-import com.linecorp.bot.model.message.flex.component.FlexComponent;
-import com.linecorp.bot.model.message.flex.component.Text;
+import com.linecorp.bot.model.message.flex.component.*;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Command({"記", "記帳"})
@@ -41,9 +42,21 @@ public class BookkeepingHandler implements CommandHandler {
         this.bookkeepingRepository = bookkeepingRepository;
     }
 
+//    @PostConstruct
+//    private void test() {
+//        String text = "記 查 20210329";
+//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+//        execute(commandPO);
+//    }
+
     @Override
     public Message execute(CommandPO commandPO) {
         String text = commandPO.getText();
+        //查帳功能
+        if (text.contains("查") || text.contains("check")) {
+            return this.getBookkeeper(commandPO);
+        }
         String typeName = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
         String amount = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         CurrencyEnum currencyEnum = CurrencyEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 2));
@@ -98,6 +111,64 @@ public class BookkeepingHandler implements CommandHandler {
             return false;
         }
         return Pattern.matches("[0-9]*(\\.?)[0-9]*", input);
+    }
+
+    public Message getBookkeeper(CommandPO commandPO) {
+        String startDate = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
+        if (startDate == null)  //預設當天
+            startDate = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
+        long startDateTime = DateUtils.parseToStartOfDayMilli(startDate, DateUtils.yyyyMMdd);
+        String endDate = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
+        if (endDate == null)
+            endDate = startDate;
+        long endDateTime = DateUtils.parseToEndOfDayMilli(endDate, DateUtils.yyyyMMdd);
+        List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndCreateTimeBetween(commandPO.getUserId(), new Timestamp(startDateTime), new Timestamp(endDateTime));
+        //按照日期分類
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(po -> DateUtils.format(po.getCreateTime(), DateUtils.yyyyMMddDash)));
+        List<FlexComponent> bodyContents = new ArrayList<>();
+        BigDecimal total = new BigDecimal(0);
+        listBookkeepingGroupByDate.keySet().stream().forEach(date -> {
+            List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
+            BigDecimal totalOnOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+            total.add(totalOnOneDay);
+
+            //一天所有資訊
+            List<FlexComponent> oneDateContents = new ArrayList<>();
+            Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
+                    //日期
+                    Text.builder().text(date.replace("-", "/")).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").flex(0).build(),
+                    //該天總金額
+                    Text.builder().text("$" + totalOnOneDay).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).align(FlexAlign.END).color("#111111").flex(0).build()
+            )).paddingAll(FlexPaddingSize.XS).build();
+            oneDateContents.add(oneDateAndTotal);
+
+            listBookkeepingSameDate.stream().forEach(po -> {
+                Box typeAndAmount = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
+                        //類型名稱
+                        Text.builder().text(po.getTypeName()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
+                        //金額
+                        Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#111111").align(FlexAlign.END).build()
+                )).build();
+                oneDateContents.add(typeAndAmount);
+            });
+            Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneDateContents).paddingTop(FlexPaddingSize.SM).build();
+            bodyContents.add(oneDateBox);
+            Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
+            bodyContents.add(separator);
+        });
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.MD).build();
+
+        //標頭
+        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("記帳小本本").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).build());
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
+        //footer total amount
+        List<FlexComponent> footerContents = Arrays.asList(
+                Text.builder().text("Total").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).style(Text.TextStyle.ITALIC).build(),
+                Text.builder().text("$" + total.setScale(2, BigDecimal.ROUND_HALF_UP)).size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.END).build()
+        );
+        Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
+        return FlexMessage.builder().altText("記帳小本本").contents(contents).build();
     }
 
 }
