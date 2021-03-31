@@ -126,19 +126,18 @@ public class BookkeepingHandler implements CommandHandler {
         //按照日期分類
         Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(po -> DateUtils.format(po.getCreateTime(), DateUtils.yyyyMMddDash)));
         List<FlexComponent> bodyContents = new ArrayList<>();
-        BigDecimal total = new BigDecimal(0);
+
         listBookkeepingGroupByDate.keySet().stream().forEach(date -> {
             List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
             BigDecimal totalOnOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-            total.add(totalOnOneDay);
 
             //一天所有資訊
             List<FlexComponent> oneDateContents = new ArrayList<>();
             Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
                     //日期
-                    Text.builder().text(date.replace("-", "/")).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").flex(0).build(),
+                    Text.builder().text(date.replace("-", "/")).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
                     //該天總金額
-                    Text.builder().text("$" + totalOnOneDay).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).align(FlexAlign.END).color("#111111").flex(0).build()
+                    Text.builder().text("$" + totalOnOneDay).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
             )).paddingAll(FlexPaddingSize.XS).build();
             oneDateContents.add(oneDateAndTotal);
 
@@ -161,6 +160,13 @@ public class BookkeepingHandler implements CommandHandler {
         //標頭
         List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("記帳小本本").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).build());
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
+
+        //計算總金額
+        BigDecimal total = listBookkeepingGroupByDate.keySet().stream().map(date -> {
+            List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
+            return listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+        }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+
         //footer total amount
         List<FlexComponent> footerContents = Arrays.asList(
                 Text.builder().text("Total").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).style(Text.TextStyle.ITALIC).build(),
