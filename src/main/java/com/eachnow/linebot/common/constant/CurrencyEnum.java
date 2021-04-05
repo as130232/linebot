@@ -53,6 +53,7 @@ public enum CurrencyEnum {
         }
         return null; //default
     }
+
     public static List<CurrencyEnum> commonCurrency() {
         List<CurrencyEnum> result = Arrays.asList(TWD, CNY, JPY, KRW, GBP, EUR, BTC);
         return result;
