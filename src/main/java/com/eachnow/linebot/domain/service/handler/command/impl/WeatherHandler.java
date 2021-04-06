@@ -1,9 +1,9 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
-import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.constant.WeatherElementEnum;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.openweather.ParameterPO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
@@ -15,13 +15,13 @@ import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.ZoneId;
+import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
-@Description("天氣 {地區} {類型}")
 @Command({"天氣"})
 public class WeatherHandler implements CommandHandler {
     private OpenWeatherService openWeatherService;
@@ -60,6 +60,19 @@ public class WeatherHandler implements CommandHandler {
                 sb.append("\n");
             });
         });
+
+//        Map<String, Map<String, ParameterPO>> dateAndElementMap = new HashMap<>();
+//        weatherResultPO.getRecords().getLocation().get(0).getWeatherElement().forEach(weatherElementPO -> {
+//            String element = weatherElementPO.getElementName();
+//            weatherElementPO.getTime().forEach(timePO -> {
+//                String date = timePO.getStartTime() + " - " + timePO.getEndTime();
+//                Map<String, ParameterPO> elementMap = dateAndElementMap.get(date);
+//                if (elementMap == null)
+//                    elementMap = new HashMap<>();
+//                elementMap.put(element, timePO.getParameter());
+//                dateAndElementMap.put(date, elementMap);
+//            });
+//        });
         return new TextMessage(sb.toString());
     }
 
@@ -72,4 +85,12 @@ public class WeatherHandler implements CommandHandler {
         return zonetime.format(DateUtils.yyyyMMddHHmmDash);
     }
 
+
+    @PostConstruct
+    private void test() {
+        String text = "天氣 臺北市";
+        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+        execute(commandPO);
+    }
 }

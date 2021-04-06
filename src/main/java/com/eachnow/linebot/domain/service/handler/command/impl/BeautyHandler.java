@@ -1,8 +1,9 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
-import com.eachnow.linebot.common.annotation.Description;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.DescriptionCommandPO;
+import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.URIAction;
@@ -22,14 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Description("表特 {多, 上一張, refresh}")
 @Command({"抽", "beauty", "表特"})
 public class BeautyHandler implements CommandHandler {
     private BeautyCrawlerService beautyCrawlerService;
@@ -38,6 +35,13 @@ public class BeautyHandler implements CommandHandler {
     @Autowired
     public BeautyHandler(BeautyCrawlerService beautyCrawlerService) {
         this.beautyCrawlerService = beautyCrawlerService;
+    }
+
+    public static DescriptionPO getDescription() {
+        List<DescriptionCommandPO> commands = new ArrayList<>();
+        commands.add(DescriptionCommandPO.builder().explain("隨機抽取表特版圖片").command("抽").build());
+        commands.add(DescriptionCommandPO.builder().explain("隨機精選十張表特版圖片").command("抽 多").build());
+        return DescriptionPO.builder().title("表特").description("爬取PTT表特版圖片資源。").commands(commands).build();
     }
 
     @Override

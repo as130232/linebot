@@ -3,6 +3,8 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.LanguageEnum;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.DescriptionCommandPO;
+import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -25,8 +27,10 @@ import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Command(value = {"translate", "翻譯"})
@@ -36,6 +40,15 @@ public class TranslationHandler implements CommandHandler {
     @Autowired
     public TranslationHandler(GoogleApiService googleApiService) {
         this.googleApiService = googleApiService;
+    }
+
+    public static DescriptionPO getDescription() {
+        List<DescriptionCommandPO> commands = new ArrayList<>();
+        commands.add(DescriptionCommandPO.builder().explain("翻譯多國語").command("翻譯 {語言}").example("翻譯 日").build());
+        commands.add(DescriptionCommandPO.builder().explain("結束翻譯模式").command("@close").example("").build());
+        String supportLangs = Arrays.stream(LanguageEnum.values()).map(languageEnum -> languageEnum.getCode()).collect(Collectors.joining(", "));
+        return DescriptionPO.builder().title("翻譯").description("可選擇語言按鈕進行翻譯，目前支援: " + supportLangs + "，結束時請輸入 @close 關閉翻譯模式，否則任何字串皆判定為翻譯文字。")
+                .commands(commands).build();
     }
 
     @Override

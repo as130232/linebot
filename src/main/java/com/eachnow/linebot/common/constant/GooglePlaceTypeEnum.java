@@ -48,7 +48,7 @@ public enum GooglePlaceTypeEnum {
     LIGHT_RAIL_STATION("輕軌"),
     LIQUOR_STORE("酒商"),
     LOCAL_GOVERNMENT_OFFICE("政府"),
-    LOCKSMITH(""),
+    LOCKSMITH("開鎖"),
     LODGING("住宿"),
     MOSQUE("清真寺"),
     MOVIE_RENTAL("影片出租"),

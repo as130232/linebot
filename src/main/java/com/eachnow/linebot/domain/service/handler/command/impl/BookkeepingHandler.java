@@ -5,6 +5,8 @@ import com.eachnow.linebot.common.constant.CurrencyEnum;
 import com.eachnow.linebot.common.db.po.BookkeepingPO;
 import com.eachnow.linebot.common.db.repository.BookkeepingRepository;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.DescriptionCommandPO;
+import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -17,11 +19,14 @@ import com.linecorp.bot.model.message.flex.component.*;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.*;
+import com.linecorp.bot.model.message.quickreply.QuickReply;
+import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +44,14 @@ public class BookkeepingHandler implements CommandHandler {
     @Autowired
     private BookkeepingHandler(BookkeepingRepository bookkeepingRepository) {
         this.bookkeepingRepository = bookkeepingRepository;
+    }
+
+    public static DescriptionPO getDescription() {
+        List<DescriptionCommandPO> commands = new ArrayList<>();
+        commands.add(DescriptionCommandPO.builder().explain("記帳").command("記 {類型} {金額} {幣值(可省略)}").example("記 晚餐 100 台幣(可省略)").build());
+        commands.add(DescriptionCommandPO.builder().explain("查帳").command("記 查 {開始時間(可省略)} {結束時間(可省略)}").example("記 查 20210101 20210103").build());
+        return DescriptionPO.builder().title("記帳").description("支援多國幣值，記帳時可以在金額後輸入對應幣值，若省略預設為新台幣，查帳時的時間格式yyyyMMdd，未給時間則預設查詢當天日期。")
+                .commands(commands).build();
     }
 
 //    @PostConstruct
@@ -128,15 +141,14 @@ public class BookkeepingHandler implements CommandHandler {
 
         listBookkeepingGroupByDate.keySet().stream().forEach(date -> {
             List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
-            BigDecimal totalOnOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-
+            BigDecimal totalOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
             //一天所有資訊
             List<FlexComponent> oneDateContents = new ArrayList<>();
             Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
                     //日期
                     Text.builder().text(date.replace("-", "/")).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
                     //該天總金額
-                    Text.builder().text("$" + totalOnOneDay).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
+                    Text.builder().text("$" + totalOneDay).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
             )).paddingAll(FlexPaddingSize.XS).build();
             oneDateContents.add(oneDateAndTotal);
 
@@ -174,7 +186,21 @@ public class BookkeepingHandler implements CommandHandler {
         );
         Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
-        return FlexMessage.builder().altText("記帳小本本").contents(contents).build();
-    }
 
+        //取得今天日期
+        String data = "記 查 ";
+        ZonedDateTime dateTime = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
+        String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue()).format(DateUtils.yyyyMMdd);
+        String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth()).format(DateUtils.yyyyMMdd);
+        String minusMonthsDate = dateTime.minusMonths(3).format(DateUtils.yyyyMMdd);
+        String dayOfYearDate = dateTime.minusDays(dateTime.getDayOfYear()).format(DateUtils.yyyyMMdd);
+        QuickReply quickReply = QuickReply.builder().items(
+                Arrays.asList(
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("本周").data(data + dayOfWeekDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("本月").data(data + dayOfMonthDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("三個月").data(data + minusMonthsDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("今年").data(data + dayOfYearDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build()
+                )).build();
+        return FlexMessage.builder().altText("記帳小本本").contents(contents).quickReply(quickReply).build();
+    }
 }

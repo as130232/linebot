@@ -3,6 +3,8 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.CurrencyEnum;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.DescriptionCommandPO;
+import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.common.util.CurrencyUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.CurrencyService;
@@ -41,6 +43,15 @@ public class CurrencyHandler implements CommandHandler {
     @Autowired
     public CurrencyHandler(CurrencyService currencyService) {
         this.currencyService = currencyService;
+    }
+
+    public static DescriptionPO getDescription() {
+        List<DescriptionCommandPO> commands = new ArrayList<>();
+        commands.add(DescriptionCommandPO.builder().explain("及時匯率").command("匯率").example("").build());
+        commands.add(DescriptionCommandPO.builder().explain("貨幣轉換").command("匯率 {原幣值} {轉換幣值} {金額}").example("匯率 台幣 日幣 1234").build());
+        String supportCurrency = Arrays.stream(CurrencyEnum.values()).map(languageEnum -> languageEnum.getName()).collect(Collectors.joining(", "));
+        return DescriptionPO.builder().title("匯率").description("取得最新各國匯率資訊，亦可選擇貨幣按鈕進行匯率轉換，目前支援貨幣: " + supportCurrency)
+                .commands(commands).build();
     }
 
     @Override
@@ -109,10 +120,6 @@ public class CurrencyHandler implements CommandHandler {
         }).collect(Collectors.toList());
         QuickReply quickReply = QuickReply.builder().items(items).build();
         return quickReply;
-    }
-
-    private String getFormat() {
-        return "貨幣 {原始幣值} {轉換幣值} {金額}";
     }
 
 }
