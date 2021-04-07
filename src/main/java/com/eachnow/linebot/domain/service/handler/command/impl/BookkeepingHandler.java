@@ -50,8 +50,8 @@ public class BookkeepingHandler implements CommandHandler {
         List<DescriptionCommandPO> commands = new ArrayList<>();
         commands.add(DescriptionCommandPO.builder().explain("記帳").command("記 {類型} {金額} {幣值(可省略)}").example("記 晚餐 100 台幣(可省略)").build());
         commands.add(DescriptionCommandPO.builder().explain("查帳").command("記 查 {開始時間(可省略)} {結束時間(可省略)}").example("記 查 20210101 20210103").build());
-        return DescriptionPO.builder().title("記帳").description("支援多國幣值，記帳時可以在金額後輸入對應幣值，若省略預設為新台幣，查帳時的時間格式yyyyMMdd，未給時間則預設查詢當天日期。")
-                .commands(commands).build();
+        return DescriptionPO.builder().title("記帳").description("記帳時可在金額後輸入對應幣值，省略則為新台幣，查帳的時間格式為yyyyMMdd，省略則查詢當天日期。")
+                .commands(commands).imageUrl("https://www.dummies.com/wp-content/uploads/bookkeeping-balance-sheet.jpg").build();
     }
 
 //    @PostConstruct

@@ -5,6 +5,7 @@ import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.DescriptionCommandPO;
 import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
+import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.flex.component.*;
@@ -50,7 +51,7 @@ public class FuntionHandler implements CommandHandler {
     }
 
     public Bubble getBubble(DescriptionPO descriptionPO) {
-        URI imageUrl = URI.create("https://i.imgur.com/R0qpw6h.jpg");   //default
+        URI imageUrl = URI.create(descriptionPO.getImageUrl() == null ? "https://i.imgur.com/R0qpw6h.jpg" : descriptionPO.getImageUrl());   //default
         FlexComponent hero = Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover)
                 .aspectRatio(320, 213).url(imageUrl).build();
 
@@ -60,19 +61,26 @@ public class FuntionHandler implements CommandHandler {
             commandContents.add(Text.builder().text((i + 1) + ". " + commandPO.getExplain()).weight(Text.TextWeight.BOLD).build());
             commandContents.add(Box.builder().layout(FlexLayout.BASELINE).contents(Arrays.asList(
                     Icon.builder().url(URI.create("https://i.imgur.com/yPacRyd.png")).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).offsetEnd(FlexOffsetSize.SM).build(),   //input icon
-                    Text.builder().text(commandPO.getCommand()).build(),
-                    Icon.builder().url(URI.create("https://i.imgur.com/YNJ8mW7.png")).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).offsetEnd(FlexOffsetSize.SM).build(),   //example icon
-                    Text.builder().text(commandPO.getExample() == null || "".equals(commandPO.getExample()) ? " " : commandPO.getExample()).build()
+                    Text.builder().text(commandPO.getCommand()).build()
             )).build());
-        }
 
+            if (commandPO.getExample() != null) {
+                commandContents.add(Box.builder().layout(FlexLayout.BASELINE).contents(Arrays.asList(
+                        Icon.builder().url(URI.create("https://i.imgur.com/YNJ8mW7.png")).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).offsetEnd(FlexOffsetSize.SM).build(),   //example icon
+                        Text.builder().text(commandPO.getExample()).build()
+                )).build());
+            }
+        }
         List<FlexComponent> bodyContents = Arrays.asList(
                 Text.builder().text(descriptionPO.getDescription()).size(FlexFontSize.SM).wrap(true).build(),
                 Separator.builder().color("#666666").margin(FlexMarginSize.SM).build(),
                 Box.builder().layout(FlexLayout.VERTICAL).paddingTop(FlexPaddingSize.SM).contents(commandContents).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).paddingAll(FlexPaddingSize.LG).contents(bodyContents).build();
-        Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(null)
+        Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(Button.builder().height(Button.ButtonHeight.SMALL)
+                .action(PostbackAction.builder().label(descriptionPO.getTitle()).data(descriptionPO.getTitle()).build())
+                .style(Button.ButtonStyle.PRIMARY).color("00ff7f").build())).backgroundColor("00ff7f").build();
+        Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(footer)
                 .size(Bubble.BubbleSize.KILO).build();
         return bubble;
     }
