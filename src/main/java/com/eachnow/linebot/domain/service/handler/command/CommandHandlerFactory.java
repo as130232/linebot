@@ -43,6 +43,8 @@ public class CommandHandlerFactory {
     private CurrencyHandler currencyHandler;
 
     @Autowired
+    private FuntionHandler funtionHandler;
+    @Autowired
     private DefaultHandler defaultHandler;
 
     @Autowired
@@ -92,6 +94,8 @@ public class CommandHandlerFactory {
             commandHandler = helloHandler;
         } else if (TranslationHandler.class.equals(commandHandlerClass)) {
             commandHandler = translationHandler;
+        } else if (FuntionHandler.class.equals(commandHandlerClass)) {
+            commandHandler = funtionHandler;
         }
         return commandHandler;
 //        try {
