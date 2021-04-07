@@ -190,8 +190,8 @@ public class BookkeepingHandler implements CommandHandler {
         //取得今天日期
         String data = "記 查 ";
         ZonedDateTime dateTime = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
-        String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue()).format(DateUtils.yyyyMMdd);
-        String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth()).format(DateUtils.yyyyMMdd);
+        String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue() - 1).format(DateUtils.yyyyMMdd);
+        String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth() - 1).format(DateUtils.yyyyMMdd);
         String minusMonthsDate = dateTime.minusMonths(3).format(DateUtils.yyyyMMdd);
         String dayOfYearDate = dateTime.minusDays(dateTime.getDayOfYear()).format(DateUtils.yyyyMMdd);
         QuickReply quickReply = QuickReply.builder().items(

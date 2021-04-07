@@ -11,4 +11,5 @@ public class DescriptionPO {
     private String title;
     private String description;
     private List<DescriptionCommandPO> commands;
+    private String imageUrl;
 }
