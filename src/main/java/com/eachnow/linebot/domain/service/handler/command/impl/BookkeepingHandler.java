@@ -134,8 +134,10 @@ public class BookkeepingHandler implements CommandHandler {
         long endDateTime = DateUtils.parseToEndOfDayMilli(endDate, DateUtils.yyyyMMdd);
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndCreateTimeBetween(commandPO.getUserId(), new Timestamp(startDateTime), new Timestamp(endDateTime));
 
-        //按照日期分類與排序(日期近的在前)
-        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().sorted(Comparator.comparing(BookkeepingPO::getCreateTime).reversed()).collect(Collectors.groupingBy(po -> DateUtils.format(po.getCreateTime(), DateUtils.yyyyMMddDash)));
+        //排序，日期近的在前
+        listBookkeeping = listBookkeeping.stream().sorted(Comparator.comparing(BookkeepingPO::getCreateTime).reversed()).collect(Collectors.toList());
+        //按照日期分類
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(po -> DateUtils.format(po.getCreateTime(), DateUtils.yyyyMMddDash)));
         List<FlexComponent> bodyContents = new ArrayList<>();
         listBookkeepingGroupByDate.keySet().stream().forEach(date -> {
             List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
