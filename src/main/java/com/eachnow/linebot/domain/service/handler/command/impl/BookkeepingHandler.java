@@ -48,8 +48,8 @@ public class BookkeepingHandler implements CommandHandler {
 
     public static DescriptionPO getDescription() {
         List<DescriptionCommandPO> commands = new ArrayList<>();
-        commands.add(DescriptionCommandPO.builder().explain("記帳").command("記 {類型} {金額} {幣值(可省略)}").example("記 晚餐 100 台幣(可省略)").build());
-        commands.add(DescriptionCommandPO.builder().explain("查帳").command("記 查 {開始時間(可省略)} {結束時間(可省略)}").example("記 查 20210101 20210103").build());
+        commands.add(DescriptionCommandPO.builder().explain("記帳").command("記 {類型} {金額} {幣值}").example("記 晚餐 100 台幣(可省略)").build());
+        commands.add(DescriptionCommandPO.builder().explain("查帳").command("記 查 {開始時間} {結束時間}").example("記 查 20210101 20210103").build());
         return DescriptionPO.builder().title("記帳").description("記帳時可在金額後輸入對應幣值，省略則為新台幣，查帳的時間格式為yyyyMMdd，省略則查詢當天日期。")
                 .commands(commands).imageUrl("https://www.dummies.com/wp-content/uploads/bookkeeping-balance-sheet.jpg").build();
     }
@@ -190,8 +190,8 @@ public class BookkeepingHandler implements CommandHandler {
         //取得今天日期
         String data = "記 查 ";
         ZonedDateTime dateTime = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
-        String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue() - 1).format(DateUtils.yyyyMMdd);
-        String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth() - 1).format(DateUtils.yyyyMMdd);
+        String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue()).format(DateUtils.yyyyMMdd);
+        String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth()).format(DateUtils.yyyyMMdd);
         String minusMonthsDate = dateTime.minusMonths(3).format(DateUtils.yyyyMMdd);
         String dayOfYearDate = dateTime.minusDays(dateTime.getDayOfYear()).format(DateUtils.yyyyMMdd);
         QuickReply quickReply = QuickReply.builder().items(

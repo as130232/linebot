@@ -26,21 +26,23 @@ public class FuntionHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         List<Bubble> listBubble = new ArrayList<>(10);
+
+        //翻譯
+        DescriptionPO translationDescription = TranslationHandler.getDescription();
+        listBubble.add(getBubble(translationDescription));
+        //記帳查帳
+        DescriptionPO bookkeepingDescription = BookkeepingHandler.getDescription();
+        listBubble.add(getBubble(bookkeepingDescription));
+        //匯率(幣值轉換)
+        DescriptionPO currencyDescription = CurrencyHandler.getDescription();
+        listBubble.add(getBubble(currencyDescription));
+
         //表特
         DescriptionPO beautyDescription = BeautyHandler.getDescription();
         listBubble.add(getBubble(beautyDescription));
         //地點
         DescriptionPO placeDescription = PlaceHandler.getDescription();
         listBubble.add(getBubble(placeDescription));
-        //翻譯
-        DescriptionPO translationDescription = TranslationHandler.getDescription();
-        listBubble.add(getBubble(translationDescription));
-        //匯率(幣值轉換)
-        DescriptionPO currencyDescription = CurrencyHandler.getDescription();
-        listBubble.add(getBubble(currencyDescription));
-        //記帳/查帳
-        DescriptionPO bookkeepingDescription = BookkeepingHandler.getDescription();
-        listBubble.add(getBubble(bookkeepingDescription));
         //天氣
 
         //吃什麼、你好
@@ -66,7 +68,7 @@ public class FuntionHandler implements CommandHandler {
 
             if (commandPO.getExample() != null) {
                 commandContents.add(Box.builder().layout(FlexLayout.BASELINE).contents(Arrays.asList(
-                        Icon.builder().url(URI.create("https://i.imgur.com/YNJ8mW7.png")).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).offsetEnd(FlexOffsetSize.SM).build(),   //example icon
+                        Icon.builder().url(URI.create("https://i.imgur.com/YNJ8mW7.png")).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).build(),   //example icon
                         Text.builder().text(commandPO.getExample()).build()
                 )).build());
             }

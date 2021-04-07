@@ -48,7 +48,7 @@ public class CurrencyHandler implements CommandHandler {
     public static DescriptionPO getDescription() {
         List<DescriptionCommandPO> commands = new ArrayList<>();
         commands.add(DescriptionCommandPO.builder().explain("及時匯率").command("匯率").build());
-        commands.add(DescriptionCommandPO.builder().explain("貨幣轉換").command("匯率 {原幣值} {轉換幣值} {金額}").example("匯率 台幣 日幣 1234").build());
+        commands.add(DescriptionCommandPO.builder().explain("貨幣轉換").command("匯率 {原幣} {轉換幣} {金額}").example("匯率 台幣 日幣 1234").build());
         return DescriptionPO.builder().title("匯率").description("取得最新各國匯率資訊，亦可選擇貨幣按鈕進行匯率轉換，目前支援多國貨幣。")
                 .commands(commands).imageUrl("https://www.investopedia.com/thmb/Mjlr3my8SkbkoQMDpMgz8oZcf4M=/2121x1414/filters:fill(auto,1)/foreign-currency-804917648-e79b58313e114a94b198e49fd015098f.jpg").build();
     }
