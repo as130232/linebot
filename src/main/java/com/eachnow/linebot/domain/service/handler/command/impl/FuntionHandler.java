@@ -81,7 +81,7 @@ public class FuntionHandler implements CommandHandler {
         Box body = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).paddingAll(FlexPaddingSize.LG).contents(bodyContents).build();
         Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(Button.builder().height(Button.ButtonHeight.SMALL)
                 .action(PostbackAction.builder().label(descriptionPO.getTitle()).data(descriptionPO.getTitle()).build())
-                .style(Button.ButtonStyle.PRIMARY).color("#17c950").build())).backgroundColor("#17c950").build();
+                .style(Button.ButtonStyle.PRIMARY).color("#17c950").build())).backgroundColor("#17c950").paddingAll(FlexPaddingSize.NONE).build();
         Bubble bubble = Bubble.builder().header(null).hero(hero).body(body).footer(footer)
                 .size(Bubble.BubbleSize.KILO).build();
         return bubble;
