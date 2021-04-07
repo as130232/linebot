@@ -7,6 +7,7 @@ import com.eachnow.linebot.common.db.repository.BookkeepingRepository;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.DescriptionCommandPO;
 import com.eachnow.linebot.common.po.DescriptionPO;
+import com.eachnow.linebot.common.po.google.map.ResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -27,10 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -135,10 +133,10 @@ public class BookkeepingHandler implements CommandHandler {
             endDate = startDate;
         long endDateTime = DateUtils.parseToEndOfDayMilli(endDate, DateUtils.yyyyMMdd);
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndCreateTimeBetween(commandPO.getUserId(), new Timestamp(startDateTime), new Timestamp(endDateTime));
-        //按照日期分類
-        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(po -> DateUtils.format(po.getCreateTime(), DateUtils.yyyyMMddDash)));
-        List<FlexComponent> bodyContents = new ArrayList<>();
 
+        //按照日期分類與排序(日期近的在前)
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().sorted(Comparator.comparing(BookkeepingPO::getCreateTime).reversed()).collect(Collectors.groupingBy(po -> DateUtils.format(po.getCreateTime(), DateUtils.yyyyMMddDash)));
+        List<FlexComponent> bodyContents = new ArrayList<>();
         listBookkeepingGroupByDate.keySet().stream().forEach(date -> {
             List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
             BigDecimal totalOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -196,10 +194,10 @@ public class BookkeepingHandler implements CommandHandler {
         String dayOfYearDate = dateTime.minusDays(dateTime.getDayOfYear()).format(DateUtils.yyyyMMdd);
         QuickReply quickReply = QuickReply.builder().items(
                 Arrays.asList(
-                        QuickReplyItem.builder().action(PostbackAction.builder().label("本周").data(data + dayOfWeekDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
-                        QuickReplyItem.builder().action(PostbackAction.builder().label("本月").data(data + dayOfMonthDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
-                        QuickReplyItem.builder().action(PostbackAction.builder().label("三個月").data(data + minusMonthsDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
-                        QuickReplyItem.builder().action(PostbackAction.builder().label("今年").data(data + dayOfYearDate + " " + dateTime.format(DateUtils.yyyyMMdd)).build()).build()
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("本周").data(data + dayOfWeekDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("本月").data(data + dayOfMonthDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("三個月").data(data + minusMonthsDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
+                        QuickReplyItem.builder().action(PostbackAction.builder().label("今年").data(data + dayOfYearDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build()
                 )).build();
         return FlexMessage.builder().altText("記帳小本本").contents(contents).quickReply(quickReply).build();
     }
