@@ -98,7 +98,6 @@ public class CurrencyHandler implements CommandHandler {
             bodyContents.add(currencyBody);
             Separator separator = Separator.builder().margin(FlexMarginSize.XS).color("#666666").build();
             bodyContents.add(separator);
-
         });
         //最後更新時間
         String utc = CurrencyUtils.getUtc(jsonObject, CurrencyEnum.TWD.getKey());

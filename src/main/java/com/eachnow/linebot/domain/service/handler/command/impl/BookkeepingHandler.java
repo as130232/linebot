@@ -25,6 +25,7 @@ import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -54,7 +55,7 @@ public class BookkeepingHandler implements CommandHandler {
 
 //    @PostConstruct
 //    private void test() {
-//        String text = "記 查 20210329";
+//        String text = "記 查";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -166,7 +167,8 @@ public class BookkeepingHandler implements CommandHandler {
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
             bodyContents.add(separator);
         });
-        bodyContents.remove(bodyContents.size() - 1);   //移除掉最後一個separator
+        if (bodyContents.size() > 0)
+            bodyContents.remove(bodyContents.size() - 1);   //移除掉最後一個separator
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.MD).build();
 
         //標頭

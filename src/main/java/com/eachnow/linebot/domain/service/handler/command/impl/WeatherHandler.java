@@ -86,11 +86,11 @@ public class WeatherHandler implements CommandHandler {
     }
 
 
-    @PostConstruct
-    private void test() {
-        String text = "天氣 臺北市";
-        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-        execute(commandPO);
-    }
+//    @PostConstruct
+//    private void test() {
+//        String text = "天氣 臺北市";
+//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+//        execute(commandPO);
+//    }
 }
