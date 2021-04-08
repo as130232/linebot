@@ -9,4 +9,5 @@ public class DescriptionCommandPO {
     private String explain;
     private String command;
     private String example;
+    private String postback;
 }

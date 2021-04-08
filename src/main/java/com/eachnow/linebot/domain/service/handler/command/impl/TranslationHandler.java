@@ -44,8 +44,8 @@ public class TranslationHandler implements CommandHandler {
 
     public static DescriptionPO getDescription() {
         List<DescriptionCommandPO> commands = new ArrayList<>();
-        commands.add(DescriptionCommandPO.builder().explain("翻譯多國語").command("翻譯 {語言}").example("翻譯 日").build());
-        commands.add(DescriptionCommandPO.builder().explain("結束翻譯模式").command("@close").build());
+        commands.add(DescriptionCommandPO.builder().explain("翻譯多國語").command("翻譯 {語言}").example("翻譯 英").postback("翻譯 英").build());
+        commands.add(DescriptionCommandPO.builder().explain("結束翻譯模式").command("@close").postback("@close").build());
         String supportLangs = Arrays.stream(LanguageEnum.values()).map(languageEnum -> languageEnum.getCode()).collect(Collectors.joining(", "));
         return DescriptionPO.builder().title("翻譯").description("可選擇語言按鈕進行翻譯，目前支援: " + supportLangs + "，結束時輸入@close關閉翻譯模式。")
                 .commands(commands).imageUrl("https://developers.google.com/ml-kit/images/on_device_translate2x.png").build();

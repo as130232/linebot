@@ -63,7 +63,7 @@ public class FuntionHandler implements CommandHandler {
             commandContents.add(Text.builder().text((i + 1) + ". " + commandPO.getExplain()).weight(Text.TextWeight.BOLD).build());
             commandContents.add(Box.builder().layout(FlexLayout.BASELINE).contents(Arrays.asList(
                     Icon.builder().url(URI.create("https://i.imgur.com/yPacRyd.png")).size(FlexFontSize.LG).offsetTop(FlexOffsetSize.SM).offsetEnd(FlexOffsetSize.SM).build(),   //input icon
-                    Text.builder().text(commandPO.getCommand()).build()
+                    Text.builder().text(commandPO.getCommand()).action(PostbackAction.builder().data(commandPO.getPostback()).label(commandPO.getPostback()).build()).build()
             )).build());
 
             if (commandPO.getExample() != null) {
