@@ -154,8 +154,8 @@ public class BookkeepingHandler implements CommandHandler {
             List<FlexComponent> oneDateContents = new ArrayList<>();
             //取得該日期對應星期幾
             ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
-            String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN);
-            String dateContainDayOfWeek = date.replace("-", "/") + " ({dayOfWeek})".replace("{dayOfWeek}", dayOfWeekName);
+            String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
+            String dateContainDayOfWeek = date.replace("-", "/") + "({dayOfWeek})".replace("{dayOfWeek}", dayOfWeekName);
             Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
                     //日期
                     Text.builder().text(dateContainDayOfWeek).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
