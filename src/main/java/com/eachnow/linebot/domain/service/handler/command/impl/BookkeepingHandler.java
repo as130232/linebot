@@ -24,10 +24,11 @@ import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -151,9 +152,13 @@ public class BookkeepingHandler implements CommandHandler {
             BigDecimal totalOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
             //一天所有資訊
             List<FlexComponent> oneDateContents = new ArrayList<>();
+            //取得該日期對應星期幾
+            ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
+            String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN);
+            String dateContainDayOfWeek = date.replace("-", "/") + " ({dayOfWeek})".replace("{dayOfWeek}", dayOfWeekName);
             Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
                     //日期
-                    Text.builder().text(date.replace("-", "/")).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
+                    Text.builder().text(dateContainDayOfWeek).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
                     //該天總金額
                     Text.builder().text("$" + totalOneDay).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
             )).paddingAll(FlexPaddingSize.XS).build();
@@ -199,7 +204,7 @@ public class BookkeepingHandler implements CommandHandler {
         String data = "記 查 ";
         ZonedDateTime dateTime = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
         String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue()).format(DateUtils.yyyyMMdd);
-        String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth()).format(DateUtils.yyyyMMdd);
+        String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth() - 1).format(DateUtils.yyyyMMdd);
         String minusMonthsDate = dateTime.minusMonths(3).format(DateUtils.yyyyMMdd);
         String dayOfYearDate = dateTime.minusDays(dateTime.getDayOfYear()).format(DateUtils.yyyyMMdd);
         QuickReply quickReply = QuickReply.builder().items(
@@ -211,4 +216,5 @@ public class BookkeepingHandler implements CommandHandler {
                 )).build();
         return FlexMessage.builder().altText("記帳小本本").contents(contents).quickReply(quickReply).build();
     }
+
 }
