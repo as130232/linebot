@@ -46,6 +46,11 @@ public class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).toInstant().toEpochMilli();
     }
 
+    public static String parse(String date, DateTimeFormatter from, DateTimeFormatter to){
+        LocalDate localDate = LocalDate.parse(date, from);
+        return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).format(to);
+    }
+
     /**
      * 取得台北現在日期格式
      *

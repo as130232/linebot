@@ -7,7 +7,6 @@ import com.eachnow.linebot.common.db.repository.BookkeepingRepository;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.DescriptionCommandPO;
 import com.eachnow.linebot.common.po.DescriptionPO;
-import com.eachnow.linebot.common.po.google.map.ResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -25,7 +24,6 @@ import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -47,7 +45,7 @@ public class BookkeepingHandler implements CommandHandler {
 
     public static DescriptionPO getDescription() {
         List<DescriptionCommandPO> commands = new ArrayList<>();
-        commands.add(DescriptionCommandPO.builder().explain("記帳").command("記 {類型} {金額} {幣值}").example("記 晚餐 100 台幣(可省略)").postback("記 早餐 50").build());
+        commands.add(DescriptionCommandPO.builder().explain("記帳").command("記 {類型} {金額} {幣值} {日期}").example("記 晚餐 100 台幣(省) 20210101(省)").postback("記 早餐 50 台").build());
         commands.add(DescriptionCommandPO.builder().explain("查帳").command("記 查 {開始時間} {結束時間}").example("記 查 20210101 20210103").postback("記 查").build());
         return DescriptionPO.builder().title("記帳").description("記帳時可在金額後輸入對應幣值，省略則為新台幣，查帳的時間格式為yyyyMMdd，省略則查詢當天日期。")
                 .commands(commands).imageUrl("https://www.dummies.com/wp-content/uploads/bookkeeping-balance-sheet.jpg").build();
@@ -71,6 +69,10 @@ public class BookkeepingHandler implements CommandHandler {
         String typeName = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
         String amount = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         CurrencyEnum currencyEnum = CurrencyEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 2));
+        String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 3);
+        if (!date.contains("-"))
+            date = DateUtils.parse(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);   //格式轉換
+
         if (currencyEnum == null)
             currencyEnum = CurrencyEnum.TWD; //default 新台幣
         if (commandPO.getParams().size() < 2 || !isNumber(amount)) {
@@ -79,7 +81,7 @@ public class BookkeepingHandler implements CommandHandler {
         if (text.contains(CONFIRM)) {
             MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
-                    .createTime(new Timestamp((DateUtils.getCurrentEpochMilli()))).build();
+                    .date(date).createTime(new Timestamp((DateUtils.getCurrentEpochMilli()))).build();
             bookkeepingRepository.save(po);
             log.info("記帳成功。BookkeepingPO:{}", po);
             return new TextMessage("記帳成功。");
@@ -88,14 +90,15 @@ public class BookkeepingHandler implements CommandHandler {
             return new TextMessage("記帳已取消。");
         }
         String data = commandPO.getCommand() + ParamterUtils.CONTACT + typeName + ParamterUtils.CONTACT +
-                amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT;
+                amount + ParamterUtils.CONTACT + currencyEnum.getName() + ParamterUtils.CONTACT + date + ParamterUtils.CONTACT;
         MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), data); //新增緩存
         List<FlexComponent> bodyContents = Arrays.asList(
                 Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build(),
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
-                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build()
+                Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
+                Text.builder().text("日期: " + DateUtils.getCurrentDate()).size(FlexFontSize.LG).build()
         );
-        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).build();
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).paddingAll(FlexPaddingSize.MD).build();
         List<FlexComponent> footerContents = Arrays.asList(
                 Button.builder().style(Button.ButtonStyle.PRIMARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("確定").data(CONFIRM).build()).build(),
                 Button.builder().style(Button.ButtonStyle.SECONDARY).height(Button.ButtonHeight.SMALL).action(PostbackAction.builder().label("取消").data(CANCEL).build()).build()

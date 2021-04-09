@@ -29,4 +29,6 @@ public class BookkeepingPO {
     @Column(updatable = false)
     @CreationTimestamp
     private Timestamp createTime;
+    @Column(length = 10)
+    private String date;
 }
