@@ -53,7 +53,7 @@ public class BookkeepingHandler implements CommandHandler {
 
 //    @PostConstruct
 //    private void test() {
-//        String text = "記 查";
+//        String text = "記 午餐-火烤雞胸便當 110";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -70,6 +70,8 @@ public class BookkeepingHandler implements CommandHandler {
         String amount = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         CurrencyEnum currencyEnum = CurrencyEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 2));
         String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 3);
+        if (date == null)
+            date = DateUtils.getCurrentDate();
         if (!date.contains("-"))
             date = DateUtils.parse(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);   //格式轉換
 
@@ -96,7 +98,7 @@ public class BookkeepingHandler implements CommandHandler {
                 Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build(),
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
                 Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
-                Text.builder().text("日期: " + DateUtils.getCurrentDate()).size(FlexFontSize.LG).build()
+                Text.builder().text("日期: " + date).size(FlexFontSize.LG).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).paddingAll(FlexPaddingSize.MD).build();
         List<FlexComponent> footerContents = Arrays.asList(
@@ -139,9 +141,9 @@ public class BookkeepingHandler implements CommandHandler {
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndCreateTimeBetween(commandPO.getUserId(), new Timestamp(startDateTime), new Timestamp(endDateTime));
 
         //排序，日期近的在前
-        listBookkeeping = listBookkeeping.stream().sorted(Comparator.comparing(BookkeepingPO::getCreateTime).reversed()).collect(Collectors.toList());
+        listBookkeeping = listBookkeeping.stream().sorted(Comparator.comparing(BookkeepingPO::getDate).reversed()).collect(Collectors.toList());
         //按照日期分類
-        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(po -> DateUtils.format(po.getCreateTime(), DateUtils.yyyyMMddDash)));
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(BookkeepingPO::getDate));
         List<FlexComponent> bodyContents = new ArrayList<>();
         listBookkeepingGroupByDate.keySet().stream().forEach(date -> {
             List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
