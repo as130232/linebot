@@ -54,7 +54,7 @@ public class BookkeepingHandler implements CommandHandler {
 
 //    @PostConstruct
 //    private void test() {
-//        String text = "記 查";
+//        String text = "記 查 20210401 20210409";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -140,12 +140,13 @@ public class BookkeepingHandler implements CommandHandler {
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),
                 DateUtils.parse(startDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash),
                 DateUtils.parse(endDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash));
-        //排序，日期近的在前
-        listBookkeeping = listBookkeeping.stream().sorted(Comparator.comparing(BookkeepingPO::getDate).reversed()).collect(Collectors.toList());
         //按照日期分類
         Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(BookkeepingPO::getDate));
+        //排序，日期小的在前
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDateInSorted = listBookkeepingGroupByDate.entrySet().stream()
+                .sorted((Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
         List<FlexComponent> bodyContents = new ArrayList<>();
-        listBookkeepingGroupByDate.keySet().stream().forEach(date -> {
+        listBookkeepingGroupByDateInSorted.keySet().stream().forEach(date -> {
             List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
             BigDecimal totalOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
             //一天所有資訊
