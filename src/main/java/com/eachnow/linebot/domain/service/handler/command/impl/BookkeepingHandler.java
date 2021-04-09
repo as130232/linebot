@@ -24,6 +24,7 @@ import com.linecorp.bot.model.message.quickreply.QuickReplyItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.ZonedDateTime;
@@ -53,7 +54,7 @@ public class BookkeepingHandler implements CommandHandler {
 
 //    @PostConstruct
 //    private void test() {
-//        String text = "記 午餐-火烤雞胸便當 110";
+//        String text = "記 查";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -133,13 +134,12 @@ public class BookkeepingHandler implements CommandHandler {
         String startDate = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         if (startDate == null)  //預設當天
             startDate = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
-        long startDateTime = DateUtils.parseToStartOfDayMilli(startDate, DateUtils.yyyyMMdd);
         String endDate = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
         if (endDate == null)
             endDate = startDate;
-        long endDateTime = DateUtils.parseToEndOfDayMilli(endDate, DateUtils.yyyyMMdd);
-        List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndCreateTimeBetween(commandPO.getUserId(), new Timestamp(startDateTime), new Timestamp(endDateTime));
-
+        List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),
+                DateUtils.parse(startDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash),
+                DateUtils.parse(endDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash));
         //排序，日期近的在前
         listBookkeeping = listBookkeeping.stream().sorted(Comparator.comparing(BookkeepingPO::getDate).reversed()).collect(Collectors.toList());
         //按照日期分類

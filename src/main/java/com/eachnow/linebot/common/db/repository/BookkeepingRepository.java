@@ -17,4 +17,9 @@ public interface BookkeepingRepository extends JpaRepository<BookkeepingPO, Inte
     List<BookkeepingPO> findByUserIdAndCreateTimeBetween(@Param("userId") String userId,
                                                          @Param("startDateTime") Timestamp startDateTime,
                                                          @Param("endDateTime") Timestamp endDateTime);
+
+    @Query(value = "SELECT * FROM bookkeeping WHERE user_id = :userId AND date BETWEEN :startDateTime AND :endDateTime", nativeQuery = true)
+    List<BookkeepingPO> findByUserIdAndDateBetween(@Param("userId") String userId,
+                                                         @Param("startDateTime") String startDateTime,
+                                                         @Param("endDateTime") String endDateTime);
 }
