@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.db.po.RemindPO;
 import com.eachnow.linebot.common.db.repository.RemindRepository;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.util.DateUtils;
+import com.eachnow.linebot.common.util.NumberUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
@@ -114,12 +115,12 @@ public class RemindHandler implements CommandHandler {
         try {
             //20210408 161800 -> 0 18 16 8 4 ? 2021
             String cron = "{second} {minute} {hour} {day} {month} ? {year}";
-            String cronOfYear = parseCron(date.substring(0, 4));
-            String cronOfMonth = parseCron(date.substring(4, 6));
-            String cronOfDay = parseCron(date.substring(6, 8));
-            String cronOfHour = parseCron(time.substring(0, 2));
-            String cronOfMinute = parseCron(time.substring(2, 4));
-            String cronOfSecond = parseCron(time.substring(4, 6));
+            String cronOfYear = parseCronParam(date.substring(0, 4));
+            String cronOfMonth = parseCronParam(date.substring(4, 6));
+            String cronOfDay = parseCronParam(date.substring(6, 8));
+            String cronOfHour = parseCronParam(time.substring(0, 2));
+            String cronOfMinute = parseCronParam(time.substring(2, 4));
+            String cronOfSecond = parseCronParam(time.substring(4, 6));
             return cron.replace("{year}", cronOfYear).replace("{month}", cronOfMonth).replace("{day}", cronOfDay)
                     .replace("{hour}", cronOfHour).replace("{minute}", cronOfMinute).replace("{second}", cronOfSecond);
         } catch (Exception e) {
@@ -128,7 +129,10 @@ public class RemindHandler implements CommandHandler {
         return null;
     }
 
-    private static String parseCron(String cron) {
+    /**
+     * 解析cron 每一個時間參數 > 0 0 8 15 * ? *
+     */
+    private static String parseCronParam(String cron) {
         if (cron.contains("$") || cron.contains("＄")) {
             return "*";
         }
@@ -138,7 +142,11 @@ public class RemindHandler implements CommandHandler {
         return cron;
     }
 
-    private static String parseCronParam(String cronParam) {
+    /**
+     * 解析cron 每一個時間參數 > 0 0 8 15 * ? *
+     * 並轉成顯示的敘述
+     */
+    private static String parseCronDescription(String cronParam) {
         if (cronParam.contains("*")) {
             return "每";
         }
@@ -149,22 +157,20 @@ public class RemindHandler implements CommandHandler {
         //0 0 8 15 * ? *
         String date = "{year}年 {month}月 {day}日";
         String[] cronArr = cron.split(" ");
-        String year = parseCronParam(cronArr[6]);
-        String month = parseCronParam(cronArr[4]);
-        String day = parseCronParam(cronArr[3]);
-        date.replace("{year}", year).replace("{month}", month).replace("{day}", day);
-        return date;
+        String year = parseCronDescription(cronArr[6]);
+        String month = parseCronDescription(cronArr[4]);
+        String day = parseCronDescription(cronArr[3]);
+        return date.replace("{year}", year).replace("{month}", month).replace("{day}", day);
     }
 
     public static String parseTimeByCron(String cron) {
         //0 0 8 15 * ? *
         String time = "{hour}時 {minute}分 {second}秒";
         String[] cronArr = cron.split(" ");
-        String hour = parseCronParam(cronArr[2]);
-        String minute = parseCronParam(cronArr[1]);
-        String second = parseCronParam(cronArr[0]);
-        time.replace("{hour}", hour).replace("{minute}", minute).replace("{second}", second);
-        return time;
+        String hour = parseCronDescription(cronArr[2]);
+        String minute = parseCronDescription(cronArr[1]);
+        String second = parseCronDescription(cronArr[0]);
+        return time.replace("{hour}", hour).replace("{minute}", minute).replace("{second}", second);
     }
 
     public static void main(String[] args) {
