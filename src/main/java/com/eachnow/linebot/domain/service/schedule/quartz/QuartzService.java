@@ -35,6 +35,7 @@ public class QuartzService {
     public void init() {
         try {
             scheduler.start();
+            log.info("Scheduler start success.");
             //取得資料庫中所有有效的提醒任務
             List<RemindPO> listRemind = remindRepository.findByValid(CommonConstant.VALID);
             listRemind.forEach(po -> {
