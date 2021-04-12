@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.schedule.quartz.job;
 
 import com.eachnow.linebot.domain.service.line.LineNotifyService;
+import com.eachnow.linebot.domain.service.line.MessageSender;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -9,14 +10,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Slf4j
 public class RemindJob implements Job {
     private LineNotifyService lineNotifyService;
+    private MessageSender messageSender;
 
     @Autowired
-    public RemindJob(LineNotifyService lineNotifyService) {
+    public RemindJob(LineNotifyService lineNotifyService,
+                     MessageSender messageSender) {
         this.lineNotifyService = lineNotifyService;
+        this.messageSender = messageSender;
     }
 
     @Override
     public void execute(JobExecutionContext jobExecutionContext) {
-
+        log.info("trigger remind job. jobExecutionContext:{}", jobExecutionContext);
+        String userId = jobExecutionContext.getMergedJobDataMap().get("userId").toString();
+        String label = jobExecutionContext.getMergedJobDataMap().get("label").toString();
+//        Integer remindId = Integer.valueOf(jobExecutionContext.getMergedJobDataMap().get("remindId").toString());
+//        lineNotifyService.send(LineNotifyConstant.OWN, label);
+        messageSender.send(userId, "text", label);
     }
 }

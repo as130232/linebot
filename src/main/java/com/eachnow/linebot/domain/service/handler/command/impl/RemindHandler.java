@@ -52,7 +52,7 @@ public class RemindHandler implements CommandHandler {
         String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         String time = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
         if (label == null || date == null || time == null) {
-            return new TextMessage("請輸入正確格式:提醒 {標頭} {日期} {時間}，例:提醒 繳房租 $$$$$$15 0800，注意需空格隔開！");
+            return new TextMessage("請輸入正確格式:提醒 {標頭} {日期} {時間}，例:提醒 繳房租 $$$$$$15 0900，注意需空格隔開！");
         }
         String cron = getCron(date, time);
         Integer type = getType(cron);

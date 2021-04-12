@@ -33,7 +33,7 @@ public class MessageSender {
         return headers;
     }
 
-    public void send(String to, String type, String text) throws Exception {
+    public void send(String to, String type, String text) {
         List<MessagePO> messages = new ArrayList<>();
         messages.add(MessagePO.builder().type(type).text(text).build());
         PushMessagePO pushMessagePO = PushMessagePO.builder().to(to).messages(messages).build();
