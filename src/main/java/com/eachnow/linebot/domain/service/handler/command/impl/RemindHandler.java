@@ -56,7 +56,7 @@ public class RemindHandler implements CommandHandler {
         String cron = getCron(date, time);
         Integer type = getType(cron);
         if (cron == null)
-            return new TextMessage("請輸入正確格式:提醒 {標頭} {日期} {時間}，例:提醒 繳房租 $$$$$$15 0800，注意需空格隔開！");
+            return new TextMessage("日期與時間格式錯誤，{日期}為yyyyMMdd、{時間}為hhMMss，例:20210101 083000，為2021年1月1日早上8點30分");
 
         if (commandPO.getText().contains(CONFIRM)) {
             RemindPO remindPO = RemindPO.builder().userId(commandPO.getUserId()).label(label).cron(cron)
@@ -76,8 +76,8 @@ public class RemindHandler implements CommandHandler {
         List<FlexComponent> bodyContents = Arrays.asList(
                 Text.builder().text("標頭: " + label).size(FlexFontSize.LG).build(),
                 Text.builder().text("類型: " + (CommonConstant.ONCE == type ? "一次性" : "持續性")).size(FlexFontSize.LG).build(),
-                Text.builder().text("日期: " + date).size(FlexFontSize.LG).build(),
-                Text.builder().text("時間: " + time).size(FlexFontSize.LG).build()
+                Text.builder().text("日期: " + parseDateByCron(cron)).size(FlexFontSize.LG).build(),
+                Text.builder().text("時間: " + parseTimeByCron(cron)).size(FlexFontSize.LG).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).paddingAll(FlexPaddingSize.MD).build();
         List<FlexComponent> footerContents = Arrays.asList(
@@ -111,17 +111,21 @@ public class RemindHandler implements CommandHandler {
     private static String getCron(String date, String time) {
         if (date == null || time == null)
             return null;
-        //20210408 161800 -> 0 18 16 8 4 ? 2021
-        String cron = "{second} {minute} {hour} {day} {month} ? {year}";
-        String cronOfYear = parseCron(date.substring(0, 4));
-        String cronOfMonth = parseCron(date.substring(4, 6));
-        String cronOfDay = parseCron(date.substring(6, 8));
-        String cronOfHour = parseCron(time.substring(0, 2));
-        String cronOfMinute = parseCron(time.substring(2, 4));
-        String cronOfSecond = parseCron(time.substring(4, 6));
-        cron = cron.replace("{year}", cronOfYear).replace("{month}", cronOfMonth).replace("{day}", cronOfDay)
-                .replace("{hour}", cronOfHour).replace("{minute}", cronOfMinute).replace("{second}", cronOfSecond);
-        return cron;
+        try {
+            //20210408 161800 -> 0 18 16 8 4 ? 2021
+            String cron = "{second} {minute} {hour} {day} {month} ? {year}";
+            String cronOfYear = parseCron(date.substring(0, 4));
+            String cronOfMonth = parseCron(date.substring(4, 6));
+            String cronOfDay = parseCron(date.substring(6, 8));
+            String cronOfHour = parseCron(time.substring(0, 2));
+            String cronOfMinute = parseCron(time.substring(2, 4));
+            String cronOfSecond = parseCron(time.substring(4, 6));
+            return cron.replace("{year}", cronOfYear).replace("{month}", cronOfMonth).replace("{day}", cronOfDay)
+                    .replace("{hour}", cronOfHour).replace("{minute}", cronOfMinute).replace("{second}", cronOfSecond);
+        } catch (Exception e) {
+            log.error("getCron failed! date:{}, time:{}, error msg:{}", date, time, e.getMessage());
+        }
+        return null;
     }
 
     private static String parseCron(String cron) {
@@ -132,6 +136,35 @@ public class RemindHandler implements CommandHandler {
             cron = cron.substring(1, cron.length());
         }
         return cron;
+    }
+
+    private static String parseCronParam(String cronParam) {
+        if (cronParam.contains("*")) {
+            return "每";
+        }
+        return cronParam;
+    }
+
+    public static String parseDateByCron(String cron) {
+        //0 0 8 15 * ? *
+        String date = "{year}年 {month}月 {day}日";
+        String[] cronArr = cron.split(" ");
+        String year = parseCronParam(cronArr[6]);
+        String month = parseCronParam(cronArr[4]);
+        String day = parseCronParam(cronArr[3]);
+        date.replace("{year}", year).replace("{month}", month).replace("{day}", day);
+        return date;
+    }
+
+    public static String parseTimeByCron(String cron) {
+        //0 0 8 15 * ? *
+        String time = "{hour}時 {minute}分 {second}秒";
+        String[] cronArr = cron.split(" ");
+        String hour = parseCronParam(cronArr[2]);
+        String minute = parseCronParam(cronArr[1]);
+        String second = parseCronParam(cronArr[0]);
+        time.replace("{hour}", hour).replace("{minute}", minute).replace("{second}", second);
+        return time;
     }
 
     public static void main(String[] args) {
