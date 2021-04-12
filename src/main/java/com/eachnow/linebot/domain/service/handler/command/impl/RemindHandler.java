@@ -46,7 +46,7 @@ public class RemindHandler implements CommandHandler {
 
     @Override
     public Message execute(CommandPO commandPO) {
-        //提醒 繳房租 ??????15 0800
+        //提醒 繳房租 $$$$$$15 0900
         String label = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
         String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         String time = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
