@@ -63,17 +63,8 @@ public class QuartzService {
                     .usingJobData("userId", userId)
                     .usingJobData("label", label)
                     .build();
-            //"0 18 16 8 4 ? 2021"
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).inTimeZone(TimeZone.getTimeZone(DateUtils.CST_ZONE_ID));
-            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity(TRIGGER_NAME, TRIGGER_GROUP)
-                    .withSchedule(scheduleBuilder).build();
-//        SimpleTrigger trigger = TriggerBuilder.newTrigger()
-//                .withIdentity(TRIGGER_NAME, TRIGGER_GROUP).startNow()         // 立即执行
-//                .endAt(new Date(System.currentTimeMillis() + 10 * 1000))      // 10s后停止
-//                .withSchedule(
-//                        SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(1)   // 每秒执行一次
-//                                .repeatForever()    // 一直执行
-//                ).build();
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("CRON_TRIGGER" + remindId, TRIGGER_GROUP).withSchedule(scheduleBuilder).build();
             scheduler.scheduleJob(jobDetail, trigger);
             log.info("Quartz scheduler add Job success. remindId:{}, label:{}, cron:{}, userId:{}", remindId, label, cron, userId);
         } catch (Exception e) {
