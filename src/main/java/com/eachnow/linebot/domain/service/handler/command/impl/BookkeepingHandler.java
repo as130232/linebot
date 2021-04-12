@@ -85,7 +85,7 @@ public class BookkeepingHandler implements CommandHandler {
         if (text.contains(CONFIRM)) {
             MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
-                    .date(date).createTime(new Timestamp((DateUtils.getCurrentEpochMilli()))).build();
+                    .date(date).createTime(DateUtils.getCurrentTime()).build();
             bookkeepingRepository.save(po);
             log.info("記帳成功。BookkeepingPO:{}", po);
             return new TextMessage("記帳成功。");

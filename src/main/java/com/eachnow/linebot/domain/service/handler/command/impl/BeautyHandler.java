@@ -42,7 +42,7 @@ public class BeautyHandler implements CommandHandler {
         commands.add(DescriptionCommandPO.builder().explain("隨機抽取表特版圖片").command("抽").postback("抽").build());
         commands.add(DescriptionCommandPO.builder().explain("隨機精選十張表特版圖片").command("抽 多").postback("抽 多").build());
         return DescriptionPO.builder().title("表特").description("爬取PTT表特版圖片資源。")
-                .commands(commands).imageUrl("https://i.imgur.com/FT6BTl1.jpg").build();
+                .commands(commands).imageUrl("https://i.imgur.com/ht8dxBm.jpg").build();
     }
 
     @Override

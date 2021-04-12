@@ -41,6 +41,8 @@ public class CommandHandlerFactory {
     private BookkeepingHandler bookkeepingHandler;
     @Autowired
     private CurrencyHandler currencyHandler;
+    @Autowired
+    private RemindHandler remindHandler;
 
     @Autowired
     private FuntionHandler funtionHandler;
@@ -96,6 +98,8 @@ public class CommandHandlerFactory {
             commandHandler = translationHandler;
         } else if (FuntionHandler.class.equals(commandHandlerClass)) {
             commandHandler = funtionHandler;
+        } else if (RemindHandler.class.equals(commandHandlerClass)) {
+            commandHandler = remindHandler;
         }
         return commandHandler;
 //        try {

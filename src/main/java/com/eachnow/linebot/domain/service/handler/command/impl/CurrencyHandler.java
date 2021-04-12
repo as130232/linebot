@@ -75,7 +75,7 @@ public class CurrencyHandler implements CommandHandler {
             //公式 = 1美金 除 原貨幣 乘 轉換貨幣 乘 金額(在四捨五入)
             BigDecimal result = (BigDecimal.valueOf(1l).divide(fromExrate, 4, ROUND_HALF_DOWN).multiply(toExrate).multiply(new BigDecimal(amount)));
             result = result.setScale(2, BigDecimal.ROUND_HALF_UP);
-            return TextMessage.builder().text(from.getName() + ":" + amount + " = " + to.getName() + ":" + result).build();
+            return TextMessage.builder().text(from.getName() + ": " + amount + " = " + to.getName() + ": " + result).build();
         }
 
         List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("即時匯率").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());

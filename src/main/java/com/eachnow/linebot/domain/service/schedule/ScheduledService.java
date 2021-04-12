@@ -32,6 +32,7 @@ public class ScheduledService {
     private BeautyCrawlerService beautyCrawlerService;
     private OpenWeatherService openWeatherService;
 
+
     @Autowired
     public ScheduledService(LineNotifyService lineNotifyService,
                             BeautyCrawlerService beautyCrawlerService,
@@ -49,6 +50,12 @@ public class ScheduledService {
         return CRON_EXECUTE;
     }
 
+//    @Scheduled(cron = "0 9 16 8 4 ? 2021")
+//    public void test() {
+//        log.info("[schedule]test。time:{}", new Date());
+//        log.info("[schedule]test，完成。time:{}", new Date());
+//    }
+
     @Scheduled(cron = "${schedule.beauty.cron}")
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
@@ -65,12 +72,12 @@ public class ScheduledService {
     public void rainAlarm() {
         String loactionName = "臺北市";
         WeatherResultPO po = openWeatherService.getWeatherInfo(loactionName, null);
-        for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
+        for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(1).getWeatherElement()) {
             //降雨
             if (WeatherElementEnum.POP.getElement().equals(weatherElementPO.getElementName())) {
                 TimePO timePO = weatherElementPO.getTime().get(1);  // 取得隔天早上06:00 ~ 18:00 的機率
                 Integer unit = Integer.valueOf(timePO.getParameter().getParameterUnit());
-                if (unit >= 70) {   //降雨機率大於70% 則通知
+                if (unit >= 60) {   //降雨機率大於60% 則通知
                     lineNotifyService.send(LineNotifyConstant.OWN, "明天降雨機率為: {unit}%，記得帶傘。".replace("{unit}", unit.toString()));
                 }
                 break;

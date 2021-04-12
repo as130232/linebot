@@ -46,7 +46,7 @@ public class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).toInstant().toEpochMilli();
     }
 
-    public static String parse(String date, DateTimeFormatter from, DateTimeFormatter to){
+    public static String parse(String date, DateTimeFormatter from, DateTimeFormatter to) {
         LocalDate localDate = LocalDate.parse(date, from);
         return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).format(to);
     }
@@ -73,5 +73,8 @@ public class DateUtils {
         return ZonedDateTime.now(CST_ZONE_ID).toInstant().toEpochMilli();
     }
 
+    public static Timestamp getCurrentTime() {
+        return new Timestamp((getCurrentEpochMilli()));
+    }
 
 }
