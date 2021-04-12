@@ -95,13 +95,13 @@ public class RemindHandler implements CommandHandler {
     /**
      * 根據cron判斷該任務是一次性或持續性類型
      */
-    private Integer getType(String cron) {
+    private static Integer getType(String cron) {
         Integer type = CommonConstant.ONCE;
         if (cron != null) {
             //獲取初始字串長度
             int originLength = cron.length();
             //將字元替換後取得對應長度
-            int replaceLength = cron.replace("$", "").length();
+            int replaceLength = cron.replace("*", "").length();
             int markLength = (originLength - replaceLength);
             if (markLength > 1)
                 type = CommonConstant.CONTINUOUS;
