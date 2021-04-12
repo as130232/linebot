@@ -26,7 +26,9 @@ public class FuntionHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         List<Bubble> listBubble = new ArrayList<>(10);
-
+        //提醒
+        DescriptionPO remindDescription = RemindHandler.getDescription();
+        listBubble.add(getBubble(remindDescription));
         //翻譯
         DescriptionPO translationDescription = TranslationHandler.getDescription();
         listBubble.add(getBubble(translationDescription));

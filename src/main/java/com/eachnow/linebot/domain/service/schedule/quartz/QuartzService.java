@@ -64,7 +64,7 @@ public class QuartzService {
                     .usingJobData("label", label)
                     .build();
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).inTimeZone(TimeZone.getTimeZone(DateUtils.CST_ZONE_ID));
-            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("CRON_TRIGGER" + remindId, TRIGGER_GROUP).withSchedule(scheduleBuilder).build();
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("CRON_TRIGGER_" + remindId, TRIGGER_GROUP).withSchedule(scheduleBuilder).build();
             scheduler.scheduleJob(jobDetail, trigger);
             log.info("Quartz scheduler add Job success. remindId:{}, label:{}, cron:{}, userId:{}", remindId, label, cron, userId);
         } catch (Exception e) {

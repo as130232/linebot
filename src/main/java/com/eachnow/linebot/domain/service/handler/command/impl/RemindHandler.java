@@ -5,6 +5,8 @@ import com.eachnow.linebot.common.constant.CommonConstant;
 import com.eachnow.linebot.common.db.po.RemindPO;
 import com.eachnow.linebot.common.db.repository.RemindRepository;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.DescriptionCommandPO;
+import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -24,6 +26,7 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,13 +47,28 @@ public class RemindHandler implements CommandHandler {
         this.quartzService = quartzService;
     }
 
+    public static DescriptionPO getDescription() {
+        List<DescriptionCommandPO> commands = new ArrayList<>();
+        commands.add(DescriptionCommandPO.builder().explain("設定提醒").command("提醒 {標頭} {日期} {時間}").example("提醒 聖誕節 20211225 000000").postback("提醒 聖誕節 20211225 000000").build());
+        commands.add(DescriptionCommandPO.builder().explain("查詢行事曆").command("提醒 查").postback("提醒 查").build());
+        return DescriptionPO.builder().title("提醒").description("輸入有效格式{日期}yyyyMMdd、{時間}為hhMMss，若時間為持續性，則可輸入『$$』符號，例:每年每月15號都須提醒繳房租則-> 提醒 繳房租 $$$$$$15 090000。")
+                .commands(commands).imageUrl("https://image.freepik.com/free-vector/little-people-characters-make-online-schedule-tablet-design-business-graphics-tasks-scheduling-week-flat-style-modern-design-illustration-web-page-cards-poster_126608-502.jpg").build();
+    }
+
     @Override
     public Message execute(CommandPO commandPO) {
+        String text = commandPO.getText();
+        //查詢提醒
+        if (text.contains("查") || text.contains("check")) {
+
+        }
         //提醒 繳房租 $$$$$$15 0900
         String label = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
         String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         String time = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
-        if (label == null || date == null || time == null) {
+        if (time == null)
+            time = "000000";    //default 00:00:00
+        if (label == null || date == null) {
             return new TextMessage("請輸入正確格式:提醒 {標頭} {日期} {時間}，例:提醒 繳房租 $$$$$$15 0900，注意需空格隔開！");
         }
         String cron = getCron(date, time);
