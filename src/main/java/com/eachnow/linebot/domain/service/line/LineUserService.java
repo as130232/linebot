@@ -4,10 +4,10 @@ import com.eachnow.linebot.common.db.po.LineGroupUserPO;
 import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.db.repository.LineGroupUserRepository;
 import com.eachnow.linebot.common.db.repository.LineUserRepository;
+import com.eachnow.linebot.common.util.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -62,4 +62,25 @@ public class LineUserService {
         log.error("找不到該line群組對應用戶! userId:{}, groupId:{}", userId, groupId);
     }
 
+    public String getNotifyToken(String userId) {
+        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
+        if (optional.isPresent()) {
+            return optional.get().getNotifyToken();
+        }
+        return null;
+    }
+
+    public void updateNotifyToken(String userId, String token) {
+        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
+        LineUserPO po;
+        if (optional.isPresent()) {
+            po = optional.get();
+        } else {
+            log.error("該用戶還未註冊! userId:{}", userId);
+            po = LineUserPO.builder().id(userId).createTime(DateUtils.getCurrentTime()).build();
+        }
+        po.setNotifyToken(token);
+        lineUserRepository.save(po);
+        log.info("更新用戶notify token，完成。userId:{}, token:{}", userId, token);
+    }
 }

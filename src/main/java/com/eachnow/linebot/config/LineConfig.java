@@ -17,4 +17,6 @@ public class LineConfig {
     private String lineNotifyKeyOwn;
     @Value("${line.notify.key.group}")
     private String lineNotifyKeyGroup;
+    @Value("${line.notify.client-id}")
+    private String lineNotifyClientId;
 }

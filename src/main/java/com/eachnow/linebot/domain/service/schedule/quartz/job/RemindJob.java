@@ -32,7 +32,7 @@ public class RemindJob implements Job {
     public void execute(JobExecutionContext jobExecutionContext) {
         log.info("trigger remind job. jobExecutionContext:{}", jobExecutionContext);
         String userId = jobExecutionContext.getMergedJobDataMap().get("userId").toString();
-        String label = jobExecutionContext.getMergedJobDataMap().get("label").toString();
+        String label = "[提醒]" + jobExecutionContext.getMergedJobDataMap().get("label").toString();
         Integer remindId = Integer.valueOf(jobExecutionContext.getMergedJobDataMap().get("remindId").toString());
         lineNotifyService.send(LineNotifyConstant.OWN, label);
 //        messageSender.send(userId, "text", label);

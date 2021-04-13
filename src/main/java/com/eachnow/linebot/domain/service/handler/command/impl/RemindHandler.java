@@ -9,23 +9,25 @@ import com.eachnow.linebot.common.po.DescriptionCommandPO;
 import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
+import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
+import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.eachnow.linebot.domain.service.schedule.quartz.QuartzService;
 import com.linecorp.bot.model.action.PostbackAction;
+import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
-import com.linecorp.bot.model.message.flex.component.Box;
-import com.linecorp.bot.model.message.flex.component.Button;
-import com.linecorp.bot.model.message.flex.component.FlexComponent;
-import com.linecorp.bot.model.message.flex.component.Text;
+import com.linecorp.bot.model.message.flex.component.*;
 import com.linecorp.bot.model.message.flex.container.Bubble;
+import com.linecorp.bot.model.message.flex.container.Carousel;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,23 +35,36 @@ import java.util.List;
 @Slf4j
 @Command({"remind", "提醒"})
 public class RemindHandler implements CommandHandler {
-
     private final String CONFIRM = "@remindConfirm";
     private final String CANCEL = "@remindCancel";
 
     private RemindRepository remindRepository;
     private QuartzService quartzService;
-
+    private LineUserService lineUserService;
+    private LineConfig lineConfig;
     @Autowired
     public RemindHandler(RemindRepository remindRepository,
-                         QuartzService quartzService) {
+                         QuartzService quartzService,
+                         LineUserService lineUserService,
+                         LineConfig lineConfig) {
         this.remindRepository = remindRepository;
         this.quartzService = quartzService;
+        this.lineUserService = lineUserService;
+        this.lineConfig = lineConfig;
+    }
+
+    private String getAuthUri(String userId) {
+        String redirectUri = "https://linebotmuyu.herokuapp.com/linebot/notify/subscribe";
+        String url = "https://notify-bot.line.me/oauth/authorize" +
+                "?response_type=code&scope=notify&response_mode=form_post" +
+                "&client_id={clientId}&redirect_uri={redirectUri}&state={state}";
+        url = url.replace("{clientId}", lineConfig.getLineNotifyClientId()).replace("{redirectUri}", redirectUri).replace("{state}", userId);
+        return url;
     }
 
     public static DescriptionPO getDescription() {
         List<DescriptionCommandPO> commands = new ArrayList<>();
-        commands.add(DescriptionCommandPO.builder().explain("設定提醒").command("提醒 {標頭} {日期} {時間}").example("提醒 聖誕節 20211225 000000").postback("提醒 聖誕節 20211225 000000").build());
+        commands.add(DescriptionCommandPO.builder().explain("設定提醒").command("提醒 {標頭} {日期} {時間}").example("提醒 聖誕節 20211225").postback("提醒 聖誕節 20211225").build());
         commands.add(DescriptionCommandPO.builder().explain("查詢行事曆").command("提醒 查").postback("提醒 查").build());
         return DescriptionPO.builder().title("提醒").description("輸入有效格式{日期}yyyyMMdd、{時間}為hhMMss，若時間為持續性，則可輸入『$$』符號，例:每年每月15號都須提醒繳房租則-> 提醒 繳房租 $$$$$$15 090000。")
                 .commands(commands).imageUrl("https://image.freepik.com/free-vector/little-people-characters-make-online-schedule-tablet-design-business-graphics-tasks-scheduling-week-flat-style-modern-design-illustration-web-page-cards-poster_126608-502.jpg").build();
@@ -58,6 +73,30 @@ public class RemindHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         String text = commandPO.getText();
+        //先取得notify token，若還未訂閱line notify，則導向驗證notify token
+        String notifyToken = lineUserService.getNotifyToken(commandPO.getUserId());
+        if (notifyToken == null) {
+            URI pictureUri = URI.create("https://image.freepik.com/free-vector/mobile-phones-smartphones-with-push-notification-bubbles-flat-cartoon-illustration_101884-813.jpg");
+            Image hero = Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectRatio(2,2).aspectMode(Image.ImageAspectMode.Cover).url(pictureUri).build();
+            List<FlexComponent> bodyContents = Arrays.asList(
+                    Text.builder().text("需要主人授權，才可以設定提醒").align(FlexAlign.CENTER).build(),
+                    Text.builder().text("點選訂閱並選擇").align(FlexAlign.CENTER).build(),
+                    Separator.builder().margin(FlexMarginSize.MD).color("#666666").build(),
+                    Text.builder().text("透過1對1聊天室接收").color("#ff0000").align(FlexAlign.CENTER).margin(FlexMarginSize.LG).build(),
+                    Text.builder().text("LINE Notify的通知").color("#ff0000").align(FlexAlign.CENTER).build()
+            );
+            Box body = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(bodyContents).build();
+            URI authUri = URI.create(getAuthUri(commandPO.getUserId()));
+            List<FlexComponent> footerContents = Arrays.asList(
+                    Button.builder().style(Button.ButtonStyle.PRIMARY).action(new URIAction("訂閱", authUri, new URIAction.AltUri(authUri))).build());
+            Box footer = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(footerContents).build();
+            List<Bubble> listBubble = Arrays.asList(
+                    Bubble.builder().header(null).hero(hero).body(body).footer(footer).build()
+            );
+            FlexContainer contents = Carousel.builder().contents(listBubble).build();
+            return new FlexMessage("取得權限", contents);
+        }
+
         //查詢提醒
         if (text.contains("查") || text.contains("check")) {
 

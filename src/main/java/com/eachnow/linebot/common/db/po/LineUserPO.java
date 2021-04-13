@@ -1,11 +1,12 @@
 package com.eachnow.linebot.common.db.po;
 
 import lombok.*;
-import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
@@ -24,4 +25,6 @@ public class LineUserPO {
     @Column(updatable = false)
     @CreationTimestamp
     private Timestamp createTime;
+    @Column(length = 33)
+    private String notifyToken;
 }
