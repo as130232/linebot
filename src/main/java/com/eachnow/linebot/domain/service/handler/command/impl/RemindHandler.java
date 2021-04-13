@@ -55,7 +55,8 @@ public class RemindHandler implements CommandHandler {
     }
 
     private String getAuthUri(String userId) {
-        String redirectUri = "https://linebotmuyu.herokuapp.com/linebot/notify/subscribe";
+//        String redirectUri = "https://linebotmuyu.herokuapp.com/linebot/notify/subscribe";
+        String redirectUri = "https://linebotmuyu.herokuapp.com/remind/success.html";
         String url = "https://notify-bot.line.me/oauth/authorize" +
                 "?response_type=code&scope=notify&response_mode=form_post" +
                 "&client_id={clientId}&redirect_uri={redirectUri}&state={state}";
