@@ -42,6 +42,7 @@ public class RemindHandler implements CommandHandler {
     private QuartzService quartzService;
     private LineUserService lineUserService;
     private LineConfig lineConfig;
+
     @Autowired
     public RemindHandler(RemindRepository remindRepository,
                          QuartzService quartzService,
@@ -76,27 +77,8 @@ public class RemindHandler implements CommandHandler {
         //先取得notify token，若還未訂閱line notify，則導向驗證notify token
         String notifyToken = lineUserService.getNotifyToken(commandPO.getUserId());
         if (notifyToken == null) {
-            URI pictureUri = URI.create("https://image.freepik.com/free-vector/mobile-phones-smartphones-with-push-notification-bubbles-flat-cartoon-illustration_101884-813.jpg");
-            Image hero = Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectRatio(2,2).aspectMode(Image.ImageAspectMode.Cover).url(pictureUri).build();
-            List<FlexComponent> bodyContents = Arrays.asList(
-                    Text.builder().text("需要主人授權，才可以設定提醒").align(FlexAlign.CENTER).build(),
-                    Text.builder().text("點選訂閱並選擇").align(FlexAlign.CENTER).build(),
-                    Separator.builder().margin(FlexMarginSize.MD).color("#666666").build(),
-                    Text.builder().text("透過1對1聊天室接收").color("#ff0000").align(FlexAlign.CENTER).margin(FlexMarginSize.LG).build(),
-                    Text.builder().text("LINE Notify的通知").color("#ff0000").align(FlexAlign.CENTER).build()
-            );
-            Box body = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(bodyContents).build();
-            URI authUri = URI.create(getAuthUri(commandPO.getUserId()));
-            List<FlexComponent> footerContents = Arrays.asList(
-                    Button.builder().style(Button.ButtonStyle.PRIMARY).action(new URIAction("訂閱", authUri, new URIAction.AltUri(authUri))).build());
-            Box footer = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(footerContents).build();
-            List<Bubble> listBubble = Arrays.asList(
-                    Bubble.builder().header(null).hero(hero).body(body).footer(footer).build()
-            );
-            FlexContainer contents = Carousel.builder().contents(listBubble).build();
-            return new FlexMessage("取得權限", contents);
+            return getAuthMessage(commandPO.getUserId());
         }
-
         //查詢提醒
         if (text.contains("查") || text.contains("check")) {
 
@@ -146,6 +128,28 @@ public class RemindHandler implements CommandHandler {
         Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).spacing(FlexMarginSize.MD).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
         return new FlexMessage("提醒任務確認", contents);
+    }
+
+    private Message getAuthMessage(String userId) {
+        URI pictureUri = URI.create("https://image.freepik.com/free-vector/mobile-phones-smartphones-with-push-notification-bubbles-flat-cartoon-illustration_101884-813.jpg");
+        Image hero = Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectRatio(2, 2).aspectMode(Image.ImageAspectMode.Cover).url(pictureUri).build();
+        List<FlexComponent> bodyContents = Arrays.asList(
+                Text.builder().text("需要主人授權同意，才可設定提醒").align(FlexAlign.CENTER).build(),
+                Text.builder().text("點選訂閱並選擇以下").align(FlexAlign.CENTER).build(),
+                Separator.builder().margin(FlexMarginSize.MD).color("#666666").build(),
+                Text.builder().text("透過1對1聊天室接收").color("#ff0000").align(FlexAlign.CENTER).margin(FlexMarginSize.LG).build(),
+                Text.builder().text("LINE Notify的通知").color("#ff0000").align(FlexAlign.CENTER).build()
+        );
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(bodyContents).build();
+        URI authUri = URI.create(getAuthUri(userId));
+        List<FlexComponent> footerContents = Arrays.asList(
+                Button.builder().style(Button.ButtonStyle.PRIMARY).action(new URIAction("訂閱", authUri, new URIAction.AltUri(authUri))).build());
+        Box footer = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(footerContents).build();
+        List<Bubble> listBubble = Arrays.asList(
+                Bubble.builder().header(null).hero(hero).body(body).footer(footer).build()
+        );
+        FlexContainer contents = Carousel.builder().contents(listBubble).build();
+        return new FlexMessage("取得權限", contents);
     }
 
     /**
@@ -227,12 +231,6 @@ public class RemindHandler implements CommandHandler {
         String minute = parseCronDescription(cronArr[1]);
         String second = parseCronDescription(cronArr[0]);
         return time.replace("{hour}", hour).replace("{minute}", minute).replace("{second}", second);
-    }
-
-    public static void main(String[] args) {
-        System.out.println(getCron("20210408", "161800"));
-        System.out.println(getCron("$$$$$$15", "080000"));
-        System.out.println(getCron("$$$$$$08", "$$1800"));
     }
 
 }

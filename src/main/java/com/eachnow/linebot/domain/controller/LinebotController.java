@@ -33,10 +33,25 @@ public class LinebotController {
         messageSender.send(pushMessagePO);
     }
 
+    /**
+     * 取得授權碼
+     * @param code
+     * @param state
+     * @throws Exception
+     */
     @PostMapping(value = "/notify/subscribe")
     public void lineNotifySubscribe(@RequestParam(value = "code") String code, @RequestParam(value = "state") String state) throws Exception {
         log.info("--lineNotifySubscribe--");
         lineUserService.updateNotifyToken(state, code);
     }
 
+    /**
+     * 取得存取權杖
+     * @throws Exception
+     */
+    @PostMapping(value = "/notify/access")
+    public void lineNotifyAccess(@RequestParam(value = "message") String message, @RequestParam(value = "access_token") String accessToken) throws Exception {
+        log.info("--lineNotifyAccess--");
+//        lineUserService.updateNotifyToken(state, code);
+    }
 }
