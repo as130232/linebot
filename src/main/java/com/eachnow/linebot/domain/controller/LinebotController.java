@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.controller;
 
 import com.eachnow.linebot.common.po.PushMessagePO;
+import com.eachnow.linebot.domain.service.gateway.LineApiService;
 import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageSender;
 import lombok.extern.slf4j.Slf4j;
@@ -13,12 +14,15 @@ import org.springframework.web.bind.annotation.*;
 public class LinebotController {
     private MessageSender messageSender;
     private LineUserService lineUserService;
+    private LineApiService lineApiService;
 
     @Autowired
     public LinebotController(MessageSender messageSender,
-                             LineUserService lineUserService) {
+                             LineUserService lineUserService,
+                             LineApiService lineApiService) {
         this.messageSender = messageSender;
         this.lineUserService = lineUserService;
+        this.lineApiService = lineApiService;
     }
 
     @PostMapping(value = "/message/text/push")
@@ -35,6 +39,7 @@ public class LinebotController {
 
     /**
      * 取得授權碼
+     *
      * @param code
      * @param state
      * @throws Exception
@@ -42,16 +47,9 @@ public class LinebotController {
     @PostMapping(value = "/notify/subscribe")
     public void lineNotifySubscribe(@RequestParam(value = "code") String code, @RequestParam(value = "state") String state) throws Exception {
         log.info("--lineNotifySubscribe--");
-        lineUserService.updateNotifyToken(state, code);
-    }
-
-    /**
-     * 取得存取權杖
-     * @throws Exception
-     */
-    @PostMapping(value = "/notify/access")
-    public void lineNotifyAccess(@RequestParam(value = "message") String message, @RequestParam(value = "access_token") String accessToken) throws Exception {
-        log.info("--lineNotifyAccess--");
-//        lineUserService.updateNotifyToken(state, code);
+        String token = lineApiService.getLineNotifyToken(code);
+        if (token != null) {
+            lineUserService.updateNotifyToken(state, token);
+        }
     }
 }
