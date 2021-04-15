@@ -31,7 +31,7 @@ public class QuartzService {
         this.remindRepository = remindRepository;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         try {
             scheduler.start();

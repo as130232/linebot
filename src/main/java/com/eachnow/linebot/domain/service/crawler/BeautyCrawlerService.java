@@ -29,7 +29,7 @@ public class BeautyCrawlerService {
         this.pttCrawlerExecutor = pttCrawlerExecutor;
         this.pttCrawlerService = pttCrawlerService;
     }
-    
+
     //    @PostConstruct
     public void init() {
         log.info("清空圖庫，並重新爬取表特版。");
