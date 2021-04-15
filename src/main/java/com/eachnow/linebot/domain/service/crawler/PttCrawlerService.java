@@ -1,7 +1,6 @@
 package com.eachnow.linebot.domain.service.crawler;
 
-import com.eachnow.linebot.common.constant.LineNotifyConstant;
-import com.eachnow.linebot.domain.service.line.LineNotifyService;
+import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -17,13 +16,13 @@ import java.util.stream.Collectors;
 @Component
 public class PttCrawlerService {
     private WebDriverFactory webDriverFactory;
-    private LineNotifyService lineNotifyService;
+    private LineNotifySender lineNotifySender;
 
     @Autowired
     public PttCrawlerService(WebDriverFactory webDriverFactory,
-                             LineNotifyService lineNotifyService) {
+                             LineNotifySender lineNotifySender) {
         this.webDriverFactory = webDriverFactory;
-        this.lineNotifyService = lineNotifyService;
+        this.lineNotifySender = lineNotifySender;
     }
 
     public List<String> crawler(String url, int pageSize) {

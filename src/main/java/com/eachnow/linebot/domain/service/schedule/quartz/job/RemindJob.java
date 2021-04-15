@@ -1,10 +1,11 @@
 package com.eachnow.linebot.domain.service.schedule.quartz.job;
 
 import com.eachnow.linebot.common.constant.CommonConstant;
-import com.eachnow.linebot.common.constant.LineNotifyConstant;
 import com.eachnow.linebot.common.db.po.RemindPO;
 import com.eachnow.linebot.common.db.repository.RemindRepository;
-import com.eachnow.linebot.domain.service.line.LineNotifyService;
+import com.eachnow.linebot.config.LineConfig;
+import com.eachnow.linebot.domain.service.line.LineNotifySender;
+import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageSender;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.Job;
@@ -16,16 +17,22 @@ import java.util.Optional;
 @Slf4j
 public class RemindJob implements Job {
     private RemindRepository remindRepository;
-    private LineNotifyService lineNotifyService;
+    private LineNotifySender lineNotifySender;
     private MessageSender messageSender;
+    private LineUserService lineUserService;
+    private LineConfig lineConfig;
 
     @Autowired
     public RemindJob(RemindRepository remindRepository,
-                     LineNotifyService lineNotifyService,
-                     MessageSender messageSender) {
+                     LineNotifySender lineNotifySender,
+                     MessageSender messageSender,
+                     LineUserService lineUserService,
+                     LineConfig lineConfig) {
         this.remindRepository = remindRepository;
-        this.lineNotifyService = lineNotifyService;
+        this.lineNotifySender = lineNotifySender;
         this.messageSender = messageSender;
+        this.lineUserService = lineUserService;
+        this.lineConfig = lineConfig;
     }
 
     @Override
@@ -34,7 +41,10 @@ public class RemindJob implements Job {
         String userId = jobExecutionContext.getMergedJobDataMap().get("userId").toString();
         String label = "『提醒』 " + jobExecutionContext.getMergedJobDataMap().get("label").toString();
         Integer remindId = Integer.valueOf(jobExecutionContext.getMergedJobDataMap().get("remindId").toString());
-        lineNotifyService.send(LineNotifyConstant.OWN, label);
+        String token = lineUserService.getNotifyToken(userId);
+        if (token == null)
+            token = lineConfig.getLineNotifyKeyOwn();
+        lineNotifySender.send(token, label);
 //        messageSender.send(userId, "text", label);
         Optional<RemindPO> optional = remindRepository.findById(remindId);
         if (optional.isPresent()) {

@@ -14,37 +14,31 @@ import org.springframework.web.client.RestTemplate;
  */
 @Slf4j
 @Component
-public class LineNotifyService {
+public class LineNotifySender {
     private RestTemplate restTemplate;
     private LineConfig lineConfig;
     private final String BASE_URL = "https://notify-api.line.me/api/notify";
     @Autowired
-    public LineNotifyService(RestTemplate restTemplate, LineConfig lineConfig) {
+    public LineNotifySender(RestTemplate restTemplate, LineConfig lineConfig) {
         this.restTemplate = restTemplate;
         this.lineConfig = lineConfig;
     }
 
-    private HttpHeaders getHttpHeaders(Integer type) {
-        String key = lineConfig.getLineNotifyKeyOwn();
-        if (LineNotifyConstant.OWN.equals(type)) {
-            key = lineConfig.getLineNotifyKeyOwn();
-        } else if (LineNotifyConstant.GROUP.equals(type)) {
-            key = lineConfig.getLineNotifyKeyGroup();
-        }
+    private HttpHeaders getHttpHeaders(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Bearer " + key);
+        headers.set("Authorization", "Bearer " + token);
         return headers;
     }
 
     /**
      * 藉由lineNotify發送訊息通知
-     * @param type LineNotifyConstant
+     * @param token Line Notify Token
      * @param message 訊息
      */
-    public void send(Integer type, String message) {
+    public void send(String token, String message) {
         try {
-            HttpEntity<String> entity = new HttpEntity<>(null, getHttpHeaders(type));
+            HttpEntity<String> entity = new HttpEntity<>(null, getHttpHeaders(token));
             ResponseEntity<String> response = restTemplate.exchange(BASE_URL + "?message=" + message,
                     HttpMethod.POST, entity, String.class);
             log.info("[Line Notify]發送訊息，成功。message:{}", message);
