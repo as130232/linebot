@@ -84,10 +84,10 @@ public class BookkeepingHandler implements CommandHandler {
             return new TextMessage("請輸入正確格式:" + getFormat() + "，例:記 晚餐 180，注意需空格隔開！");
         }
         if (text.contains(CONFIRM)) {
-            MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
                     .date(date).createTime(DateUtils.getCurrentTime()).build();
             bookkeepingRepository.save(po);
+            MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             log.info("記帳成功。BookkeepingPO:{}", po);
             return new TextMessage("記帳成功。");
         } else if (text.contains(CANCEL)) {

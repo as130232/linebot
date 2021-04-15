@@ -104,6 +104,7 @@ public class RemindHandler implements CommandHandler {
             log.info("新增提醒任務，成功。remindPO:{}", remindPO);
             //新增任務
             quartzService.addJob(remindPO.getId(), commandPO.getUserId(), label, cron);
+            MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             return new TextMessage("新增提醒成功。");
         } else if (commandPO.getText().contains(CANCEL)) {
             MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
