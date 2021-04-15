@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
+
 @Slf4j
 @Component
 public class LineApiServiceImpl implements LineApiService {
@@ -32,7 +34,7 @@ public class LineApiServiceImpl implements LineApiService {
         try {
             String url = "https://notify-bot.line.me/oauth/token?grant_type=authorization_code&redirect_uri=https://linebotmuyu.herokuapp.com/linebot/notify/subscribe" +
                     "&client_id={clientId}&client_secret={clientSecret}&code={code}".replace("{clientId}", lineConfig.getLineNotifyClientId())
-                            .replace("{client_secret}", lineConfig.getLineNotifyClientSecret()).replace("{code}", code);
+                            .replace("{clientSecret}", lineConfig.getLineNotifyClientSecret()).replace("{code}", code);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
