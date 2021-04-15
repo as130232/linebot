@@ -138,7 +138,7 @@ public class RemindHandler implements CommandHandler {
                 Text.builder().text("需要主人授權同意，才可設定提醒").align(FlexAlign.CENTER).build(),
                 Text.builder().text("點選訂閱並選擇以下").align(FlexAlign.CENTER).build(),
                 Separator.builder().margin(FlexMarginSize.MD).color("#666666").build(),
-                Text.builder().text("透過1對1聊天室接收").color("#ff0000").align(FlexAlign.CENTER).margin(FlexMarginSize.LG).build(),
+                Text.builder().text("透過1對1聊天接收").color("#ff0000").align(FlexAlign.CENTER).margin(FlexMarginSize.LG).build(),
                 Text.builder().text("LINE Notify的通知").color("#ff0000").align(FlexAlign.CENTER).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(bodyContents).build();

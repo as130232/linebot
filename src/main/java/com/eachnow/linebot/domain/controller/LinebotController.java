@@ -7,6 +7,7 @@ import com.eachnow.linebot.domain.service.line.MessageSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @RestController
@@ -45,11 +46,17 @@ public class LinebotController {
      * @throws Exception
      */
     @PostMapping(value = "/notify/subscribe")
-    public void lineNotifySubscribe(@RequestParam(value = "code") String code, @RequestParam(value = "state") String state) throws Exception {
+    public ModelAndView lineNotifySubscribe(@RequestParam(value = "code") String code, @RequestParam(value = "state") String state) throws Exception {
         log.info("--lineNotifySubscribe--");
         String token = lineApiService.getLineNotifyToken(code);
         if (token != null) {
             lineUserService.updateNotifyToken(state, token);
+            ModelAndView modelAndView = new ModelAndView();
+            modelAndView.setViewName("remind/success.html");
+            return modelAndView;
         }
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("remind/failed.html");
+        return modelAndView;
     }
 }
