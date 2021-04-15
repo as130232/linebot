@@ -12,6 +12,7 @@ import com.eachnow.linebot.common.util.NumberUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
+import com.linecorp.bot.model.action.DatetimePickerAction;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
@@ -101,7 +102,8 @@ public class BookkeepingHandler implements CommandHandler {
                 Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build(),
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
                 Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
-                Text.builder().text("日期: " + date).size(FlexFontSize.LG).build()
+                Text.builder().text("日期: " + date).size(FlexFontSize.LG).action(DatetimePickerAction.OfLocalDate.builder()
+                        .data("").label("選擇日期").build()).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).paddingAll(FlexPaddingSize.MD).build();
         List<FlexComponent> footerContents = Arrays.asList(

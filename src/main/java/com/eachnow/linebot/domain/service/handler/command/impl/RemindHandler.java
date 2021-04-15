@@ -79,6 +79,9 @@ public class RemindHandler implements CommandHandler {
         if (notifyToken == null) {
             return getAuthMessage(commandPO.getUserId());
         }
+        if (commandPO.getParams().size() == 0){
+            //
+        }
         //查詢提醒
         if (text.contains("查") || text.contains("check")) {
 
@@ -138,8 +141,7 @@ public class RemindHandler implements CommandHandler {
                 Text.builder().text("需要主人授權同意，才可設定提醒").align(FlexAlign.CENTER).build(),
                 Text.builder().text("點選訂閱並選擇以下").align(FlexAlign.CENTER).build(),
                 Separator.builder().margin(FlexMarginSize.MD).color("#666666").build(),
-                Text.builder().text("透過1對1聊天接收").color("#ff0000").align(FlexAlign.CENTER).margin(FlexMarginSize.LG).build(),
-                Text.builder().text("LINE Notify的通知").color("#ff0000").align(FlexAlign.CENTER).build()
+                Text.builder().text("透過1對1聊天接收LINE Notify的通知").color("#ff0000").wrap(true).align(FlexAlign.CENTER).margin(FlexMarginSize.LG).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).spacing(FlexMarginSize.SM).contents(bodyContents).build();
         URI authUri = URI.create(getAuthUri(userId));

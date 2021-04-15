@@ -29,12 +29,12 @@ public class BeautyCrawlerService {
         this.pttCrawlerExecutor = pttCrawlerExecutor;
         this.pttCrawlerService = pttCrawlerService;
     }
-
+    
     //    @PostConstruct
     public void init() {
         log.info("清空圖庫，並重新爬取表特版。");
         listPicture = new ArrayList<>(MAX_SIZE);
-        crawler(3);
+        crawler(2);
     }
 
     public void crawler(int pageSize) {
