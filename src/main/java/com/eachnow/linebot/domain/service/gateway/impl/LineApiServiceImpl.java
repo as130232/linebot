@@ -1,7 +1,5 @@
 package com.eachnow.linebot.domain.service.gateway.impl;
 
-import com.eachnow.linebot.common.po.google.translation.InputTranslationPO;
-import com.eachnow.linebot.common.po.google.translation.OutputTranslationPO;
 import com.eachnow.linebot.common.po.line.LineNotifyTokenPO;
 import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.gateway.LineApiService;
@@ -13,8 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @Component
@@ -41,6 +37,7 @@ public class LineApiServiceImpl implements LineApiService {
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<LineNotifyTokenPO> responseEntity = restTemplate.postForEntity(url, request, LineNotifyTokenPO.class);
             String result = responseEntity.getBody().getAccessToken();
+            log.info("取得line notify token 成功。token:{}", result);
             return result;
         } catch (Exception e) {
             log.error("呼叫取得line notify token，失敗! code:{}, error msg:{}", code, e.getMessage());
