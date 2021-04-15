@@ -38,7 +38,7 @@ public class LinebotController {
     }
 
     /**
-     * 取得授權碼
+     * Callback-取得授權碼，在根據授權碼取得對應line notify token
      *
      * @param code
      * @param state
