@@ -7,6 +7,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.TimeUnit;
+
 @Slf4j
 @Component
 public class WebDriverFactory {
@@ -19,12 +21,14 @@ public class WebDriverFactory {
         log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
         if (headless) {
-            options.setHeadless(true);  //無視窗模式，增加效能
-            options.addArguments("--disable-dev-shm-usage");
+//            options.setHeadless(true);  //無視窗模式，增加效能
+            options.addArguments("--headless");
+            options.addArguments("--disable-gpu");
             options.addArguments("--no-sandbox");
+//            options.addArguments("--disable-dev-shm-usage");
         }
         driver = new ChromeDriver(options);
-//        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         driver.get(url);
         log.info("webdriver連線url: {}", url);
         return driver;
