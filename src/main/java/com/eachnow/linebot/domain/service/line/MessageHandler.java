@@ -122,6 +122,8 @@ public class MessageHandler {
             Map<String, String> datetimepickerMap = event.getPostbackContent().getParams();
             try {
                 datetimepickerPO = JsonUtils.toObject(datetimepickerMap, DatetimepickerPO.class);
+                if (text.contains("-"))
+                    datetimepickerPO.setType(text.split("-")[1]);
             } catch (Exception e) {
                 log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
             }

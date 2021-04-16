@@ -5,6 +5,7 @@ import com.eachnow.linebot.common.constant.CurrencyEnum;
 import com.eachnow.linebot.common.db.po.BookkeepingPO;
 import com.eachnow.linebot.common.db.repository.BookkeepingRepository;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.DatetimepickerPO;
 import com.eachnow.linebot.common.po.DescriptionCommandPO;
 import com.eachnow.linebot.common.po.DescriptionPO;
 import com.eachnow.linebot.common.util.DateUtils;
@@ -102,8 +103,8 @@ public class BookkeepingHandler implements CommandHandler {
                 Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build(),
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
                 Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
-                Text.builder().text("日期: " + date + " (可選)").size(FlexFontSize.LG).action(DatetimePickerAction.OfLocalDate.builder()
-                        .data("datetimepicker").label("選擇日期").build()).build()
+                Text.builder().text("日期: " + date).size(FlexFontSize.LG).decoration(Text.TextDecoration.UNDERLINE)
+                        .action(DatetimePickerAction.OfLocalDate.builder().data("datetimepicker").label("選擇日期").build()).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).paddingAll(FlexPaddingSize.MD).build();
         List<FlexComponent> footerContents = Arrays.asList(
@@ -128,9 +129,18 @@ public class BookkeepingHandler implements CommandHandler {
         String endDate = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
         if (endDate == null)
             endDate = startDate;
+        String startDateDash = DateUtils.parse(startDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);
+        String endDateDash = DateUtils.parse(endDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);
+        //判斷是否有datetimepicker
+        if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null) {
+            if (DatetimepickerPO.TYPE_START.equals(commandPO.getDatetimepicker().getType())) {
+                startDateDash = commandPO.getDatetimepicker().getDate();
+            } else {
+                endDateDash = commandPO.getDatetimepicker().getDate();
+            }
+        }
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),
-                DateUtils.parse(startDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash),
-                DateUtils.parse(endDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash));
+                startDateDash, endDateDash);
         //按照日期分類
         Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(BookkeepingPO::getDate));
         //排序，日期小的在前
@@ -168,8 +178,16 @@ public class BookkeepingHandler implements CommandHandler {
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
             bodyContents.add(separator);
         });
-        if (bodyContents.size() > 0)
-            bodyContents.remove(bodyContents.size() - 1);   //移除掉最後一個separator
+        //日期區間
+        List<FlexComponent> fromAndToContents = Arrays.asList(
+                Text.builder().text("From:" + startDateDash).size(FlexFontSize.LG).decoration(Text.TextDecoration.UNDERLINE)
+                        .action(DatetimePickerAction.OfLocalDate.builder().data("datetimepicker-" + DatetimepickerPO.TYPE_START).label("選擇日期").build()).build(),
+                Text.builder().text("To:" + endDateDash).size(FlexFontSize.LG).decoration(Text.TextDecoration.UNDERLINE)
+                        .action(DatetimePickerAction.OfLocalDate.builder().data("datetimepicker-" + DatetimepickerPO.TYPE_END).label("選擇日期").build()).build()
+        );
+        Box fromAndToBox = Box.builder().layout(FlexLayout.HORIZONTAL).contents(fromAndToContents).paddingAll(FlexPaddingSize.MD).build();
+        bodyContents.add(fromAndToBox);
+
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.MD).build();
 
         //標頭
