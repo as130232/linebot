@@ -56,6 +56,7 @@ public class PttCrawlerService {
                 if (articleElement.getAttribute("text").contains("[公告]")
                         || articleElement.getAttribute("text").contains("[帥哥]")
                         || articleElement.getAttribute("text").contains("肉特")
+                        || articleElement.getAttribute("text").contains("[申請]")
                         || articleElement.getAttribute("text").contains("[問題]")
                         || articleElement.getAttribute("text").contains("[閒聊]"))
                     continue;
