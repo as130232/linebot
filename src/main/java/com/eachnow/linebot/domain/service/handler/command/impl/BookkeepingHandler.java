@@ -27,12 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -77,7 +74,10 @@ public class BookkeepingHandler implements CommandHandler {
         if (date == null)
             date = DateUtils.getCurrentDate();
         if (!date.contains("-"))
-            date = DateUtils.parse(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);   //格式轉換
+            date = DateUtils.parse(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);   //格式轉換，數字轉為有dash分隔
+        //判斷是否有datetimepicker
+        if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
+            date = commandPO.getDatetimepicker().getDate();
 
         if (currencyEnum == null)
             currencyEnum = CurrencyEnum.TWD; //default 新台幣
@@ -102,8 +102,8 @@ public class BookkeepingHandler implements CommandHandler {
                 Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build(),
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
                 Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
-                Text.builder().text("日期: " + date).size(FlexFontSize.LG).action(DatetimePickerAction.OfLocalDate.builder()
-                        .data("test").label("選擇日期").build()).build()
+                Text.builder().text("日期: " + date + "(可選)").size(FlexFontSize.LG).action(DatetimePickerAction.OfLocalDate.builder()
+                        .data("datetimepicker").label("選擇日期").build()).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).paddingAll(FlexPaddingSize.MD).build();
         List<FlexComponent> footerContents = Arrays.asList(

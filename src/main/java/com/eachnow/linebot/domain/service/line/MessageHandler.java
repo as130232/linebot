@@ -1,6 +1,8 @@
 package com.eachnow.linebot.domain.service.line;
 
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.DatetimepickerPO;
+import com.eachnow.linebot.common.util.JsonUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandlerFactory;
@@ -15,6 +17,7 @@ import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -45,23 +48,38 @@ public class MessageHandler {
         this.lineUserService = lineUserService;
     }
 
-    public static void setUserAndCacheCommand(String userId, String text){
+    public static void setUserAndCacheCommand(String userId, String text) {
         userAndCacheCommand.put(userId, text);
     }
 
-    public static void removeUserAndCacheCommand(String userId){
+    public static void removeUserAndCacheCommand(String userId) {
         userAndCacheCommand.remove(userId);
     }
 
 
     public Message executeCommand(String userId, String text) {
+        DatetimepickerPO datetimepicker = null;
+        if (text.contains("datetimepicker")) {
+            datetimepicker = parsedDatetimepicker(text);
+            text = "";  //清空資料
+        }
         if (userAndCacheCommand.get(userId) != null)
             text = userAndCacheCommand.get(userId) + text;
-        
-        CommandPO commandPO = CommandPO.builder().userId(userId).text(text)
+        CommandPO commandPO = CommandPO.builder().userId(userId).text(text).datetimepicker(datetimepicker)
                 .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
         CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(commandPO);
         return commandHandler.execute(commandPO);
+    }
+
+    private DatetimepickerPO parsedDatetimepicker(String text) {
+        JSONObject json = new JSONObject(text);
+        String parsms = json.get("params").toString();
+        try {
+            return JsonUtils.toObject(parsms, DatetimepickerPO.class);
+        } catch (Exception e) {
+            log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
+        }
+        return null;
     }
 
     /**
