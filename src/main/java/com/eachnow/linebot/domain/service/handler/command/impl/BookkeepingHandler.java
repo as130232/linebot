@@ -123,6 +123,7 @@ public class BookkeepingHandler implements CommandHandler {
     }
 
     public Message getBookkeeper(CommandPO commandPO) {
+        String data = "記 查 ";
         String startDate = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         if (startDate == null)  //預設當天
             startDate = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
@@ -135,8 +136,10 @@ public class BookkeepingHandler implements CommandHandler {
         if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null) {
             if (DatetimepickerPO.TYPE_START.equals(commandPO.getDatetimepicker().getType())) {
                 startDateDash = commandPO.getDatetimepicker().getDate();
+                startDate = DateUtils.parse(startDateDash, DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
             } else {
                 endDateDash = commandPO.getDatetimepicker().getDate();
+                endDate = DateUtils.parse(endDateDash, DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
             }
         }
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),
@@ -178,14 +181,15 @@ public class BookkeepingHandler implements CommandHandler {
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
             bodyContents.add(separator);
         });
+        String datetimepickerData = data + ParamterUtils.CONTACT + startDate + ParamterUtils.CONTACT + endDate + ParamterUtils.CONTACT;
         //日期區間
         List<FlexComponent> fromAndToContents = Arrays.asList(
-                Text.builder().text("From:" + startDateDash).size(FlexFontSize.LG).decoration(Text.TextDecoration.UNDERLINE)
-                        .action(DatetimePickerAction.OfLocalDate.builder().data("datetimepicker-" + DatetimepickerPO.TYPE_START).label("選擇日期").build()).build(),
-                Text.builder().text("To:" + endDateDash).size(FlexFontSize.LG).decoration(Text.TextDecoration.UNDERLINE)
-                        .action(DatetimePickerAction.OfLocalDate.builder().data("datetimepicker-" + DatetimepickerPO.TYPE_END).label("選擇日期").build()).build()
+                Text.builder().text("From:" + startDateDash).size(FlexFontSize.SM).decoration(Text.TextDecoration.UNDERLINE)
+                        .action(DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker-" + DatetimepickerPO.TYPE_START).label("選擇日期").build()).build(),
+                Text.builder().text("To:" + endDateDash).size(FlexFontSize.SM).decoration(Text.TextDecoration.UNDERLINE)
+                        .action(DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker-" + DatetimepickerPO.TYPE_END).label("選擇日期").build()).build()
         );
-        Box fromAndToBox = Box.builder().layout(FlexLayout.HORIZONTAL).contents(fromAndToContents).paddingAll(FlexPaddingSize.MD).build();
+        Box fromAndToBox = Box.builder().layout(FlexLayout.HORIZONTAL).contents(fromAndToContents).build();
         bodyContents.add(fromAndToBox);
 
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.MD).build();
@@ -207,9 +211,7 @@ public class BookkeepingHandler implements CommandHandler {
         );
         Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
-
         //取得今天日期
-        String data = "記 查 ";
         ZonedDateTime dateTime = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
         String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue()).format(DateUtils.yyyyMMdd);
         String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth() - 1).format(DateUtils.yyyyMMdd);
