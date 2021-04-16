@@ -102,7 +102,7 @@ public class BookkeepingHandler implements CommandHandler {
                 Text.builder().text("類型: " + typeName).size(FlexFontSize.LG).build(),
                 Text.builder().text("金額: " + amount).size(FlexFontSize.LG).build(),
                 Text.builder().text("幣值: " + currencyEnum.getName()).size(FlexFontSize.LG).build(),
-                Text.builder().text("日期: " + date + "(可選)").size(FlexFontSize.LG).action(DatetimePickerAction.OfLocalDate.builder()
+                Text.builder().text("日期: " + date + " (可選)").size(FlexFontSize.LG).action(DatetimePickerAction.OfLocalDate.builder()
                         .data("datetimepicker").label("選擇日期").build()).build()
         );
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).margin(FlexMarginSize.SM).paddingAll(FlexPaddingSize.MD).build();

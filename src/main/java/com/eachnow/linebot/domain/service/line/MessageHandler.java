@@ -72,9 +72,10 @@ public class MessageHandler {
     }
 
     private DatetimepickerPO parsedDatetimepicker(String text) {
-        JSONObject json = new JSONObject(text);
-        String parsms = json.get("params").toString();
         try {
+            log.info("---text:{}", text);
+            JSONObject json = new JSONObject(text);
+            String parsms = json.get("params").toString();
             return JsonUtils.toObject(parsms, DatetimepickerPO.class);
         } catch (Exception e) {
             log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
