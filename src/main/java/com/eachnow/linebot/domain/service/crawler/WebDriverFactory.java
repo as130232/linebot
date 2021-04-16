@@ -24,15 +24,17 @@ public class WebDriverFactory {
         log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
         if (headless) {
-            options.setHeadless(true);  //無視窗模式，增加效能
-            options.addArguments("--no-sandbox");
+            options.setHeadless(true);  //開啟無視窗模式與禁止GPU渲染，增加效能
+            options.addArguments("--no-sandbox");   //關閉沙河模式
             options.addArguments("--disable-dev-shm-usage");
-            options.setPageLoadStrategy(PageLoadStrategy.NONE);
-//            Map<String, Object> chromePrefs = new HashMap<>();
-//            options.setExperimentalOption("prefs", chromePrefs)ㄤ
+//            options.setPageLoadStrategy(PageLoadStrategy.NONE);
+            //禁用圖片
+            HashMap<String, Object> prefs = new HashMap<>();
+            prefs.put("profile.default_content_settings", 2);
+            options.setExperimentalOption("prefs", prefs);
+            options.addArguments("blink-settings=imagesEnabled=false");
         }
         driver = new ChromeDriver(options);
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         driver.get(url);
         log.info("webdriver連線url: {}", url);
         return driver;
