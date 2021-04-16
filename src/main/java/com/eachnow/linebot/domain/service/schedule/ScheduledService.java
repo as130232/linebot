@@ -53,13 +53,7 @@ public class ScheduledService {
         return CRON_EXECUTE;
     }
 
-//    @Scheduled(cron = "0 9 16 8 4 ? 2021")
-//    public void test() {
-//        log.info("[schedule]test。time:{}", new Date());
-//        log.info("[schedule]test，完成。time:{}", new Date());
-//    }
-
-    @Scheduled(cron = "${schedule.beauty.cron}")
+//    @Scheduled(cron = "${schedule.beauty.cron}")
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
             return;
@@ -87,9 +81,5 @@ public class ScheduledService {
             }
         }
     }
-
-    /**
-     * 自動記帳:iCloud 4/4 13:00 $90
-     */
 
 }
