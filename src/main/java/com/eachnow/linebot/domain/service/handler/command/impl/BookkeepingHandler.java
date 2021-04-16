@@ -83,7 +83,7 @@ public class BookkeepingHandler implements CommandHandler {
         if (currencyEnum == null)
             currencyEnum = CurrencyEnum.TWD; //default 新台幣
         if (commandPO.getParams().size() < 2 || !NumberUtils.isNumber(amount)) {
-            return new TextMessage("請輸入正確格式:" + getFormat() + "，例:記 晚餐 180，注意需空格隔開！");
+            return new TextMessage("請輸入正確格式: 記 {類型} {金額} {幣值}(可省略)，例:記 晚餐 180，注意需空格隔開！");
         }
         if (text.contains(CONFIRM)) {
             BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
@@ -116,10 +116,6 @@ public class BookkeepingHandler implements CommandHandler {
         Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(footerContents).spacing(FlexMarginSize.MD).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
         return new FlexMessage("記帳確認", contents);
-    }
-
-    public String getFormat() {
-        return "記 {類型} {金額} {幣值}(可省略)";
     }
 
     public Message getBookkeeper(CommandPO commandPO) {
@@ -184,9 +180,9 @@ public class BookkeepingHandler implements CommandHandler {
         String datetimepickerData = data + startDate + ParamterUtils.CONTACT + endDate + ParamterUtils.CONTACT;
         //日期區間
         List<FlexComponent> fromAndToContents = Arrays.asList(
-                Text.builder().text("From:" + startDateDash).size(FlexFontSize.Md).decoration(Text.TextDecoration.UNDERLINE)
+                Text.builder().text("From: " + startDateDash).size(FlexFontSize.Md).decoration(Text.TextDecoration.UNDERLINE)
                         .action(DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker-" + DatetimepickerPO.TYPE_START).label("選擇日期").build()).build(),
-                Text.builder().text("To:" + endDateDash).size(FlexFontSize.Md).decoration(Text.TextDecoration.UNDERLINE)
+                Text.builder().text("To: " + endDateDash).size(FlexFontSize.Md).decoration(Text.TextDecoration.UNDERLINE).align(FlexAlign.END)
                         .action(DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker-" + DatetimepickerPO.TYPE_END).label("選擇日期").build()).build()
         );
         Box fromAndToBox = Box.builder().layout(FlexLayout.HORIZONTAL).contents(fromAndToContents).margin(FlexMarginSize.MD).build();
