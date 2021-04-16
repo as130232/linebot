@@ -181,15 +181,15 @@ public class BookkeepingHandler implements CommandHandler {
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
             bodyContents.add(separator);
         });
-        String datetimepickerData = data + ParamterUtils.CONTACT + startDate + ParamterUtils.CONTACT + endDate + ParamterUtils.CONTACT;
+        String datetimepickerData = data + startDate + ParamterUtils.CONTACT + endDate + ParamterUtils.CONTACT;
         //日期區間
         List<FlexComponent> fromAndToContents = Arrays.asList(
-                Text.builder().text("From:" + startDateDash).size(FlexFontSize.SM).decoration(Text.TextDecoration.UNDERLINE)
+                Text.builder().text("From:" + startDateDash).size(FlexFontSize.Md).decoration(Text.TextDecoration.UNDERLINE)
                         .action(DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker-" + DatetimepickerPO.TYPE_START).label("選擇日期").build()).build(),
-                Text.builder().text("To:" + endDateDash).size(FlexFontSize.SM).decoration(Text.TextDecoration.UNDERLINE)
+                Text.builder().text("To:" + endDateDash).size(FlexFontSize.Md).decoration(Text.TextDecoration.UNDERLINE)
                         .action(DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker-" + DatetimepickerPO.TYPE_END).label("選擇日期").build()).build()
         );
-        Box fromAndToBox = Box.builder().layout(FlexLayout.HORIZONTAL).contents(fromAndToContents).build();
+        Box fromAndToBox = Box.builder().layout(FlexLayout.HORIZONTAL).contents(fromAndToContents).margin(FlexMarginSize.MD).build();
         bodyContents.add(fromAndToBox);
 
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.MD).build();
