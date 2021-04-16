@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -79,6 +80,13 @@ public class JsonUtils {
             return null;
 
         return UTIL_OBJECT_MAPPER.readValue(jsonString, objectType);
+    }
+
+    public static <T> T toObject(Map<String, String> map, Class<T> objectType) throws IOException {
+        if (map == null)
+            return null;
+
+        return UTIL_OBJECT_MAPPER.convertValue(map, objectType);
     }
 
     /**

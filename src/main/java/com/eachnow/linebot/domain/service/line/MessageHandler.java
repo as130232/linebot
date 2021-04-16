@@ -17,7 +17,6 @@ import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.spring.boot.annotation.EventMapping;
 import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -57,30 +56,13 @@ public class MessageHandler {
     }
 
 
-    public Message executeCommand(String userId, String text) {
-        DatetimepickerPO datetimepicker = null;
-        if (text.contains("datetimepicker")) {
-            datetimepicker = parsedDatetimepicker(text);
-            text = "";  //清空資料
-        }
+    public Message executeCommand(String userId, String text, DatetimepickerPO datetimepicker) {
         if (userAndCacheCommand.get(userId) != null)
             text = userAndCacheCommand.get(userId) + text;
         CommandPO commandPO = CommandPO.builder().userId(userId).text(text).datetimepicker(datetimepicker)
                 .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
         CommandHandler commandHandler = handlerCommandFactory.getCommandHandler(commandPO);
         return commandHandler.execute(commandPO);
-    }
-
-    private DatetimepickerPO parsedDatetimepicker(String text) {
-        try {
-            log.info("---text:{}", text);
-            JSONObject json = new JSONObject(text);
-            String parsms = json.get("params").toString();
-            return JsonUtils.toObject(parsms, DatetimepickerPO.class);
-        } catch (Exception e) {
-            log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
-        }
-        return null;
     }
 
     /**
@@ -118,7 +100,7 @@ public class MessageHandler {
         log.info("userId:{}, event:{}", event.getSource().getUserId(), event);
         final String text = event.getMessage().getText();
         //根據指令取得對應指令處理服務
-        return executeCommand(event.getSource().getUserId(), text);
+        return executeCommand(event.getSource().getUserId(), text, null);
     }
 
     /**
@@ -135,8 +117,17 @@ public class MessageHandler {
     public Message handlePostbackEvent(PostbackEvent event) {
         log.info("handlePostbackEvent，event: " + event);
         final String text = event.getPostbackContent().getData();
+        DatetimepickerPO datetimepickerPO = null;
+        if (text.contains("datetimepicker")) {
+            Map<String, String> datetimepickerMap = event.getPostbackContent().getParams();
+            try {
+                datetimepickerPO = JsonUtils.toObject(datetimepickerMap, DatetimepickerPO.class);
+            } catch (Exception e) {
+                log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
+            }
+        }
         //根據指令取得對應指令處理服務
-        return executeCommand(event.getSource().getUserId(), text);
+        return executeCommand(event.getSource().getUserId(), text, datetimepickerPO);
     }
 
     @EventMapping
