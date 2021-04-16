@@ -1,12 +1,15 @@
 package com.eachnow.linebot.domain.service.crawler;
 
 import lombok.extern.slf4j.Slf4j;
+import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -21,11 +24,12 @@ public class WebDriverFactory {
         log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
         if (headless) {
-//            options.setHeadless(true);  //無視窗模式，增加效能
-            options.addArguments("--headless");
-            options.addArguments("--disable-gpu");
+            options.setHeadless(true);  //無視窗模式，增加效能
             options.addArguments("--no-sandbox");
-//            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-dev-shm-usage");
+            options.setPageLoadStrategy(PageLoadStrategy.NONE);
+//            Map<String, Object> chromePrefs = new HashMap<>();
+//            options.setExperimentalOption("prefs", chromePrefs)ㄤ
         }
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
