@@ -54,7 +54,7 @@ public class ScheduledService {
         return CRON_EXECUTE;
     }
 
-    @Scheduled(cron = "${schedule.beauty.cron}")
+//    @Scheduled(cron = "${schedule.beauty.cron}")
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
             return;
