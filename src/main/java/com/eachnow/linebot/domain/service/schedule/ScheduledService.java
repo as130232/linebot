@@ -78,11 +78,13 @@ public class ScheduledService {
                 ZonedDateTime startTime = DateUtils.parseDate(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash);
                 if (currentHour == 23 && (currentDay + 1) == startTime.getDayOfMonth()
                         || currentHour == 8 && currentDay == startTime.getDayOfMonth()) {
-                    if (timePO.getStartTime().contains("06:00:00") && timePO.getEndTime().contains("18:00:00")
-                            //降雨機率大於60% 則通知
-                            && Integer.valueOf(timePO.getParameter().getParameterUnit()) >= 60) {
-                        lineNotifySender.send(lineConfig.getLineNotifyKeyOwn(), "降雨機率為: {unit}%，請記得帶傘。".replace("{unit}", unit.toString()));
-                        break;
+                    if (timePO.getStartTime().contains("06:00:00") && timePO.getEndTime().contains("18:00:00")) {
+                        Integer unit = Integer.valueOf(timePO.getParameter().getParameterUnit());
+                        //降雨機率大於60% 則通知
+                        if (unit >= 60) {
+                            lineNotifySender.send(lineConfig.getLineNotifyKeyOwn(), DateUtils.parse(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmDash) + " - 18:00，降雨機率為: {unit}%，請記得帶傘。".replace("{unit}", unit.toString()));
+                            break;
+                        }
                     }
                 }
             }
