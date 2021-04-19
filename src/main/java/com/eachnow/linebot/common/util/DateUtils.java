@@ -77,4 +77,8 @@ public class DateUtils {
         return new Timestamp((getCurrentEpochMilli()));
     }
 
+    public static ZonedDateTime getCurrentDateTime() {
+        return ZonedDateTime.now(CST_ZONE_ID);
+    }
+
 }

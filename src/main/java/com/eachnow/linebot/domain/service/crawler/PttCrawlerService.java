@@ -69,7 +69,7 @@ public class PttCrawlerService {
                 webElement.click();
                 List<WebElement> listPictureElement = driver.findElements(By.cssSelector(("a[href]")));
                 List<String> listPictureOnPage = listPictureElement.stream().map(e -> e.getAttribute("href"))
-                        .filter(e -> e.contains("jpg") && !e.contains("https://i.imgur.com/zguYZdO.jpg")).collect(Collectors.toList());
+                        .filter(e -> e.contains("jpg") && !e.contains("https://i.imgur.com/zguYZdO.jpg") && !e.contains("https://i.imgur.com/ZfoC3ro.jpg")).collect(Collectors.toList());
                 result.addAll(listPictureOnPage);
                 driver.navigate().back();
             }

@@ -1,10 +1,10 @@
 package com.eachnow.linebot.domain.service.schedule;
 
-import com.eachnow.linebot.common.constant.LineNotifyConstant;
 import com.eachnow.linebot.common.constant.WeatherElementEnum;
 import com.eachnow.linebot.common.po.openweather.TimePO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
+import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 
 //import org.springframework.scheduling.annotation.SchedulingConfigurer;
@@ -53,7 +54,7 @@ public class ScheduledService {
         return CRON_EXECUTE;
     }
 
-//    @Scheduled(cron = "${schedule.beauty.cron}")
+    @Scheduled(cron = "${schedule.beauty.cron}")
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
             return;
@@ -65,19 +66,25 @@ public class ScheduledService {
     /**
      * 下雨警報
      */
-    @Scheduled(cron = "0 0 23 * * ?")
+    @Scheduled(cron = "0 0 8,23 * * ?")
     public void rainAlarm() {
         String loactionName = "臺北市";
-        WeatherResultPO po = openWeatherService.getWeatherInfo(loactionName, null);
-        for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(1).getWeatherElement()) {
-            //降雨
-            if (WeatherElementEnum.POP.getElement().equals(weatherElementPO.getElementName())) {
-                TimePO timePO = weatherElementPO.getTime().get(1);  // 取得隔天早上06:00 ~ 18:00 的機率
-                Integer unit = Integer.valueOf(timePO.getParameter().getParameterUnit());
-                if (unit >= 60) {   //降雨機率大於60% 則通知
-                    lineNotifySender.send(lineConfig.getLineNotifyKeyOwn(), "明天降雨機率為: {unit}%，記得帶傘。".replace("{unit}", unit.toString()));
+        WeatherResultPO po = openWeatherService.getWeatherInfo(loactionName, WeatherElementEnum.POP.getElement());
+        ZonedDateTime zonedDateTime = DateUtils.getCurrentDateTime();
+        Integer currentDay = zonedDateTime.getDayOfMonth();
+        Integer currentHour = zonedDateTime.getHour();
+        for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
+            for (TimePO timePO : weatherElementPO.getTime()) {   //取得隔天早上06:00 ~ 18:00 的機率
+                ZonedDateTime startTime = DateUtils.parseDate(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash);
+                if (currentHour == 23 && (currentDay + 1) == startTime.getDayOfMonth()
+                        || currentHour == 8 && currentDay == startTime.getDayOfMonth()) {
+                    if (timePO.getStartTime().contains("06:00:00") && timePO.getEndTime().contains("18:00:00")
+                            //降雨機率大於60% 則通知
+                            && Integer.valueOf(timePO.getParameter().getParameterUnit()) >= 60) {
+                        lineNotifySender.send(lineConfig.getLineNotifyKeyOwn(), "降雨機率為: {unit}%，請記得帶傘。".replace("{unit}", unit.toString()));
+                        break;
+                    }
                 }
-                break;
             }
         }
     }
