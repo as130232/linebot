@@ -75,7 +75,7 @@ public class BookkeepingHandler implements CommandHandler {
         if (date == null)
             date = DateUtils.getCurrentDate();
         if (!date.contains("-"))
-            date = DateUtils.parse(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);   //格式轉換，數字轉為有dash分隔
+            date = DateUtils.parseDate(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);   //格式轉換，數字轉為有dash分隔
         //判斷是否有datetimepicker
         if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
             date = commandPO.getDatetimepicker().getDate();
@@ -126,16 +126,16 @@ public class BookkeepingHandler implements CommandHandler {
         String endDate = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
         if (endDate == null)
             endDate = startDate;
-        String startDateDash = DateUtils.parse(startDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);
-        String endDateDash = DateUtils.parse(endDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);
+        String startDateDash = DateUtils.parseDate(startDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);
+        String endDateDash = DateUtils.parseDate(endDate, DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash);
         //判斷是否有datetimepicker
         if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null) {
             if (DatetimepickerPO.TYPE_START.equals(commandPO.getDatetimepicker().getType())) {
                 startDateDash = commandPO.getDatetimepicker().getDate();
-                startDate = DateUtils.parse(startDateDash, DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
+                startDate = DateUtils.parseDate(startDateDash, DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
             } else {
                 endDateDash = commandPO.getDatetimepicker().getDate();
-                endDate = DateUtils.parse(endDateDash, DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
+                endDate = DateUtils.parseDate(endDateDash, DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
             }
         }
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),

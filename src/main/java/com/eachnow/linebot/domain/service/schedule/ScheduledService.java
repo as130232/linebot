@@ -71,14 +71,14 @@ public class ScheduledService {
     public void rainAlarm() {
         String loactionName = "臺北市";
         WeatherResultPO po = openWeatherService.getWeatherInfo(loactionName, WeatherElementEnum.POP.getElement());
-        ZonedDateTime zonedDateTime = DateUtils.getCurrentDateTime();
         for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
             for (TimePO timePO : weatherElementPO.getTime()) {   //取得隔天早上06:00 ~ 18:00 的機率
                 Integer unit = Integer.valueOf(timePO.getParameter().getParameterName());
                 //降雨機率大於70% 則通知
                 if (unit >= 70) {
-                    lineNotifySender.send(lineConfig.getLineNotifyKeyOwn(), DateUtils.parse(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmDash) + " - 18:00，降雨機率為: {unit}%，請記得帶傘。".replace("{unit}", unit.toString()));
-                    break;
+                    String start = DateUtils.parseDateTime(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmDash);
+                    String end = (DateUtils.parseDateTime(timePO.getEndTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmDash)).split(" ")[1];
+                    lineNotifySender.send(lineConfig.getLineNotifyKeyOwn(), start + " - " + end + "，降雨機率為: {unit}%，出門請帶傘。".replace("{unit}", unit.toString()));
                 }
             }
         }

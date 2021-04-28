@@ -25,6 +25,16 @@ public class DateUtils {
         return parse.atStartOfDay(CST_ZONE_ID);
     }
 
+    public static String parseDate(String date, DateTimeFormatter from, DateTimeFormatter to) {
+        LocalDate localDate = LocalDate.parse(date, from);
+        return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).format(to);
+    }
+
+    public static String parseDateTime(String date, DateTimeFormatter from, DateTimeFormatter to) {
+        LocalDateTime localDateTime = LocalDateTime.parse(date, from);
+        return localDateTime.atZone(CST_ZONE_ID).format(to);
+    }
+    
     public static long parseDateTimeToMilli(String dateTime) {
         LocalDateTime localDateTime = LocalDateTime.parse(dateTime, yyyyMMddHHmmssDash);
         return localDateTime.atZone(CST_ZONE_ID).toInstant().toEpochMilli();
@@ -44,11 +54,6 @@ public class DateUtils {
     public static long parseToEndOfDayMilli(String date, DateTimeFormatter formatter) {
         LocalDate localDate = LocalDate.parse(date, formatter);
         return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).toInstant().toEpochMilli();
-    }
-
-    public static String parse(String date, DateTimeFormatter from, DateTimeFormatter to) {
-        LocalDate localDate = LocalDate.parse(date, from);
-        return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).format(to);
     }
 
     /**
