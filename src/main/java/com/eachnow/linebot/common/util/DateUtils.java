@@ -34,7 +34,7 @@ public class DateUtils {
         LocalDateTime localDateTime = LocalDateTime.parse(date, from);
         return localDateTime.atZone(CST_ZONE_ID).format(to);
     }
-    
+
     public static long parseDateTimeToMilli(String dateTime) {
         LocalDateTime localDateTime = LocalDateTime.parse(dateTime, yyyyMMddHHmmssDash);
         return localDateTime.atZone(CST_ZONE_ID).toInstant().toEpochMilli();
