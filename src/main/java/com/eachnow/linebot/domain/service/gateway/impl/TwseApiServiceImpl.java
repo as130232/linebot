@@ -29,13 +29,13 @@ public class TwseApiServiceImpl implements TwseApiService {
         this.restTemplate = restTemplate;
     }
 
-    @PostConstruct
-    private void test() {
-        IndexPO indexPO = this.getDailyTradingOfTaiwanIndex("20210507");
-        System.out.println(indexPO);
-        List<IndexPO> list = this.getDailyTradeSummaryOfAllIndex("20210510");
-        System.out.println(list);
-    }
+//    @PostConstruct
+//    private void test() {
+//        IndexPO indexPO = this.getDailyTradingOfTaiwanIndex("20210507");
+//        System.out.println(indexPO);
+//        List<IndexPO> list = this.getDailyTradeSummaryOfAllIndex("20210510");
+//        System.out.println(list);
+//    }
 
     @Override
     public IndexPO getDailyTradingOfTaiwanIndex(String date) {
