@@ -27,7 +27,7 @@ public class DateUtils {
 
     public static String parseDate(String date, DateTimeFormatter from, DateTimeFormatter to) {
         LocalDate localDate = LocalDate.parse(date, from);
-        return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).format(to);
+        return localDate.format(to);
     }
 
     public static String parseDateTime(String date, DateTimeFormatter from, DateTimeFormatter to) {
@@ -86,4 +86,17 @@ public class DateUtils {
         return ZonedDateTime.now(CST_ZONE_ID);
     }
 
+    private static String checkDateStrAndPares(String date) {
+        switch (date) {
+            case "今天":
+                break;
+            case "昨天":
+                break;
+            case "明天":
+                break;
+            default:
+                break;
+        }
+        return date;
+    }
 }

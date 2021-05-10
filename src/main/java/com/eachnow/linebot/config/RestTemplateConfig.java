@@ -1,11 +1,17 @@
 package com.eachnow.linebot.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
+import org.apache.http.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +20,11 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.SSLContext;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Configuration
 public class RestTemplateConfig {
     /**
@@ -30,7 +38,17 @@ public class RestTemplateConfig {
     }
 
     @Bean("proxy-resttemplate")
-    public RestTemplate restTemplateBet188(@Qualifier("proxy-factory") ClientHttpRequestFactory factory) {
+    public RestTemplate proxyRestTemplate(@Qualifier("proxy-factory") ClientHttpRequestFactory factory) {
+        RestTemplate restTemplate = new RestTemplate(factory);
+        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+        return restTemplate;
+    }
+
+    /**
+     * 若調用沒有證書的https會出現"PKIX path building failed"錯誤
+     */
+    @Bean("https-resttemplate")
+    public RestTemplate httpsRestTemplate(@Qualifier("https-request-factory") ClientHttpRequestFactory factory) {
         RestTemplate restTemplate = new RestTemplate(factory);
         restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
         return restTemplate;
@@ -67,5 +85,25 @@ public class RestTemplateConfig {
         return clientHttpRequestFactory;
     }
 
+    @Bean("https-request-factory")
+    public HttpComponentsClientHttpRequestFactory generateHttpsRequestFactory() {
+        try {
+            TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            SSLConnectionSocketFactory connectionSocketFactory =
+                    new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
 
+            HttpClientBuilder httpClientBuilder = HttpClients.custom();
+            httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
+            CloseableHttpClient httpClient = httpClientBuilder.build();
+            HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+            factory.setHttpClient(httpClient);
+            factory.setConnectTimeout(10 * 1000);
+            factory.setReadTimeout(30 * 1000);
+            return factory;
+        } catch (Exception e) {
+            log.error("generate HttpsRequestFactory failed! error msg:{}", e.getMessage());
+            throw new RuntimeException();
+        }
+    }
 }
