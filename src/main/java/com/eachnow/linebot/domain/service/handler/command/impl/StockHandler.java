@@ -59,12 +59,12 @@ public class StockHandler implements CommandHandler {
         List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
 
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
-                Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").build()
+                Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
         )).paddingAll(FlexPaddingSize.XS).backgroundColor("#FF6B6E").build();
 
         //Title
-        Box title = Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
-                Text.builder().text("指數名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").build(),
+        Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
+                Text.builder().text("指數名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).build(),
                 Text.builder().text("金額(萬)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
                 Text.builder().text("筆數").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
                 Text.builder().text("漲跌").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
@@ -76,10 +76,10 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
         List<FlexComponent> listCategoryIndexComponent = listCategoryIndex.stream().map(po -> {
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getName()).size(FlexFontSize.SM).color("#555555").build(),
-                    Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).align(FlexAlign.END)
+                    Text.builder().text(po.getName()).size(FlexFontSize.SM).flex(1).build(),
+                    Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
+                    Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
+                    Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END)
                             .color(po.getChange().toString().contains("-") ? "#228b22" : "#ff0000").build()
             )).build();
         }).collect(Collectors.toList());

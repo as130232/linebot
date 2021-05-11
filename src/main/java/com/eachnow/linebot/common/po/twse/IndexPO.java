@@ -3,6 +3,8 @@ package com.eachnow.linebot.common.po.twse;
 import lombok.Builder;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 指數PO
  */
@@ -22,6 +24,14 @@ public class IndexPO {
         if (this.name != null && this.name.contains("類指數"))
             return this.name.replace("類指數", "");
         return this.name;
+    }
+
+    public String getTradeValue() {
+        //移除逗點
+        String amount = this.tradeValue.replace(",", "");
+        //單位從元轉為萬
+        BigDecimal result = (new BigDecimal(amount)).divide(new BigDecimal(10000)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        return result.toString();
     }
 
 }
