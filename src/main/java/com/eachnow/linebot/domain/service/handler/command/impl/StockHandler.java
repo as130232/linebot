@@ -84,7 +84,7 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
         List<FlexComponent> listCategoryIndexComponent = listCategoryIndex.stream().map(po -> {
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getName().length() > 4 ? po.getName().substring(0, 5):po.getName()).size(FlexFontSize.SM).flex(1).build(),
+                    Text.builder().text(po.getName().length() > 4 ? po.getName().substring(0, 4) : po.getName()).size(FlexFontSize.SM).flex(1).build(),
                     Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END)
@@ -94,7 +94,7 @@ public class StockHandler implements CommandHandler {
         bodyComponent.addAll(listCategoryIndexComponent);
         bodyComponent.add(separator);
         Box twIndexBox = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                Text.builder().text("台指").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#555555").build(),
+                Text.builder().text("加權指").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#555555").build(),
                 Text.builder().text(twIndex.getTradeValue()).size(FlexFontSize.SM).align(FlexAlign.END).build(),
                 Text.builder().text(twIndex.getTransaction()).size(FlexFontSize.SM).align(FlexAlign.END).build(),
                 Text.builder().text(twIndex.getChange().toString()).size(FlexFontSize.SM).align(FlexAlign.END)
