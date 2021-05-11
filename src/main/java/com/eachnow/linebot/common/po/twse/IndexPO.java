@@ -29,8 +29,8 @@ public class IndexPO {
     public String getTradeValue() {
         //移除逗點
         String amount = this.tradeValue.replace(",", "");
-        //單位從元轉為萬
-        BigDecimal result = (new BigDecimal(amount)).divide(new BigDecimal(10000)).setScale(0, BigDecimal.ROUND_HALF_UP);
+        //單位從元轉為億
+        BigDecimal result = (new BigDecimal(amount)).divide(new BigDecimal(100000000)).setScale(2, BigDecimal.ROUND_HALF_UP);
         return result.toString();
     }
 

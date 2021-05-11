@@ -10,6 +10,7 @@ import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.DatetimePickerAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.*;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
@@ -57,15 +58,17 @@ public class StockHandler implements CommandHandler {
 
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
         List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
-
-        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
+        if (twIndex.getTaiex() == null) {
+            return new TextMessage(commandPO.getDatetimepicker().getDate() + "台股未開市。");
+        }
+            Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
                 Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
         )).paddingAll(FlexPaddingSize.XS).backgroundColor("#FF6B6E").build();
 
         //Title
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
-                Text.builder().text("指數名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).build(),
-                Text.builder().text("金額(萬)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
+                Text.builder().text("指數名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(2).build(),
+                Text.builder().text("金額(億)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
                 Text.builder().text("筆數").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
                 Text.builder().text("漲跌(%)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
         ).build();
@@ -76,7 +79,7 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
         List<FlexComponent> listCategoryIndexComponent = listCategoryIndex.stream().map(po -> {
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getName()).size(FlexFontSize.SM).flex(1).build(),
+                    Text.builder().text(po.getName()).size(FlexFontSize.SM).flex(2).build(),
                     Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END)
@@ -106,11 +109,11 @@ public class StockHandler implements CommandHandler {
         return FlexMessage.builder().altText("台股各類指數日成交量").contents(contents).build();
     }
 
-//    @PostConstruct
-//    private void test() {
-//        String text = "股票 指數";
-//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-//        getIndex(commandPO);
-//    }
+    @PostConstruct
+    private void test() {
+        String text = "股票 指數 20210501";
+        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+        getIndex(commandPO);
+    }
 }
