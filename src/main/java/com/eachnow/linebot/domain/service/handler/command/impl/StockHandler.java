@@ -18,10 +18,12 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
+import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,18 +60,21 @@ public class StockHandler implements CommandHandler {
 
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
         List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
-        if (twIndex.getTaiex() == null) {
-            return new TextMessage(commandPO.getDatetimepicker().getDate() + "台股未開市。");
+        if (twIndex.getTaiex() == null || listCategoryIndex.size() == 0) {
+            //取得該日期對應星期幾
+            ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
+            String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN);
+            return new TextMessage(commandPO.getDatetimepicker().getDate() + "(" + dayOfWeekName + ") 台股未開市。");
         }
-            Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
-                Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
+                Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.MD).color("#ffffff").align(FlexAlign.CENTER).build()
         )).paddingAll(FlexPaddingSize.XS).backgroundColor("#FF6B6E").build();
 
         //Title
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
                 Text.builder().text("指數名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(2).build(),
                 Text.builder().text("金額(億)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
-                Text.builder().text("筆數").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
+                Text.builder().text("筆數").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.CENTER).build(),
                 Text.builder().text("漲跌(%)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
         ).build();
         Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
