@@ -72,7 +72,7 @@ public class StockHandler implements CommandHandler {
 
         //Title
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
-                Text.builder().text("指數名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(2).build(),
+                Text.builder().text("指數名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).build(),
                 Text.builder().text("金額(億)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
                 Text.builder().text("筆數").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.CENTER).build(),
                 Text.builder().text("漲跌(%)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
@@ -84,7 +84,7 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
         List<FlexComponent> listCategoryIndexComponent = listCategoryIndex.stream().map(po -> {
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getName()).size(FlexFontSize.SM).flex(2).build(),
+                    Text.builder().text(po.getName().length() > 4 ? po.getName().substring(0, 3):po.getName()).size(FlexFontSize.SM).flex(1).build(),
                     Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END)
