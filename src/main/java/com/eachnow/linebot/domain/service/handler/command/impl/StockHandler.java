@@ -59,13 +59,13 @@ public class StockHandler implements CommandHandler {
             date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
 
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
-        List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
-        if (twIndex.getTaiex() == null || listCategoryIndex.size() == 0) {
+        if (twIndex == null) {
             //取得該日期對應星期幾
             ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
             String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN);
             return new TextMessage(commandPO.getDatetimepicker().getDate() + "(" + dayOfWeekName + ") 台股未開市。");
         }
+        List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
                 Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
         )).paddingAll(FlexPaddingSize.MD).backgroundColor("#FF6B6E").build();
@@ -84,7 +84,7 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
         List<FlexComponent> listCategoryIndexComponent = listCategoryIndex.stream().map(po -> {
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getName().length() > 4 ? po.getName().substring(0, 3):po.getName()).size(FlexFontSize.SM).flex(1).build(),
+                    Text.builder().text(po.getName().length() > 4 ? po.getName().substring(0, 5):po.getName()).size(FlexFontSize.SM).flex(1).build(),
                     Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
                     Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END)

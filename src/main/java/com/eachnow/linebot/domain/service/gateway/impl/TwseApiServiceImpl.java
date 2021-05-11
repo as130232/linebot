@@ -57,7 +57,6 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "exchangeReport/FMTQIK?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
-
             for (int i = 0; i < twseDataPO.getData().size(); i++) {
                 List<String> listData = twseDataPO.getData().get(i);
                 String dataDate = listData.get(0);    //日期 110/05/03
@@ -66,13 +65,13 @@ public class TwseApiServiceImpl implements TwseApiService {
                 if (localDate.getMonth().getValue() == month && localDate.getDayOfMonth() == day) {
                     indexPO = IndexPO.builder().tradeVolume(listData.get(1)).tradeValue(listData.get(2)).transaction(listData.get(3))
                             .taiex(listData.get(4)).change(Float.valueOf(listData.get(5))).name(title).date(localDate.format(DateUtils.yyyyMMddDash)).build();
-                    break;
+                    return indexPO;
                 }
             }
         } catch (Exception e) {
             log.error("呼叫取得證交所-各類指數日成交量值，失敗! date:{}, error msg:{}", date, e.getMessage());
         }
-        return indexPO;
+        return null;
     }
 
     @Override
