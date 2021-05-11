@@ -109,11 +109,11 @@ public class StockHandler implements CommandHandler {
         return FlexMessage.builder().altText("台股各類指數日成交量").contents(contents).build();
     }
 
-    @PostConstruct
-    private void test() {
-        String text = "股票 指數 20210501";
-        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-        getIndex(commandPO);
-    }
+//    @PostConstruct
+//    private void test() {
+//        String text = "股票 指數 20210501";
+//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+//        getIndex(commandPO);
+//    }
 }
