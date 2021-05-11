@@ -22,7 +22,7 @@ public class IndexPO {
 
     public String getName() {
         if (this.name != null && this.name.contains("類指數"))
-            return this.name.replace("類指數", "");
+            return this.name.replace("類指數", "").replace("及", "");
         return this.name;
     }
 
