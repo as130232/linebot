@@ -67,8 +67,8 @@ public class StockHandler implements CommandHandler {
             return new TextMessage(commandPO.getDatetimepicker().getDate() + "(" + dayOfWeekName + ") 台股未開市。");
         }
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
-                Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.MD).color("#ffffff").align(FlexAlign.CENTER).build()
-        )).paddingAll(FlexPaddingSize.XS).backgroundColor("#FF6B6E").build();
+                Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
+        )).paddingAll(FlexPaddingSize.MD).backgroundColor("#FF6B6E").build();
 
         //Title
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
