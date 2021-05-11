@@ -53,7 +53,7 @@ public class StockHandler implements CommandHandler {
             date = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
         //判斷是否有datetimepicker
         if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
-            date = commandPO.getDatetimepicker().getDate();
+            date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
 
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
         List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);

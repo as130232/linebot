@@ -113,6 +113,25 @@ public class MessageHandler {
         return locationHandler.execute(event.getMessage());
     }
 
+//    @PostConstruct
+//    private void test(){
+//        String text = "股票 指數 20210511 datetimepicker";
+//        DatetimepickerPO datetimepickerPO = null;
+//        if (text.contains("datetimepicker")) {
+//            Map<String, String> datetimepickerMap = new HashMap<>();
+//            datetimepickerMap.put("date", "2021-05-10");
+//            try {
+//                datetimepickerPO = JsonUtils.toObject(datetimepickerMap, DatetimepickerPO.class);
+//                if (text.contains("-"))
+//                    datetimepickerPO.setType(text.split("-")[1]);
+//            } catch (Exception e) {
+//                log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
+//            }
+//        }
+//        //根據指令取得對應指令處理服務
+//        executeCommand("test", text, datetimepickerPO);
+//    }
+
     @EventMapping
     public Message handlePostbackEvent(PostbackEvent event) {
         log.info("handlePostbackEvent，event: " + event);
