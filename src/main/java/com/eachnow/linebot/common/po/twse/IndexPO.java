@@ -19,8 +19,8 @@ public class IndexPO {
     private String date;   //日期
 
     public String getName() {
-        if (this.name != null && this.name.contains("指數"))
-            return this.name.replace("指數", "");
+        if (this.name != null && this.name.contains("類指數"))
+            return this.name.replace("類指數", "");
         return this.name;
     }
 

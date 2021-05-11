@@ -2,6 +2,7 @@ package com.eachnow.linebot.domain.service.gateway.impl;
 
 import com.eachnow.linebot.common.po.twse.IndexPO;
 import com.eachnow.linebot.common.po.twse.TwseDataPO;
+import com.eachnow.linebot.common.po.twse.TwseStockInfoDataPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.gateway.TwseApiService;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -36,6 +36,17 @@ public class TwseApiServiceImpl implements TwseApiService {
 //        List<IndexPO> list = this.getDailyTradeSummaryOfAllIndex("20210510");
 //        System.out.println(list);
 //    }
+
+    public TwseStockInfoDataPO getStockInfo(String stockId) {
+        try {
+            String url = String.format("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_%s.tw&json=1&delay=0", stockId);
+            ResponseEntity<TwseStockInfoDataPO> responseEntity = restTemplate.getForEntity(url, TwseStockInfoDataPO.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("呼叫取得證交所-個股當日即時狀況，失敗! stockId:{}, error msg:{}", stockId, e.getMessage());
+        }
+        return null;
+    }
 
     @Override
     public IndexPO getDailyTradingOfTaiwanIndex(String date) {
