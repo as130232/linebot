@@ -61,7 +61,7 @@ public class StockHandler implements CommandHandler {
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
         if (twIndex == null) {
             //取得該日期對應星期幾
-            ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
+            ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMdd);
             String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN);
             return new TextMessage(commandPO.getDatetimepicker().getDate() + "(" + dayOfWeekName + ") 台股未開市。");
         }

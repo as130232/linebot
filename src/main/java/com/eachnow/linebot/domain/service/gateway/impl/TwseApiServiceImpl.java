@@ -52,7 +52,7 @@ public class TwseApiServiceImpl implements TwseApiService {
     public IndexPO getDailyTradingOfTaiwanIndex(String date) {
         String title = "台股大盤成交資訊";
         LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
-        IndexPO indexPO = IndexPO.builder().name(title).date(localDate.format(DateUtils.yyyyMMddDash)).build();
+//        IndexPO indexPO = IndexPO.builder().name(title).date(localDate.format(DateUtils.yyyyMMddDash)).build();
         try {
             String url = TWSE_URL + "exchangeReport/FMTQIK?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
@@ -63,9 +63,8 @@ public class TwseApiServiceImpl implements TwseApiService {
                 Integer month = Integer.valueOf(dataDate.split("/")[1]);
                 Integer day = Integer.valueOf(dataDate.split("/")[2]);
                 if (localDate.getMonth().getValue() == month && localDate.getDayOfMonth() == day) {
-                    indexPO = IndexPO.builder().tradeVolume(listData.get(1)).tradeValue(listData.get(2)).transaction(listData.get(3))
+                    return IndexPO.builder().tradeVolume(listData.get(1)).tradeValue(listData.get(2)).transaction(listData.get(3))
                             .taiex(listData.get(4)).change(Float.valueOf(listData.get(5))).name(title).date(localDate.format(DateUtils.yyyyMMddDash)).build();
-                    return indexPO;
                 }
             }
         } catch (Exception e) {
