@@ -8,7 +8,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class TwseStockInfoDataPO {
-    private List<MsgPO> msgArray;
+    private List<MsgPO> msgArray;   //詳細股價資訊
     private String referer;
     private String userDelay;
     private String rtcode;

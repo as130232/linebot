@@ -50,9 +50,7 @@ public class TwseApiServiceImpl implements TwseApiService {
 
     @Override
     public IndexPO getDailyTradingOfTaiwanIndex(String date) {
-        String title = "台股大盤成交資訊";
         LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
-//        IndexPO indexPO = IndexPO.builder().name(title).date(localDate.format(DateUtils.yyyyMMddDash)).build();
         try {
             String url = TWSE_URL + "exchangeReport/FMTQIK?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
@@ -63,8 +61,9 @@ public class TwseApiServiceImpl implements TwseApiService {
                 Integer month = Integer.valueOf(dataDate.split("/")[1]);
                 Integer day = Integer.valueOf(dataDate.split("/")[2]);
                 if (localDate.getMonth().getValue() == month && localDate.getDayOfMonth() == day) {
-                    return IndexPO.builder().tradeVolume(listData.get(1)).tradeValue(listData.get(2)).transaction(listData.get(3))
-                            .taiex(listData.get(4)).change(Float.valueOf(listData.get(5))).name(title).date(localDate.format(DateUtils.yyyyMMddDash)).build();
+                    return IndexPO.builder().tradeVolume(listData.get(1)).tradeValue(listData.get(2))
+                            .transaction(listData.get(3)).taiex(listData.get(4)).change(Float.valueOf(listData.get(5)))
+                            .name("台股大盤成交資訊").date(localDate.format(DateUtils.yyyyMMddDash)).build();
                 }
             }
         } catch (Exception e) {
@@ -75,11 +74,11 @@ public class TwseApiServiceImpl implements TwseApiService {
 
     @Override
     public List<IndexPO> getDailyTradeSummaryOfAllIndex(String date) {
-        List<IndexPO> result = new ArrayList<>();
         try {
             String url = TWSE_URL + "exchangeReport/BFIAMU?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
+            List<IndexPO> result = new ArrayList<>(twseDataPO.getData().size());
             twseDataPO.getData().forEach(listData -> {
                 IndexPO indexPO = IndexPO.builder().name(listData.get(0)).tradeVolume(listData.get(1)).tradeValue(listData.get(2)).transaction(listData.get(3))
                         .change(Float.valueOf(listData.get(4))).date(DateUtils.parseDate(twseDataPO.getDate(), DateUtils.yyyyMMdd, DateUtils.yyyyMMddDash)).build();
@@ -90,6 +89,6 @@ public class TwseApiServiceImpl implements TwseApiService {
         } catch (Exception e) {
             log.error("呼叫取得證交所-各類指數日成交量值，失敗! date:{}, error msg:{}", date, e.getMessage());
         }
-        return result;
+        return new ArrayList<>();
     }
 }
