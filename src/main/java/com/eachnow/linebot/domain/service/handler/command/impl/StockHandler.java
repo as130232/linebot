@@ -62,15 +62,14 @@ public class StockHandler implements CommandHandler {
             date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
 
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
-        //取得該日期對應星期幾
         ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMdd);
         if (isCurrentDate && parseDate.getHour() < 14) {
             return new TextMessage("今日台股還未關市。請於14:00後查詢。");
         }
-
+        //取得該日期對應星期幾
         String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
         if (twIndex == null) {
-            return new TextMessage(date + "(" + dayOfWeekName + ") 台股未開市。");
+            return new TextMessage(parseDate.format(DateUtils.yyyyMMddDash) + "(" + dayOfWeekName + ") 台股未開市。");
         }
         List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
