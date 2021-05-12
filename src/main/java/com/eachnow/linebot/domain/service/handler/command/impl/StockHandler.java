@@ -59,11 +59,10 @@ public class StockHandler implements CommandHandler {
             date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
 
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
-        log.info("date:{}, twIndex:{}", date, twIndex);
+        //取得該日期對應星期幾
+        ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMdd);
+        String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
         if (twIndex == null) {
-            //取得該日期對應星期幾
-            ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMdd);
-            String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN);
             return new TextMessage(date + "(" + dayOfWeekName + ") 台股未開市。");
         }
         List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
@@ -105,7 +104,8 @@ public class StockHandler implements CommandHandler {
         String datetimepickerData = "股票 指數 " + date + ParamterUtils.CONTACT;
         Box twIndexAndDateBox = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
                 Button.builder().height(Button.ButtonHeight.SMALL).style(Button.ButtonStyle.SECONDARY).action(
-                        DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker").label(DateUtils.parseDate(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddSlash)).build()).build(),
+                        DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker")
+                                .label(DateUtils.parseDate(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddSlash) + "(" + dayOfWeekName + ")").build()).build(),
                 Text.builder().text(twIndex.getTaiex().toString()).size(FlexFontSize.XL).align(FlexAlign.CENTER).gravity(FlexGravity.CENTER)
                         .color(twIndex.getChange().toString().contains("-") ? "#228b22" : "#ff0000").build())).build();
         bodyComponent.add(twIndexAndDateBox);
