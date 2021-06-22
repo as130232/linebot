@@ -192,7 +192,7 @@ public class BookkeepingHandler implements CommandHandler {
 
     private List<FlexComponent> getBodyContentsByMonth(List<BookkeepingPO> listBookkeeping) {
         Map<String, List<BookkeepingPO>> listBookkeepingGroupByMonth = listBookkeeping.stream().collect(Collectors.groupingBy(po -> {
-            return po.getDate().substring(0, 6);//取得yyyy-mm
+            return po.getDate().substring(0, 7);//取得yyyy-mm
         }));
         //排序，日期小的在前
         Map<String, List<BookkeepingPO>> listBookkeepingGroupByDateInSorted = listBookkeepingGroupByMonth.entrySet().stream().sorted((Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
