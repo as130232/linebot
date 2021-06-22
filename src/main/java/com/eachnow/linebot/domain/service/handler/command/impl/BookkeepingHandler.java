@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.YearMonth;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.util.*;
@@ -143,7 +144,7 @@ public class BookkeepingHandler implements CommandHandler {
         //超過一定數量，按照月份分類
         if (listBookkeeping.size() > 120) {
             bodyContents = getBodyContentsByMonth(listBookkeeping);
-        }else {
+        } else {
             bodyContents = getBodyContentsByDate(listBookkeeping);
         }
         String datetimepickerData = data + startDate + ParamterUtils.CONTACT + endDate + ParamterUtils.CONTACT;
@@ -206,10 +207,11 @@ public class BookkeepingHandler implements CommandHandler {
                     Text.builder().text("$" + totalOneMonth).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
             )).paddingAll(FlexPaddingSize.XS).build();
             oneMonthContents.add(oneDateAndTotal);
-            ZonedDateTime dateTime = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
-            String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth() - 1).format(DateUtils.yyyyMMdd);
+            YearMonth yearMonth = YearMonth.parse(date, DateUtils.yyyyMMDash);
+            String startOfMonth = yearMonth.atDay(1).format(DateUtils.yyyyMMdd);    //取得每月一號
+            String endOfMonth = yearMonth.atEndOfMonth().format(DateUtils.yyyyMMdd);
             Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneMonthContents).paddingTop(FlexPaddingSize.SM)
-                    .action(PostbackAction.builder().label("本月").data("記 查 " + dayOfMonthDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build();
+                    .action(PostbackAction.builder().label(date).data("記 查 " + startOfMonth + ParamterUtils.CONTACT + endOfMonth).build()).build();
             bodyContents.add(oneDateBox);
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
             bodyContents.add(separator);
