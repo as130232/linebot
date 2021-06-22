@@ -167,10 +167,6 @@ public class BookkeepingHandler implements CommandHandler {
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
         //計算總金額
         BigDecimal total = listBookkeeping.stream().map(BookkeepingPO::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-//        BigDecimal total = listBookkeepingGroupByDate.keySet().stream().map(date -> {
-//            List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
-//            return listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-//        }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
         //footer total amount
         List<FlexComponent> footerContents = Arrays.asList(
                 Text.builder().text("Total").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).build(),
