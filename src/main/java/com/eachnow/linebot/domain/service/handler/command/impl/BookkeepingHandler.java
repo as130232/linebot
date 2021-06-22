@@ -138,11 +138,8 @@ public class BookkeepingHandler implements CommandHandler {
                 endDate = DateUtils.parseDate(endDateDash, DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
             }
         }
-        List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),
-                startDateDash, endDateDash);
-        log.info("listBookkeeping size:{}", listBookkeeping.size());
-
-        List<FlexComponent> bodyContents = new ArrayList<>();
+        List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(), startDateDash, endDateDash);
+        List<FlexComponent> bodyContents;
         //超過一定數量，按照月份分類
         if (listBookkeeping.size() > 120) {
             bodyContents = getBodyContentsByMonth(listBookkeeping);
@@ -179,7 +176,7 @@ public class BookkeepingHandler implements CommandHandler {
         String dayOfWeekDate = dateTime.minusDays(dateTime.getDayOfWeek().getValue()).format(DateUtils.yyyyMMdd);
         String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth() - 1).format(DateUtils.yyyyMMdd);
         String minusMonthsDate = dateTime.minusMonths(3).format(DateUtils.yyyyMMdd);
-        String dayOfYearDate = dateTime.minusDays(dateTime.getDayOfYear()).format(DateUtils.yyyyMMdd);
+        String dayOfYearDate = dateTime.minusDays(dateTime.getDayOfYear() - 1).format(DateUtils.yyyyMMdd);
         QuickReply quickReply = QuickReply.builder().items(
                 Arrays.asList(
                         QuickReplyItem.builder().action(PostbackAction.builder().label("本周").data(data + dayOfWeekDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build(),
@@ -209,7 +206,10 @@ public class BookkeepingHandler implements CommandHandler {
                     Text.builder().text("$" + totalOneMonth).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
             )).paddingAll(FlexPaddingSize.XS).build();
             oneMonthContents.add(oneDateAndTotal);
-            Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneMonthContents).paddingTop(FlexPaddingSize.SM).build();
+            ZonedDateTime dateTime = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
+            String dayOfMonthDate = dateTime.minusDays(dateTime.getDayOfMonth() - 1).format(DateUtils.yyyyMMdd);
+            Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneMonthContents).paddingTop(FlexPaddingSize.SM)
+                    .action(PostbackAction.builder().label("本月").data("記 查 " + dayOfMonthDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build();
             bodyContents.add(oneDateBox);
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
             bodyContents.add(separator);
