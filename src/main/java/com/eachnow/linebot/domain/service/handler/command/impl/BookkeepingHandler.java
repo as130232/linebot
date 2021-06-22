@@ -140,6 +140,7 @@ public class BookkeepingHandler implements CommandHandler {
         }
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),
                 startDateDash, endDateDash);
+        log.info("listBookkeeping size:{}", listBookkeeping.size());
         //按照日期分類
         Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(BookkeepingPO::getDate));
         //排序，日期小的在前
@@ -162,16 +163,18 @@ public class BookkeepingHandler implements CommandHandler {
                     Text.builder().text("$" + totalOneDay).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
             )).paddingAll(FlexPaddingSize.XS).build();
             oneDateContents.add(oneDateAndTotal);
-
-            listBookkeepingSameDate.stream().forEach(po -> {
-                Box typeAndAmount = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
-                        //類型名稱
-                        Text.builder().text(po.getTypeName()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
-                        //金額
-                        Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build()
-                )).build();
-                oneDateContents.add(typeAndAmount);
-            });
+            //數量太多會無法顯示，超過一定數量，則不顯示細節
+            if (listBookkeeping.size() <= 80){
+                listBookkeepingSameDate.stream().forEach(po -> {
+                    Box typeAndAmount = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
+                            //類型名稱
+                            Text.builder().text(po.getTypeName()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
+                            //金額
+                            Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build()
+                    )).build();
+                    oneDateContents.add(typeAndAmount);
+                });
+            }
             Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneDateContents).paddingTop(FlexPaddingSize.SM).build();
             bodyContents.add(oneDateBox);
             Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
