@@ -141,45 +141,14 @@ public class BookkeepingHandler implements CommandHandler {
         List<BookkeepingPO> listBookkeeping = bookkeepingRepository.findByUserIdAndDateBetween(commandPO.getUserId(),
                 startDateDash, endDateDash);
         log.info("listBookkeeping size:{}", listBookkeeping.size());
-        //按照日期分類
-        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(BookkeepingPO::getDate));
-        //排序，日期小的在前
-        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDateInSorted = listBookkeepingGroupByDate.entrySet().stream()
-                .sorted((Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+
         List<FlexComponent> bodyContents = new ArrayList<>();
-        listBookkeepingGroupByDateInSorted.keySet().stream().forEach(date -> {
-            List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
-            BigDecimal totalOneDay = listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-            //一天所有資訊
-            List<FlexComponent> oneDateContents = new ArrayList<>();
-            //取得該日期對應星期幾
-            ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
-            String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
-            String dateContainDayOfWeek = date.replace("-", "/") + "({dayOfWeek})".replace("{dayOfWeek}", dayOfWeekName);
-            Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
-                    //日期
-                    Text.builder().text(dateContainDayOfWeek).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
-                    //該天總金額
-                    Text.builder().text("$" + totalOneDay).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
-            )).paddingAll(FlexPaddingSize.XS).build();
-            oneDateContents.add(oneDateAndTotal);
-            //數量太多會無法顯示，超過一定數量，則不顯示細節
-            if (listBookkeeping.size() <= 80){
-                listBookkeepingSameDate.stream().forEach(po -> {
-                    Box typeAndAmount = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
-                            //類型名稱
-                            Text.builder().text(po.getTypeName()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
-                            //金額
-                            Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build()
-                    )).build();
-                    oneDateContents.add(typeAndAmount);
-                });
-            }
-            Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneDateContents).paddingTop(FlexPaddingSize.SM).build();
-            bodyContents.add(oneDateBox);
-            Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
-            bodyContents.add(separator);
-        });
+        //超過一定數量，按照月份分類
+        if (listBookkeeping.size() > 120) {
+            bodyContents = getBodyContentsByMonth(listBookkeeping);
+        }else {
+            bodyContents = getBodyContentsByDate(listBookkeeping);
+        }
         String datetimepickerData = data + startDate + ParamterUtils.CONTACT + endDate + ParamterUtils.CONTACT;
         //日期區間
         List<FlexComponent> fromAndToContents = Arrays.asList(
@@ -196,13 +165,12 @@ public class BookkeepingHandler implements CommandHandler {
         //標頭
         List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("記帳小本本").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).build());
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#F5D58C").build();
-
         //計算總金額
-        BigDecimal total = listBookkeepingGroupByDate.keySet().stream().map(date -> {
-            List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
-            return listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-        }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
-
+        BigDecimal total = listBookkeeping.stream().map(BookkeepingPO::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+//        BigDecimal total = listBookkeepingGroupByDate.keySet().stream().map(date -> {
+//            List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDate.get(date);
+//            return listBookkeepingSameDate.stream().map(item -> item.getAmount()).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+//        }).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
         //footer total amount
         List<FlexComponent> footerContents = Arrays.asList(
                 Text.builder().text("Total").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).build(),
@@ -224,6 +192,77 @@ public class BookkeepingHandler implements CommandHandler {
                         QuickReplyItem.builder().action(PostbackAction.builder().label("今年").data(data + dayOfYearDate + ParamterUtils.CONTACT + dateTime.format(DateUtils.yyyyMMdd)).build()).build()
                 )).build();
         return FlexMessage.builder().altText("記帳小本本").contents(contents).quickReply(quickReply).build();
+    }
+
+    private List<FlexComponent> getBodyContentsByMonth(List<BookkeepingPO> listBookkeeping) {
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByMonth = listBookkeeping.stream().collect(Collectors.groupingBy(po -> {
+            return po.getDate().substring(0, 6);//取得yyyy-mm
+        }));
+        //排序，日期小的在前
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDateInSorted = listBookkeepingGroupByMonth.entrySet().stream().sorted((Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+        List<FlexComponent> bodyContents = new ArrayList<>(listBookkeepingGroupByDateInSorted.size());
+        listBookkeepingGroupByDateInSorted.keySet().forEach(date -> {
+            List<BookkeepingPO> listBookkeepingSameMonth = listBookkeepingGroupByDateInSorted.get(date);
+            BigDecimal totalOneMonth = listBookkeepingSameMonth.stream().map(BookkeepingPO::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+            //一月所有資訊
+            List<FlexComponent> oneMonthContents = new ArrayList<>();
+            Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
+                    //月份
+                    Text.builder().text(date).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
+                    //該月份總金額
+                    Text.builder().text("$" + totalOneMonth).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
+            )).paddingAll(FlexPaddingSize.XS).build();
+            oneMonthContents.add(oneDateAndTotal);
+            Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneMonthContents).paddingTop(FlexPaddingSize.SM).build();
+            bodyContents.add(oneDateBox);
+            Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
+            bodyContents.add(separator);
+        });
+        return bodyContents;
+    }
+
+    private List<FlexComponent> getBodyContentsByDate(List<BookkeepingPO> listBookkeeping) {
+        List<FlexComponent> bodyContents = new ArrayList<>(listBookkeeping.size());
+        //按照日期分類
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDate = listBookkeeping.stream().collect(Collectors.groupingBy(BookkeepingPO::getDate));
+        //排序，日期小的在前
+        Map<String, List<BookkeepingPO>> listBookkeepingGroupByDateInSorted = listBookkeepingGroupByDate.entrySet().stream()
+                .sorted((Map.Entry.comparingByKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e2, LinkedHashMap::new));
+        listBookkeepingGroupByDateInSorted.keySet().forEach(date -> {
+            List<BookkeepingPO> listBookkeepingSameDate = listBookkeepingGroupByDateInSorted.get(date);
+            BigDecimal totalOneDay = listBookkeepingSameDate.stream().map(BookkeepingPO::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, BigDecimal.ROUND_HALF_UP);
+            //一天所有資訊
+            List<FlexComponent> oneDateContents = new ArrayList<>();
+            //取得該日期對應星期幾
+            ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
+            String dayOfWeekName = parseDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
+            String dateContainDayOfWeek = date.replace("-", "/") + "({dayOfWeek})".replace("{dayOfWeek}", dayOfWeekName);
+            Box oneDateAndTotal = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
+                    //日期
+                    Text.builder().text(dateContainDayOfWeek).size(FlexFontSize.Md).style(Text.TextStyle.ITALIC).weight(Text.TextWeight.BOLD).color("#555555").build(),
+                    //該天總金額
+                    Text.builder().text("$" + totalOneDay).size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
+            )).paddingAll(FlexPaddingSize.XS).build();
+            oneDateContents.add(oneDateAndTotal);
+
+            //數量太多會無法顯示，超過一定數量，則不顯示細節
+            if (listBookkeeping.size() <= 80) {
+                listBookkeepingSameDate.forEach(po -> {
+                    Box typeAndAmount = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
+                            //類型名稱
+                            Text.builder().text(po.getTypeName()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
+                            //金額
+                            Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build()
+                    )).build();
+                    oneDateContents.add(typeAndAmount);
+                });
+            }
+            Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneDateContents).paddingTop(FlexPaddingSize.SM).build();
+            bodyContents.add(oneDateBox);
+            Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
+            bodyContents.add(separator);
+        });
+        return bodyContents;
     }
 
 }
