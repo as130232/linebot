@@ -63,7 +63,7 @@ public class StockHandler implements CommandHandler {
 
         IndexPO twIndex = twseApiService.getDailyTradingOfTaiwanIndex(date);
         ZonedDateTime parseDate = DateUtils.parseDate(date, DateUtils.yyyyMMdd);
-        if (isCurrentDate && parseDate.getHour() < 14) {
+        if (isCurrentDate && ZonedDateTime.now(DateUtils.CST_ZONE_ID).getHour() < 14) {
             return new TextMessage("今日台股還未關市。請於14:00後查詢。");
         }
         //取得該日期對應星期幾
