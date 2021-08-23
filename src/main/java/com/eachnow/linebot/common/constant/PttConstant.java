@@ -18,4 +18,15 @@ public class PttConstant {
     public static final String MAIN_DISP_URL = "https://disp.cc/b/main";
     public static final String SEX_DISP_URL = "https://disp.cc/b/sex";
 
+    public String getUrl(String classType) {
+        String bbsUrl = "https://www.ptt.cc/bbs/%s/index.html";
+        return String.format(bbsUrl, classType);
+    }
+
+    public String getUrlByDisp(String classType) {
+        String dispUrl = "https://disp.cc/b/%s";
+        return String.format(dispUrl, classType);
+    }
+
+
 }
