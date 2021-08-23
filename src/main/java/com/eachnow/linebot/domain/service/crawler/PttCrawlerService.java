@@ -129,7 +129,7 @@ public class PttCrawlerService {
         return popularity;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
 //        crawler(PttConstant.BEAUTY_URL, 2, PttConstant.TYPE_ARTICLE);
 //        crawlerByDisp(PttConstant.SEX_DISP_URL, 2, PttConstant.TYPE_ARTICLE);
