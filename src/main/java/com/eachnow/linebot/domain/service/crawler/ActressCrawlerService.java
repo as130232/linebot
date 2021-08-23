@@ -1,5 +1,7 @@
 package com.eachnow.linebot.domain.service.crawler;
 
+import com.eachnow.linebot.common.constant.PttConstant;
+import com.eachnow.linebot.common.po.PttArticlePO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * 爬取資源服務
@@ -33,15 +36,14 @@ public class ActressCrawlerService {
 
     //    @PostConstruct
     public void init() {
-        log.info("清空圖庫，並重新爬取女優版。");
         listPicture = new ArrayList<>(MAX_SIZE);
         crawler(2);
     }
 
     public void crawler(int pageSize) {
-        String url = "https://www.ptt.cc/bbs/Japanavgirls/index.html";
+        String url = PttConstant.AVGIRLS_URL;
         CompletableFuture.runAsync(() -> {
-            List<String> result = pttCrawlerService.crawler(url, pageSize);
+            List<String> result = pttCrawlerService.crawler(url, pageSize, PttConstant.TYPE_PICTURE).stream().map(PttArticlePO::getPictureUrl).collect(Collectors.toList());
             this.setPicture(result);
         }, pttCrawlerExecutor).exceptionally(e -> {
                     log.error("爬取PTT版，失敗! url:{}, error msg:{}", url, e.getMessage());
