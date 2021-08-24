@@ -85,17 +85,19 @@ public class PttCrawlerService {
                         || articleElement.getAttribute("text").contains("[問題]")
                         || articleElement.getAttribute("text").contains("[閒聊]"))
                     continue;
-                availableLinks.add(link.replace("https://www.ptt.cc", ""));
+                availableLinks.add(link);
             }
         }
         for (String link : availableLinks) {
             if (driver.findElements(By.cssSelector("a[href]")).size() > 0) {
-                WebElement webElement = driver.findElement(By.cssSelector(("a[href^=\"{url}\"]").replace("{url}", link)));
+                String replaceLink = link.replace("https://www.ptt.cc", "");
+                WebElement webElement = driver.findElement(By.cssSelector(("a[href^=\"{url}\"]").replace("{url}", replaceLink)));
                 webElement.click();
                 List<WebElement> listPictureElement = driver.findElements(By.cssSelector(("a[href]")));
                 List<String> listPictureOnPage = listPictureElement.stream().map(e -> e.getAttribute("href"))
                         .filter(e -> e.contains("jpg") && !e.contains("https://i.imgur.com/zguYZdO.jpg") && !e.contains("https://i.imgur.com/ZfoC3ro.jpg")).collect(Collectors.toList());
-                List<PttArticlePO> listPttArticle = listPictureOnPage.stream().map(picture -> PttArticlePO.builder().pictureUrl(picture).build()).collect(Collectors.toList());
+                List<PttArticlePO> listPttArticle = listPictureOnPage.stream().map(picture -> PttArticlePO.builder()
+                        .pictureUrl(picture).webUrl(link).build()).collect(Collectors.toList());
                 result.addAll(listPttArticle);
                 driver.navigate().back();
             }

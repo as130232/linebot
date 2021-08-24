@@ -4,6 +4,7 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.DescriptionCommandPO;
 import com.eachnow.linebot.common.po.DescriptionPO;
+import com.eachnow.linebot.common.po.PttArticlePO;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.URIAction;
@@ -14,11 +15,11 @@ import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
 import com.linecorp.bot.model.message.flex.component.FlexComponent;
 import com.linecorp.bot.model.message.flex.component.Image;
+import com.linecorp.bot.model.message.flex.component.Text;
 import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.Carousel;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
-import com.linecorp.bot.model.message.flex.unit.FlexLayout;
-import com.linecorp.bot.model.message.flex.unit.FlexPaddingSize;
+import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -63,15 +64,22 @@ public class BeautyHandler implements CommandHandler {
             beautyCrawlerService.crawler(1);
         }
         if (text.contains("多") || text.contains("more")) {
-            Set<String> pictures = randomListPicture(10);
+            Set<PttArticlePO> pictures = randomListPicture(10);
             if (pictures.size() == 0) {
                 beautyCrawlerService.crawler(2);
                 return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
             }
-            List<Bubble> listBubble = pictures.stream().map(picture -> {
+            List<Bubble> listBubble = pictures.stream().map(po -> {
+                URI articleUri = URI.create(po.getWebUrl());
+                Box article = Box.builder().layout(FlexLayout.VERTICAL).position(FlexPosition.ABSOLUTE).backgroundColor("#ff334b")
+                        .cornerRadius("20px").offsetTop("18px").offsetStart("18px").height("25px").width("53px").contents(Arrays.asList(
+                                Text.builder().text("文章").color("ffffff").align(FlexAlign.CENTER).size(FlexFontSize.XS).offsetTop("3px").build()
+                        )).action(new URIAction("URL", articleUri, new URIAction.AltUri(articleUri))).build();
+                String picture = po.getPictureUrl();
                 URI uri = URI.create(picture);
-                List<FlexComponent> bodyContents = Arrays.asList(Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7)
-                        .url(uri).action(new URIAction("URL", uri, new URIAction.AltUri(uri))).build());
+                List<FlexComponent> bodyContents = Arrays.asList(
+                        Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7)
+                                .url(uri).action(new URIAction("URL", uri, new URIAction.AltUri(uri))).build(), article);
                 Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.NONE).build();
                 Bubble bubble = Bubble.builder().header(null).hero(null).body(body).footer(null).build();
                 return bubble;
@@ -85,14 +93,14 @@ public class BeautyHandler implements CommandHandler {
             beautyCrawlerService.crawler(2);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
-        String pictureUrl = beautyCrawlerService.randomPicture();
+        String pictureUrl = beautyCrawlerService.randomPicture().getPictureUrl();
         currentPicture = pictureUrl;    //紀錄當前圖片
         URI uri = URI.create(pictureUrl);
         return new ImageMessage(uri, uri);
     }
 
-    private Set<String> randomListPicture(int size) {
-        Set<String> result = new HashSet<>(size);
+    private Set<PttArticlePO> randomListPicture(int size) {
+        Set<PttArticlePO> result = new HashSet<>(size);
         while (result.size() != size && beautyCrawlerService.listPicture.size() > size)
             result.add(beautyCrawlerService.randomPicture());
         return result;

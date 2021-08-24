@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 /**
  * 爬取資源服務
@@ -24,7 +24,7 @@ public class BeautyCrawlerService {
     private PttCrawlerService pttCrawlerService;
 
     public final Integer MAX_SIZE = 500;
-    public List<String> listPicture = new ArrayList<>(MAX_SIZE);
+    public List<PttArticlePO> listPicture = new ArrayList<>(MAX_SIZE);
 
     @Autowired
     public BeautyCrawlerService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
@@ -33,7 +33,7 @@ public class BeautyCrawlerService {
         this.pttCrawlerService = pttCrawlerService;
     }
 
-    //    @PostConstruct
+    @PostConstruct
     public void init() {
         listPicture = new ArrayList<>(MAX_SIZE);
         crawler(2);
@@ -41,7 +41,7 @@ public class BeautyCrawlerService {
 
     public void crawler(int pageSize) {
         CompletableFuture.runAsync(() -> {
-            List<String> result = pttCrawlerService.crawler(PttEnum.BEAUTY, pageSize, PttEnum.TYPE_PICTURE).stream().map(PttArticlePO::getPictureUrl).collect(Collectors.toList());
+            List<PttArticlePO> result = pttCrawlerService.crawler(PttEnum.BEAUTY, pageSize, PttEnum.TYPE_PICTURE);
             this.setPicture(result);
         }, pttCrawlerExecutor).exceptionally(e -> {
                     log.error("爬取PTT-表特版，失敗! error msg:{}", e.getMessage());
@@ -50,7 +50,7 @@ public class BeautyCrawlerService {
         );
     }
 
-    private void setPicture(List<String> listPictureOnPage) {
+    private void setPicture(List<PttArticlePO> listPictureOnPage) {
         listPicture.addAll(listPictureOnPage);
         if (listPicture.size() > MAX_SIZE) {
             int i = 0;
@@ -61,7 +61,7 @@ public class BeautyCrawlerService {
         }
     }
 
-    public String randomPicture() {
+    public PttArticlePO randomPicture() {
         int item = new Random().nextInt(listPicture.size());
         return listPicture.get(item);
     }

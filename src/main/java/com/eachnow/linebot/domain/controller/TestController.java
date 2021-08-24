@@ -46,7 +46,7 @@ public class TestController {
 
     @GetMapping(value = "/picture")
     public String randomPicture() {
-        return beautyCrawlerService.randomPicture();
+        return beautyCrawlerService.randomPicture().getPictureUrl();
     }
 
     @GetMapping(value = "/insertUser")
