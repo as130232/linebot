@@ -73,7 +73,7 @@ public class BeautyHandler implements CommandHandler {
                 URI articleUri = URI.create(po.getWebUrl());
                 Box article = Box.builder().layout(FlexLayout.VERTICAL).position(FlexPosition.ABSOLUTE).backgroundColor("#ff334b")
                         .cornerRadius("20px").offsetTop("18px").offsetStart("18px").height("25px").width("53px").contents(Arrays.asList(
-                                Text.builder().text("文章").color("ffffff").align(FlexAlign.CENTER).size(FlexFontSize.XS).offsetTop("3px").build()
+                                Text.builder().text("文章").color("#ffffff").align(FlexAlign.CENTER).size(FlexFontSize.XS).offsetTop("3px").build()
                         )).action(new URIAction("URL", articleUri, new URIAction.AltUri(articleUri))).build();
                 String picture = po.getPictureUrl();
                 URI uri = URI.create(picture);

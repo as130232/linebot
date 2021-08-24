@@ -4,16 +4,13 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.PttArticlePO;
-import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.crawler.PttCrawlerService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
-import com.linecorp.bot.model.action.DatetimePickerAction;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.flex.component.Box;
-import com.linecorp.bot.model.message.flex.component.Button;
 import com.linecorp.bot.model.message.flex.component.FlexComponent;
 import com.linecorp.bot.model.message.flex.component.Text;
 import com.linecorp.bot.model.message.flex.container.Bubble;
@@ -56,10 +53,9 @@ public class PopularArticleHandler implements CommandHandler {
             URI uri = URI.create(pttArticlePO.getWebUrl());
             Text title = Text.builder().text(pttArticlePO.getTitle()).size(FlexFontSize.SM).color("#99ccff").wrap(true).flex(5)
                     .action(new URIAction(pttEnum.toString(), uri, new URIAction.AltUri(uri))).build();
-            Text popularity = Text.builder().text(pttArticlePO.getPopularity().toString()).color("#bbbbbb").align(FlexAlign.END).flex(1).build();
+            Text popularity = Text.builder().text(pttArticlePO.getPopularity().toString()).color("#bbbbbb").align(FlexAlign.END).build();
             Box article = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
-                    title, popularity
-            )).backgroundColor("#111111").build();
+                    title, popularity)).backgroundColor("#111111").paddingAll(FlexPaddingSize.MD).build();
             bodyComponent.add(article);
         }
         Box content = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.SM)
