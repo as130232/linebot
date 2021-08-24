@@ -1,6 +1,6 @@
 package com.eachnow.linebot.domain.service.crawler;
 
-import com.eachnow.linebot.common.constant.PttConstant;
+import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.PttArticlePO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +40,11 @@ public class BeautyCrawlerService {
     }
 
     public void crawler(int pageSize) {
-        String url = PttConstant.BEAUTY_URL;
         CompletableFuture.runAsync(() -> {
-            List<String> result = pttCrawlerService.crawler(url, pageSize, PttConstant.TYPE_PICTURE).stream().map(PttArticlePO::getPictureUrl).collect(Collectors.toList());
+            List<String> result = pttCrawlerService.crawler(PttEnum.BEAUTY, pageSize, PttEnum.TYPE_PICTURE).stream().map(PttArticlePO::getPictureUrl).collect(Collectors.toList());
             this.setPicture(result);
         }, pttCrawlerExecutor).exceptionally(e -> {
-                    log.error("爬取PTT版，失敗! url:{}, error msg:{}", url, e.getMessage());
+                    log.error("爬取PTT-表特版，失敗! error msg:{}", e.getMessage());
                     return null;
                 }
         );

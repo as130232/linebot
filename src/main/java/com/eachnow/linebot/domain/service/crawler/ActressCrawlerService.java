@@ -1,6 +1,6 @@
 package com.eachnow.linebot.domain.service.crawler;
 
-import com.eachnow.linebot.common.constant.PttConstant;
+import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.PttArticlePO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +41,11 @@ public class ActressCrawlerService {
     }
 
     public void crawler(int pageSize) {
-        String url = PttConstant.AVGIRLS_URL;
         CompletableFuture.runAsync(() -> {
-            List<String> result = pttCrawlerService.crawler(url, pageSize, PttConstant.TYPE_PICTURE).stream().map(PttArticlePO::getPictureUrl).collect(Collectors.toList());
+            List<String> result = pttCrawlerService.crawler(PttEnum.JAPANAVGIRLS, pageSize, PttEnum.TYPE_PICTURE).stream().map(PttArticlePO::getPictureUrl).collect(Collectors.toList());
             this.setPicture(result);
         }, pttCrawlerExecutor).exceptionally(e -> {
-                    log.error("爬取PTT版，失敗! url:{}, error msg:{}", url, e.getMessage());
+                    log.error("爬取PTT-女優版，失敗! error msg:{}", e.getMessage());
                     return null;
                 }
         );
