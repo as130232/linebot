@@ -25,7 +25,7 @@ public class ActressCrawlerService {
     private PttCrawlerService pttCrawlerService;
 
     public final Integer MAX_SIZE = 500;
-    public List<String> listPicture = new ArrayList<>(MAX_SIZE);
+    public List<PttArticlePO> listPicture = new ArrayList<>(MAX_SIZE);
 
     @Autowired
     public ActressCrawlerService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
@@ -42,7 +42,7 @@ public class ActressCrawlerService {
 
     public void crawler(int pageSize) {
         CompletableFuture.runAsync(() -> {
-            List<String> result = pttCrawlerService.crawler(PttEnum.JAPANAVGIRLS, pageSize, PttEnum.TYPE_PICTURE).stream().map(PttArticlePO::getPictureUrl).collect(Collectors.toList());
+            List<PttArticlePO> result = pttCrawlerService.crawler(PttEnum.JAPANAVGIRLS, pageSize, PttEnum.TYPE_PICTURE);
             this.setPicture(result);
         }, pttCrawlerExecutor).exceptionally(e -> {
                     log.error("爬取PTT-女優版，失敗! error msg:{}", e.getMessage());
@@ -51,7 +51,7 @@ public class ActressCrawlerService {
         );
     }
 
-    private void setPicture(List<String> listPictureOnPage) {
+    private void setPicture(List<PttArticlePO> listPictureOnPage) {
         listPicture.addAll(listPictureOnPage);
         if (listPicture.size() > MAX_SIZE) {
             int i = 0;
@@ -62,7 +62,7 @@ public class ActressCrawlerService {
         }
     }
 
-    public String randomPicture() {
+    public PttArticlePO randomPicture() {
         int item = new Random().nextInt(listPicture.size());
         return listPicture.get(item);
     }

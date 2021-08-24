@@ -33,7 +33,7 @@ public class BeautyCrawlerService {
         this.pttCrawlerService = pttCrawlerService;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         listPicture = new ArrayList<>(MAX_SIZE);
         crawler(2);
