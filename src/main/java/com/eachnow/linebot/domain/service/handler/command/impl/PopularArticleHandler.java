@@ -55,7 +55,7 @@ public class PopularArticleHandler implements CommandHandler {
                     .action(new URIAction(pttEnum.toString(), uri, new URIAction.AltUri(uri))).build();
             Text popularity = Text.builder().text(pttArticlePO.getPopularity().toString()).color("#bbbbbb").align(FlexAlign.END).build();
             Box article = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
-                    title, popularity)).backgroundColor("#111111").paddingAll(FlexPaddingSize.MD).build();
+                    title, popularity)).backgroundColor("#111111").paddingBottom(FlexPaddingSize.MD).build();
             bodyComponent.add(article);
         }
         Box content = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.SM)
