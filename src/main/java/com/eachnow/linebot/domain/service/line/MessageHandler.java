@@ -19,6 +19,7 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,6 +56,25 @@ public class MessageHandler {
         userAndCacheCommand.remove(userId);
     }
 
+//    @PostConstruct
+//    private void test(){
+//        String text = "股票 指數 20210511 datetimepicker";
+//        DatetimepickerPO datetimepickerPO = null;
+//        if (text.contains("datetimepicker")) {
+//            Map<String, String> datetimepickerMap = new HashMap<>();
+//            datetimepickerMap.put("date", "2021-05-10");
+//            try {
+//                datetimepickerPO = JsonUtils.toObject(datetimepickerMap, DatetimepickerPO.class);
+//                if (text.contains("-"))
+//                    datetimepickerPO.setType(text.split("-")[1]);
+//            } catch (Exception e) {
+//                log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
+//            }
+//        }
+//        String text = "殖利率";
+//        //根據指令取得對應指令處理服務
+//        executeCommand("test", text, null);
+//    }
 
     public Message executeCommand(String userId, String text, DatetimepickerPO datetimepicker) {
         if (userAndCacheCommand.get(userId) != null)
@@ -112,25 +132,6 @@ public class MessageHandler {
         LocationHandler locationHandler = locationHandlerFactory.getLocationHandler();
         return locationHandler.execute(event.getMessage());
     }
-
-//    @PostConstruct
-//    private void test(){
-//        String text = "股票 指數 20210511 datetimepicker";
-//        DatetimepickerPO datetimepickerPO = null;
-//        if (text.contains("datetimepicker")) {
-//            Map<String, String> datetimepickerMap = new HashMap<>();
-//            datetimepickerMap.put("date", "2021-05-10");
-//            try {
-//                datetimepickerPO = JsonUtils.toObject(datetimepickerMap, DatetimepickerPO.class);
-//                if (text.contains("-"))
-//                    datetimepickerPO.setType(text.split("-")[1]);
-//            } catch (Exception e) {
-//                log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
-//            }
-//        }
-//        //根據指令取得對應指令處理服務
-//        executeCommand("test", text, datetimepickerPO);
-//    }
 
     @EventMapping
     public Message handlePostbackEvent(PostbackEvent event) {
