@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public enum PttEnum {
 
-    MAIN("main", ""),
+    MAIN("main", "熱門"),
     GOSSIPING("gossiping", "八卦"),
     BEAUTY("beauty", "表特"),
     JAPANAVGIRLS("japanavgirls", "女優"),

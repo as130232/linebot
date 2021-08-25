@@ -22,7 +22,7 @@ public class CommandHandlerFactory {
     @Autowired
     private BeautyHandler beautyHandler;
     @Autowired
-    private PopularArticleHandler popularArticleHandler;
+    private PttArticleHandler pttArticleHandler;
     @Autowired
     private InstagramHandler instagramHandler;
     @Autowired
@@ -80,8 +80,8 @@ public class CommandHandlerFactory {
             commandHandler = beautyHandler;
         } else if (ActressHandler.class.equals(commandHandlerClass)) {
             commandHandler = actressHandler;
-        } else if (PopularArticleHandler.class.equals(commandHandlerClass)) {
-            commandHandler = popularArticleHandler;
+        } else if (PttArticleHandler.class.equals(commandHandlerClass)) {
+            commandHandler = pttArticleHandler;
         } else if (InstagramHandler.class.equals(commandHandlerClass)) {
             commandHandler = instagramHandler;
         } else if (BookkeepingHandler.class.equals(commandHandlerClass)) {

@@ -30,13 +30,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Command({"文章", "熱門", "topten"})
-public class PopularArticleHandler implements CommandHandler {
+public class PttArticleHandler implements CommandHandler {
     private final ThreadPoolExecutor pttCrawlerExecutor;
     private PttCrawlerService pttCrawlerService;
 
     @Autowired
-    public PopularArticleHandler(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
-                                 PttCrawlerService pttCrawlerService) {
+    public PttArticleHandler(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
+                             PttCrawlerService pttCrawlerService) {
         this.pttCrawlerExecutor = pttCrawlerExecutor;
         this.pttCrawlerService = pttCrawlerService;
     }

@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.gateway;
 
 import com.eachnow.linebot.common.po.twse.IndexPO;
+import com.eachnow.linebot.common.po.twse.RatioAndDividendYieldPO;
 
 import java.util.List;
 
@@ -20,4 +21,10 @@ public interface TwseApiService {
      * @param date 日期 yyyyMMdd
      */
     public List<IndexPO> getDailyTradeSummaryOfAllIndex(String date);
+
+    /**
+     * 取得個股本益比、股價淨值比及殖利率
+     * @param date 日期 yyyyMMdd
+     */
+    public List<RatioAndDividendYieldPO> getRatioAndDividendYield(String date);
 }

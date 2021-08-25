@@ -1,8 +1,6 @@
 package com.eachnow.linebot.domain.service.gateway.impl;
 
-import com.eachnow.linebot.common.po.twse.IndexPO;
-import com.eachnow.linebot.common.po.twse.TwseDataPO;
-import com.eachnow.linebot.common.po.twse.TwseStockInfoDataPO;
+import com.eachnow.linebot.common.po.twse.*;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.gateway.TwseApiService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class TwseApiServiceImpl implements TwseApiService {
-    private String TWSE_URL = "https://www.twse.com.tw/";
+    private String TWSE_URL = "https://www.twse.com.tw";
     private RestTemplate restTemplate;
 
     @Autowired
@@ -34,6 +32,8 @@ public class TwseApiServiceImpl implements TwseApiService {
 //        IndexPO indexPO = this.getDailyTradingOfTaiwanIndex("20210507");
 //        System.out.println(indexPO);
 //        List<IndexPO> list = this.getDailyTradeSummaryOfAllIndex("20210510");
+//        System.out.println(list);
+//        List<RatioAndDividendYieldPO>  list = this.getRatioAndDividendYield("20210824");
 //        System.out.println(list);
 //    }
 
@@ -52,7 +52,7 @@ public class TwseApiServiceImpl implements TwseApiService {
     public IndexPO getDailyTradingOfTaiwanIndex(String date) {
         LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
         try {
-            String url = TWSE_URL + "exchangeReport/FMTQIK?response=json&date=" + date;
+            String url = TWSE_URL + "/exchangeReport/FMTQIK?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
             for (int i = 0; i < twseDataPO.getData().size(); i++) {
@@ -75,7 +75,7 @@ public class TwseApiServiceImpl implements TwseApiService {
     @Override
     public List<IndexPO> getDailyTradeSummaryOfAllIndex(String date) {
         try {
-            String url = TWSE_URL + "exchangeReport/BFIAMU?response=json&date=" + date;
+            String url = TWSE_URL + "/exchangeReport/BFIAMU?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
             List<IndexPO> result = new ArrayList<>(twseDataPO.getData().size());
@@ -91,4 +91,22 @@ public class TwseApiServiceImpl implements TwseApiService {
         }
         return new ArrayList<>();
     }
+
+    @Override
+    public List<RatioAndDividendYieldPO> getRatioAndDividendYield(String date) {
+        try {
+            String url = TWSE_URL + "/exchangeReport/BWIBBU_d?response=json&selectType=ALL&date=" + date;
+            ResponseEntity<TwseRatioAndDividendYieldPO> responseEntity = restTemplate.getForEntity(url, TwseRatioAndDividendYieldPO.class);
+            TwseRatioAndDividendYieldPO twseDataPO = responseEntity.getBody();
+            List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
+                return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(list.get(2))
+                        .peRatio(list.get(4)).pbRatio(list.get(5)).build();
+            }).collect(Collectors.toList());
+            return result;
+        } catch (Exception e) {
+            log.error("呼叫取得證交所-取得個股本益比、股價淨值比及殖利率，失敗! date:{}, error msg:{}", date, e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
 }
