@@ -75,7 +75,7 @@ public class StockHandler implements CommandHandler {
             return new TextMessage(parseDate.format(DateUtils.yyyyMMddDash) + "(" + dayOfWeekName + ") 台股未開市。");
         }
         List<IndexPO> listCategoryIndex = twseApiService.getDailyTradeSummaryOfAllIndex(date);
-        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
                 Text.builder().text("台股各類指數日成交量").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
         )).paddingAll(FlexPaddingSize.MD).backgroundColor("#FF6B6E").build();
 
@@ -91,15 +91,13 @@ public class StockHandler implements CommandHandler {
         List<FlexComponent> bodyComponent = new ArrayList<>();
         bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
                 title, separator).build());
-        List<FlexComponent> listCategoryIndexComponent = listCategoryIndex.stream().map(po -> {
-            return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getName().length() > 4 ? po.getName().substring(0, 4) : po.getName()).size(FlexFontSize.SM).flex(1).build(),
-                    Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
-                    Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
-                    Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END)
-                            .color(po.getChange().toString().contains("-") ? "#228b22" : "#ff0000").build()
-            )).build();
-        }).collect(Collectors.toList());
+        List<FlexComponent> listCategoryIndexComponent = listCategoryIndex.stream().map(po -> Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
+                Text.builder().text(po.getName().length() > 4 ? po.getName().substring(0, 4) : po.getName()).size(FlexFontSize.SM).flex(1).build(),
+                Text.builder().text(po.getTradeValue()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
+                Text.builder().text(po.getTransaction()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build(),
+                Text.builder().text(po.getChange().toString()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END)
+                        .color(po.getChange().toString().contains("-") ? "#228b22" : "#ff0000").build()
+        )).build()).collect(Collectors.toList());
         bodyComponent.addAll(listCategoryIndexComponent);
         bodyComponent.add(separator);
         Box twIndexBox = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
@@ -115,7 +113,7 @@ public class StockHandler implements CommandHandler {
                 Button.builder().height(Button.ButtonHeight.SMALL).style(Button.ButtonStyle.SECONDARY).action(
                         DatetimePickerAction.OfLocalDate.builder().data(datetimepickerData + "datetimepicker")
                                 .label(DateUtils.parseDate(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddSlash) + "(" + dayOfWeekName + ")").build()).build(),
-                Text.builder().text(twIndex.getTaiex().toString()).size(FlexFontSize.XL).align(FlexAlign.CENTER).gravity(FlexGravity.CENTER)
+                Text.builder().text(twIndex.getTaiex()).size(FlexFontSize.XL).align(FlexAlign.CENTER).gravity(FlexGravity.CENTER)
                         .color(twIndex.getChange().toString().contains("-") ? "#228b22" : "#ff0000").build())).build();
         bodyComponent.add(twIndexAndDateBox);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
@@ -144,13 +142,17 @@ public class StockHandler implements CommandHandler {
             }
             list = list.stream().filter(po -> codes.contains(po.getCode()) || names.contains(po.getName())).collect(Collectors.toList());
         }
-        //排序，並只顯示30筆資訊
-        if (list.size() > 30) {
-            list = list.stream().sorted(Comparator.comparing(RatioAndDividendYieldPO::getDividendYield).reversed())
-                    .limit(30).collect(Collectors.toList());
-        }
-        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
-                Text.builder().text("個股本益、淨值比、殖利率").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
+        //排序
+        list = list.stream().sorted(Comparator.comparing(RatioAndDividendYieldPO::getDividendYield).reversed()).collect(Collectors.toList());
+
+        //只顯示30筆資訊
+        int MAX_SIZE = 30;
+        if (list.size() > MAX_SIZE)
+            list = list.stream().limit(MAX_SIZE).collect(Collectors.toList());
+
+
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
+                Text.builder().text("個股淨值、本益比、殖利率").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
         )).paddingAll(FlexPaddingSize.MD).backgroundColor("#FF527A").build();
 
         //Title
@@ -180,13 +182,13 @@ public class StockHandler implements CommandHandler {
                     Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
                     Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
                     Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
-                            .color(Double.valueOf(po.getDividendYield()).compareTo(Double.valueOf(8)) > 0 ? "#ff0000" : "#111111").build()
+                            .color(Double.valueOf(po.getDividendYield()).compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
             )).build();
         }).collect(Collectors.toList());
         bodyComponent.addAll(listCategoryIndexComponent);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
-        return FlexMessage.builder().altText("個股本益、淨值比、殖利率").contents(contents).build();
+        return FlexMessage.builder().altText("個股淨值、本益比、殖利率").contents(contents).build();
     }
 
 //    @PostConstruct
