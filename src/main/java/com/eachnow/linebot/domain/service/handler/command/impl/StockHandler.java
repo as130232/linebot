@@ -21,6 +21,7 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.URI;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
@@ -32,6 +33,8 @@ import java.util.stream.Collectors;
 @Command({"stock", "股", "股票", "殖利率", "淨值", "本益比"})
 public class StockHandler implements CommandHandler {
     private TwseApiService twseApiService;
+    private String UP_ARROW_URL = "https://i.imgur.com/JExyVSt.png";
+    private String DOWN_ARROW_URL = "https://i.imgur.com/NoekYfY.png";
 
     @Autowired
     public StockHandler(TwseApiService twseApiService) {
@@ -187,7 +190,27 @@ public class StockHandler implements CommandHandler {
         }).collect(Collectors.toList());
         bodyComponent.addAll(listCategoryIndexComponent);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
-        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
+
+        Box priceButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
+                Icon.builder().url(URI.create(UP_ARROW_URL)).offsetTop(FlexOffsetSize.XS).build(),
+                Text.builder().text("股 價").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
+                Icon.builder().url(URI.create(DOWN_ARROW_URL)).offsetTop(FlexOffsetSize.SM).build()
+        ).flex(0).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
+        Box peRatioButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
+                Icon.builder().url(URI.create(UP_ARROW_URL)).offsetTop(FlexOffsetSize.XS).build(),
+                Text.builder().text("本益比").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
+                Icon.builder().url(URI.create(DOWN_ARROW_URL)).offsetTop(FlexOffsetSize.SM).build()
+        ).flex(0).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
+        Box dividendYieldButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
+                Icon.builder().url(URI.create(UP_ARROW_URL)).offsetTop(FlexOffsetSize.XS).build(),
+                Text.builder().text("殖利率").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
+                Icon.builder().url(URI.create(DOWN_ARROW_URL)).offsetTop(FlexOffsetSize.SM).build()
+        ).flex(0).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
+
+        Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(
+                priceButtonBox, peRatioButtonBox, dividendYieldButtonBox).backgroundColor("#F06886").build();
+
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
         return FlexMessage.builder().altText("個股淨值、本益比、殖利率").contents(contents).build();
     }
 
