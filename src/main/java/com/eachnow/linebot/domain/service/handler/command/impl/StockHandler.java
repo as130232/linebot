@@ -156,10 +156,10 @@ public class StockHandler implements CommandHandler {
         //Title
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
                 Text.builder().text("代號 名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(2).align(FlexAlign.START).build(),
-                Text.builder().text("名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
+                Text.builder().text("股價").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
                 Text.builder().text("淨值").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
-                Text.builder().text("本益比").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
-                Text.builder().text("殖利率").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build()
+                Text.builder().text("本益比").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build(),
+                Text.builder().text("殖利率").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build()
         ).build();
         Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
 
@@ -170,9 +170,13 @@ public class StockHandler implements CommandHandler {
         List<FlexComponent> listCategoryIndexComponent = list.stream().map(po -> {
             //取得股價
             PricePO pricePO = twseApiService.getPrice(po.getCode());
+            String priceColor = "#111111";
+            if (pricePO != null) {
+                priceColor = Double.valueOf(pricePO.getPrice()).compareTo(Double.valueOf(pricePO.getAvePrice())) > 0 ? "#ff0000" : "#228b22";
+            }
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
                     Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
-                    Text.builder().text(pricePO == null ? "---" : pricePO.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(pricePO == null ? "---" : pricePO.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
                     Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
                     Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
                     Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
