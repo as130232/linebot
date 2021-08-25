@@ -1,7 +1,5 @@
 package com.eachnow.linebot.domain.controller;
 
-import com.eachnow.linebot.common.db.po.LineUserPO;
-import com.eachnow.linebot.common.db.repository.LineUserRepository;
 import com.eachnow.linebot.common.po.Result;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.line.LineUserService;
@@ -13,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.UUID;
 
 @Slf4j
@@ -24,6 +20,7 @@ public class TestController {
     private MessageHandler messageHandler;
     private BeautyCrawlerService beautyCrawlerService;
     private LineUserService lineUserService;
+
     @Autowired
     public TestController(MessageHandler messageHandler, BeautyCrawlerService beautyCrawlerService,
                           LineUserService lineUserService) {
@@ -33,9 +30,7 @@ public class TestController {
     }
 
     @GetMapping(value = "/preventDormancy")
-    public void preventDormancy() {
-        log.info("---preventDormancy---");
-    }
+    public void preventDormancy() {}
 
     @GetMapping(value = "/command")
     public Result testCommand(@RequestParam(value = "text") String text) {
