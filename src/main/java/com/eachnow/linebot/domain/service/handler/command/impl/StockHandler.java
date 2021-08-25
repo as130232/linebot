@@ -145,7 +145,7 @@ public class StockHandler implements CommandHandler {
         }
         //排序，並只顯示30筆資訊
         if (list.size() > 30) {
-            list = list.stream().sorted(Comparator.comparing(RatioAndDividendYieldPO::getDividendYield))
+            list = list.stream().sorted(Comparator.comparing(RatioAndDividendYieldPO::getDividendYield).reversed())
                     .limit(30).collect(Collectors.toList());
         }
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Arrays.asList(
