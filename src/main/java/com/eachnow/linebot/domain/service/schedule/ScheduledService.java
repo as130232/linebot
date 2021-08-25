@@ -8,16 +8,13 @@ import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
+import com.eachnow.linebot.domain.service.gateway.TwseApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import java.time.ZonedDateTime;
-import java.util.Date;
 
 //import org.springframework.scheduling.annotation.SchedulingConfigurer;
 //import org.springframework.scheduling.annotation.EnableScheduling;
@@ -31,20 +28,23 @@ import java.util.Date;
 public class ScheduledService {
     @Value("${cron.flag:false}")
     private boolean CRON_EXECUTE;
+    private LineConfig lineConfig;
     private LineNotifySender lineNotifySender;
     private BeautyCrawlerService beautyCrawlerService;
     private OpenWeatherService openWeatherService;
-    private LineConfig lineConfig;
+    private TwseApiService twseApiService;
 
     @Autowired
-    public ScheduledService(LineNotifySender lineNotifySender,
+    public ScheduledService(LineConfig lineConfig,
+                            LineNotifySender lineNotifySender,
                             BeautyCrawlerService beautyCrawlerService,
                             OpenWeatherService openWeatherService,
-                            LineConfig lineConfig) {
+                            TwseApiService twseApiService) {
+        this.lineConfig = lineConfig;
         this.lineNotifySender = lineNotifySender;
         this.beautyCrawlerService = beautyCrawlerService;
         this.openWeatherService = openWeatherService;
-        this.lineConfig = lineConfig;
+        this.twseApiService = twseApiService;
     }
 
     public void switchCron(boolean isOpen) {
@@ -59,9 +59,8 @@ public class ScheduledService {
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
             return;
-        log.info("[schedule]準備爬取表特版。time:{}", new Date());
+        log.info("[schedule]準備爬取表特版。");
         beautyCrawlerService.crawler(2);
-        log.info("[schedule]爬取表特版，完成。time:{}", new Date());
     }
 
     /**
@@ -84,4 +83,9 @@ public class ScheduledService {
         }
     }
 
+    @Scheduled(cron = "0 0 15 * * ?")
+    public void initPriceMap() {
+        twseApiService.initPriceMap();
+        log.info("[schedule]取得最新股價，完成。");
+    }
 }

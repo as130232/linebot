@@ -12,6 +12,17 @@ import java.util.List;
 public interface TwseApiService {
 
     /**
+     * 重新取得最新個股股價
+     */
+    public void initPriceMap();
+
+    /**
+     * 取得個股最新股價
+     * @param code 股票代號
+     */
+    public PricePO getPrice(String code);
+
+    /**
      * 取得當日所有個股股價
      */
     public List<PricePO> getStockPrice();

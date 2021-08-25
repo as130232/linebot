@@ -3,6 +3,7 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.twse.IndexPO;
+import com.eachnow.linebot.common.po.twse.PricePO;
 import com.eachnow.linebot.common.po.twse.RatioAndDividendYieldPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.NumberUtils;
@@ -153,26 +154,28 @@ public class StockHandler implements CommandHandler {
         )).paddingAll(FlexPaddingSize.MD).backgroundColor("#FF527A").build();
 
         //Title
-        Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.SM).spacing(FlexMarginSize.SM).contents(
-                Text.builder().text("代號").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(0).align(FlexAlign.START).build(),
-                Text.builder().text("名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
-                Text.builder().text("本益比").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
-                Text.builder().text("淨值比").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
-                Text.builder().text("殖利率").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
+        Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
+                Text.builder().text("代號 名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(2).align(FlexAlign.START).build(),
+                Text.builder().text("名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
+                Text.builder().text("淨值").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
+                Text.builder().text("本益比").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
+                Text.builder().text("殖利率").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build()
         ).build();
         Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
 
         List<FlexComponent> bodyComponent = new ArrayList<>();
-        bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
+        bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
                 title, separator).build());
 
         List<FlexComponent> listCategoryIndexComponent = list.stream().map(po -> {
+            //取得股價
+            PricePO pricePO = twseApiService.getPrice(po.getCode());
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getCode()).size(FlexFontSize.SM).flex(0).align(FlexAlign.START).build(),
-                    Text.builder().text(po.getName()).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
-                    Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getDividendYield() + " %").size(FlexFontSize.SM).align(FlexAlign.END)
+                    Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
+                    Text.builder().text(pricePO == null ? "---" : pricePO.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
                             .color(Double.valueOf(po.getDividendYield()).compareTo(Double.valueOf(8)) > 0 ? "#ff0000" : "#111111").build()
             )).build();
         }).collect(Collectors.toList());

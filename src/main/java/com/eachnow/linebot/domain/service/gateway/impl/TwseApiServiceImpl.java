@@ -11,9 +11,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,9 +21,27 @@ public class TwseApiServiceImpl implements TwseApiService {
     private String TWSE_URL = "https://www.twse.com.tw";
     private RestTemplate restTemplate;
 
+    private Map<String, PricePO> priceMap = new HashMap<>();
+
     @Autowired
     public TwseApiServiceImpl(@Qualifier("https-resttemplate") RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+        initPriceMap(); //啟動先拉取最新股價
+    }
+
+    @Override
+    public void initPriceMap() {
+        priceMap = this.getStockPrice().stream().collect(Collectors.toMap(PricePO::getCode, Function.identity()));
+    }
+
+    @Override
+    public PricePO getPrice(String code) {
+        PricePO pricePO = this.priceMap.get(code);
+        if (pricePO == null) {
+            initPriceMap();
+            pricePO = this.priceMap.get(code);
+        }
+        return pricePO;
     }
 
 //    @PostConstruct
@@ -36,17 +53,6 @@ public class TwseApiServiceImpl implements TwseApiService {
 //        List<RatioAndDividendYieldPO>  list = this.getRatioAndDividendYield("20210824");
 //        System.out.println(list);
 //    }
-
-    public TwseStockInfoDataPO getStockInfo(String stockId) {
-        try {
-            String url = String.format("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_%s.tw&json=1&delay=0", stockId);
-            ResponseEntity<TwseStockInfoDataPO> responseEntity = restTemplate.getForEntity(url, TwseStockInfoDataPO.class);
-            return responseEntity.getBody();
-        } catch (Exception e) {
-            log.error("呼叫取得證交所-個股當日即時狀況，失敗! stockId:{}, error msg:{}", stockId, e.getMessage());
-        }
-        return null;
-    }
 
     @Override
     public List<PricePO> getStockPrice() {
@@ -123,6 +129,19 @@ public class TwseApiServiceImpl implements TwseApiService {
             log.error("呼叫取得證交所-取得個股本益比、股價淨值比及殖利率，失敗! date:{}, error msg:{}", date, e.getMessage());
         }
         return new ArrayList<>();
+    }
+
+
+
+    public TwseStockInfoDataPO getStockInfo(String stockId) {
+        try {
+            String url = String.format("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_%s.tw&json=1&delay=0", stockId);
+            ResponseEntity<TwseStockInfoDataPO> responseEntity = restTemplate.getForEntity(url, TwseStockInfoDataPO.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("呼叫取得證交所-個股當日即時狀況，失敗! stockId:{}, error msg:{}", stockId, e.getMessage());
+        }
+        return null;
     }
 
 }
