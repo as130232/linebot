@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.gateway;
 
 import com.eachnow.linebot.common.po.twse.IndexPO;
+import com.eachnow.linebot.common.po.twse.PricePO;
 import com.eachnow.linebot.common.po.twse.RatioAndDividendYieldPO;
 
 import java.util.List;
@@ -9,6 +10,11 @@ import java.util.List;
  * 台灣證交所API
  */
 public interface TwseApiService {
+
+    /**
+     * 取得當日所有個股股價
+     */
+    public List<PricePO> getStockPrice();
 
     /**
      * 取得台股大盤指數成交量值

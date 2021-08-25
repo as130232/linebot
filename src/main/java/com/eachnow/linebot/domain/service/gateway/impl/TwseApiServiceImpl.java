@@ -49,6 +49,22 @@ public class TwseApiServiceImpl implements TwseApiService {
     }
 
     @Override
+    public List<PricePO> getStockPrice() {
+        try {
+            String url = TWSE_URL + "/exchangeReport/STOCK_DAY_AVG_ALL";
+            ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
+            TwseDataPO twseDataPO = responseEntity.getBody();
+            List<PricePO> result = twseDataPO.getData().stream().map(list -> {
+                return PricePO.builder().code(list.get(0)).name(list.get(1)).price(list.get(2)).avePrice(list.get(3)).build();
+            }).collect(Collectors.toList());
+            return result;
+        } catch (Exception e) {
+            log.error("呼叫取得證交所-取得當日所有個股股價，失敗! error msg:{}", e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
     public IndexPO getDailyTradingOfTaiwanIndex(String date) {
         LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
         try {
@@ -96,8 +112,8 @@ public class TwseApiServiceImpl implements TwseApiService {
     public List<RatioAndDividendYieldPO> getRatioAndDividendYield(String date) {
         try {
             String url = TWSE_URL + "/exchangeReport/BWIBBU_d?response=json&selectType=ALL&date=" + date;
-            ResponseEntity<TwseRatioAndDividendYieldPO> responseEntity = restTemplate.getForEntity(url, TwseRatioAndDividendYieldPO.class);
-            TwseRatioAndDividendYieldPO twseDataPO = responseEntity.getBody();
+            ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
+            TwseDataPO twseDataPO = responseEntity.getBody();
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(list.get(2))
                         .peRatio(list.get(4)).pbRatio(list.get(5)).build();
