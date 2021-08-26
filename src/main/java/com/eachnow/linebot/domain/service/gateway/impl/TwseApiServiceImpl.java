@@ -58,7 +58,8 @@ public class TwseApiServiceImpl implements TwseApiService {
     private String parseValue(String value) {
         if (value.contains("-")) {
             return "-1";
-        }
+        } else if (value.contains(","))
+            value.replace(",", "");
         return value;
     }
 
@@ -131,7 +132,7 @@ public class TwseApiServiceImpl implements TwseApiService {
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 PricePO pricePO = this.getPrice(list.get(0));
                 return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(parseValue(list.get(2)))
-                        .peRatio(parseValue(list.get(4))).pbRatio(parseValue(list.get(5))).price(pricePO.getPrice()).avePrice(pricePO.getAvePrice()).build();
+                        .peRatio(parseValue(list.get(4))).pbRatio(parseValue(list.get(5))).price(parseValue(pricePO.getPrice())).avePrice(parseValue(pricePO.getAvePrice())).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {

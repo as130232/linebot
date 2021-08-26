@@ -47,7 +47,7 @@ public class StockHandler implements CommandHandler {
         if (text.contains("指數") || text.contains("大盤")) {
             return this.getIndex(commandPO);
             //取得最新(昨日)個股本益比、殖利率及股價淨值比
-        } else if (Arrays.asList("殖利率", "淨值", "本益比").contains(commandPO.getCommand())) {
+        } else if (Arrays.asList("股價", "殖利率", "淨值", "本益比").contains(commandPO.getCommand())) {
             return this.getRatioAndDividendYield(commandPO);
         }
         //Todo 紀錄該股並自動換算停利停損價格
