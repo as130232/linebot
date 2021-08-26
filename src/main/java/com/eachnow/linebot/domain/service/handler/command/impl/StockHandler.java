@@ -177,7 +177,7 @@ public class StockHandler implements CommandHandler {
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
                 Text.builder().text("代號 名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(2).align(FlexAlign.START).build(),
                 Text.builder().text("股價").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
-                Text.builder().text("淨值").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
+                Text.builder().text("淨值").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build(),
                 Text.builder().text("本益比").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build(),
                 Text.builder().text("殖利率").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build()
         ).build();
@@ -206,23 +206,23 @@ public class StockHandler implements CommandHandler {
                 Text.builder().text("▲").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_PRICE_UP").build()).build(),
                 Text.builder().text("股 價").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
                 Text.builder().text("▼").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_PRICE_DOWN").build()).build()
-        ).flex(0).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
+        ).flex(1).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
         Box peRatioButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
                 Text.builder().text("▲").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_PE_UP").build()).build(),
                 Text.builder().text("本益比").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
                 Text.builder().text("▼").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_PE_DOWN").build()).build()
-        ).flex(0).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
+        ).flex(1).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
         Box dividendYieldButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
                 Text.builder().text("▲").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_DY_UP").build()).build(),
                 Text.builder().text("殖利率").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
                 Text.builder().text("▼").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_DY_DOWN").build()).build()
-        ).flex(0).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
+        ).flex(1).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
 
         Box footer = Box.builder().layout(FlexLayout.HORIZONTAL).contents(
                 priceButtonBox, peRatioButtonBox, dividendYieldButtonBox).backgroundColor("#F06886").build();
 
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
-        return FlexMessage.builder().altText("個股淨值、本益比、殖利率").contents(contents).build();
+        return FlexMessage.builder().altText("個股股價、淨值、本益比、殖利率").contents(contents).build();
     }
 
     //    @PostConstruct
