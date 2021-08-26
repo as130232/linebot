@@ -3,7 +3,6 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.twse.IndexPO;
-import com.eachnow.linebot.common.po.twse.PricePO;
 import com.eachnow.linebot.common.po.twse.RatioAndDividendYieldPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.NumberUtils;
@@ -188,29 +187,18 @@ public class StockHandler implements CommandHandler {
         List<FlexComponent> bodyComponent = new ArrayList<>();
         bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
                 title, separator).build());
-        
-        log.info("stock list:{}", list);
+
         List<FlexComponent> listComponent = list.stream().map(po -> {
-            Box box = Box.builder().build();
-            try{
-                //取得股價
-                PricePO pricePO = twseApiService.getPrice(po.getCode());
-                String priceColor = "#111111";
-                if (pricePO != null) {
-                    priceColor = Double.valueOf(pricePO.getPrice()).compareTo(Double.valueOf(pricePO.getAvePrice())) > 0 ? "#ff0000" : "#228b22";
-                }
-                box = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                        Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
-                        Text.builder().text(pricePO == null ? "---" : pricePO.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
-                        Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
-                        Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
-                        Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
-                                .color(Double.valueOf(po.getDividendYield()).compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
-                )).build();
-            }catch (Exception e) {
-                log.error("test error, po:{}", po);
-            }
-            return box;
+            //取得股價
+            String priceColor = Double.valueOf(po.getPrice()).compareTo(Double.valueOf(po.getAvePrice())) > 0 ? "#ff0000" : "#228b22";
+            return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
+                    Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
+                    Text.builder().text("-1".equals(po.getPrice()) ? "---" : po.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
+                    Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
+                            .color(Double.valueOf(po.getDividendYield()).compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
+            )).build();
         }).collect(Collectors.toList());
         bodyComponent.addAll(listComponent);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();

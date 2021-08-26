@@ -32,6 +32,7 @@ public class TwseApiServiceImpl implements TwseApiService {
     @Override
     public void initPriceMap() {
         priceMap = this.getStockPrice().stream().collect(Collectors.toMap(PricePO::getCode, Function.identity()));
+        System.out.println();
     }
 
     @Override
@@ -54,6 +55,13 @@ public class TwseApiServiceImpl implements TwseApiService {
 //        System.out.println(list);
 //    }
 
+    private String parseValue(String value) {
+        if (value.contains("-")) {
+            return "-1";
+        }
+        return value;
+    }
+
     @Override
     public List<PricePO> getStockPrice() {
         try {
@@ -61,7 +69,7 @@ public class TwseApiServiceImpl implements TwseApiService {
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
             List<PricePO> result = twseDataPO.getData().stream().map(list -> {
-                return PricePO.builder().code(list.get(0)).name(list.get(1)).price(list.get(2)).avePrice(list.get(3)).build();
+                return PricePO.builder().code(list.get(0)).name(list.get(1)).price(parseValue(list.get(2))).avePrice(parseValue(list.get(3))).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
@@ -122,8 +130,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             TwseDataPO twseDataPO = responseEntity.getBody();
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 PricePO pricePO = this.getPrice(list.get(0));
-                return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(list.get(2))
-                        .peRatio(list.get(4)).pbRatio(list.get(5)).price(pricePO.getPrice()).build();
+                return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(parseValue(list.get(2)))
+                        .peRatio(parseValue(list.get(4))).pbRatio(parseValue(list.get(5))).price(pricePO.getPrice()).avgPrice(pricePO.getAvePrice()).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
@@ -131,8 +139,6 @@ public class TwseApiServiceImpl implements TwseApiService {
         }
         return new ArrayList<>();
     }
-
-
 
     public TwseStockInfoDataPO getStockInfo(String stockId) {
         try {

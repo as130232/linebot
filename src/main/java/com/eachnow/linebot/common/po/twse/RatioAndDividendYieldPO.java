@@ -13,4 +13,5 @@ public class RatioAndDividendYieldPO {
     private String dividendYield;  //殖利率
 
     private String price;   //股價
+    private String avePrice;    //月均價
 }
