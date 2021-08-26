@@ -188,24 +188,31 @@ public class StockHandler implements CommandHandler {
         List<FlexComponent> bodyComponent = new ArrayList<>();
         bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
                 title, separator).build());
-
-        List<FlexComponent> listCategoryIndexComponent = list.stream().map(po -> {
-            //取得股價
-            PricePO pricePO = twseApiService.getPrice(po.getCode());
-            String priceColor = "#111111";
-            if (pricePO != null) {
-                priceColor = Double.valueOf(pricePO.getPrice()).compareTo(Double.valueOf(pricePO.getAvePrice())) > 0 ? "#ff0000" : "#228b22";
+        
+        log.info("stock list:{}", list);
+        List<FlexComponent> listComponent = list.stream().map(po -> {
+            Box box = Box.builder().build();
+            try{
+                //取得股價
+                PricePO pricePO = twseApiService.getPrice(po.getCode());
+                String priceColor = "#111111";
+                if (pricePO != null) {
+                    priceColor = Double.valueOf(pricePO.getPrice()).compareTo(Double.valueOf(pricePO.getAvePrice())) > 0 ? "#ff0000" : "#228b22";
+                }
+                box = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
+                        Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
+                        Text.builder().text(pricePO == null ? "---" : pricePO.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
+                        Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                        Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                        Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
+                                .color(Double.valueOf(po.getDividendYield()).compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
+                )).build();
+            }catch (Exception e) {
+                log.error("test error, po:{}", po);
             }
-            return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
-                    Text.builder().text(pricePO == null ? "---" : pricePO.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
-                    Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
-                            .color(Double.valueOf(po.getDividendYield()).compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
-            )).build();
+            return box;
         }).collect(Collectors.toList());
-        bodyComponent.addAll(listCategoryIndexComponent);
+        bodyComponent.addAll(listComponent);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
 
         Box priceButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
