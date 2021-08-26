@@ -8,6 +8,6 @@ import lombok.Data;
 public class PricePO {
     private String code;    //個股代號
     private String name;    //個股名稱
-    private String price;   //當日收盤價
-    private String avePrice;  //月平均價
+    private Double price;   //當日收盤價
+    private Double avePrice;  //月平均價
 }

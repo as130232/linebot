@@ -32,7 +32,6 @@ public class TwseApiServiceImpl implements TwseApiService {
     @Override
     public void initPriceMap() {
         priceMap = this.getStockPrice().stream().collect(Collectors.toMap(PricePO::getCode, Function.identity()));
-        System.out.println();
     }
 
     @Override
@@ -59,7 +58,7 @@ public class TwseApiServiceImpl implements TwseApiService {
         if (value.contains("-")) {
             return "-1";
         } else if (value.contains(","))
-            value.replace(",", "");
+            value = value.replace(",", "");
         return value;
     }
 
@@ -70,7 +69,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
             List<PricePO> result = twseDataPO.getData().stream().map(list -> {
-                return PricePO.builder().code(list.get(0)).name(list.get(1)).price(parseValue(list.get(2))).avePrice(parseValue(list.get(3))).build();
+                return PricePO.builder().code(list.get(0)).name(list.get(1))
+                        .price(Double.valueOf(parseValue(list.get(2)))).avePrice(Double.valueOf(parseValue(list.get(3)))).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
@@ -131,8 +131,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             TwseDataPO twseDataPO = responseEntity.getBody();
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 PricePO pricePO = this.getPrice(list.get(0));
-                return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(parseValue(list.get(2)))
-                        .peRatio(parseValue(list.get(4))).pbRatio(parseValue(list.get(5))).price(parseValue(pricePO.getPrice())).avePrice(parseValue(pricePO.getAvePrice())).build();
+                return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(Double.valueOf(parseValue(list.get(2))))
+                        .peRatio(Double.valueOf(parseValue(list.get(4)))).pbRatio(Double.valueOf(parseValue(list.get(5)))).price(pricePO.getPrice()).avePrice(pricePO.getAvePrice()).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {

@@ -32,8 +32,6 @@ import java.util.stream.Collectors;
 @Command({"stock", "股", "股票", "股價", "殖利率", "淨值", "本益比"})
 public class StockHandler implements CommandHandler {
     private TwseApiService twseApiService;
-    private String UP_ARROW_URL = "https://i.imgur.com/JExyVSt.png";
-    private String DOWN_ARROW_URL = "https://i.imgur.com/NoekYfY.png";
 
     @Autowired
     public StockHandler(TwseApiService twseApiService) {
@@ -191,14 +189,14 @@ public class StockHandler implements CommandHandler {
 
         List<FlexComponent> listComponent = list.stream().map(po -> {
             //取得股價
-            String priceColor = Double.valueOf(po.getPrice()).compareTo(Double.valueOf(po.getAvePrice())) > 0 ? "#ff0000" : "#228b22";
+            String priceColor = po.getPrice().compareTo(po.getAvePrice()) > 0 ? "#ff0000" : "#228b22";
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
                     Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
-                    Text.builder().text("-1".equals(po.getPrice()) ? "---" : po.getPrice()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
-                    Text.builder().text(po.getPbRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
-                    Text.builder().text("-1".equals(po.getPeRatio()) ? "---" : po.getPeRatio()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getDividendYield()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
-                            .color(Double.valueOf(po.getDividendYield()).compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
+                    Text.builder().text(po.getPrice() == -1d ? "---" : po.getPrice().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
+                    Text.builder().text(po.getPbRatio().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getPeRatio() == -1d ? "---" : po.getPeRatio().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getDividendYield().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
+                            .color(po.getDividendYield().compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
             )).build();
         }).collect(Collectors.toList());
         bodyComponent.addAll(listComponent);
@@ -227,11 +225,11 @@ public class StockHandler implements CommandHandler {
         return FlexMessage.builder().altText("個股淨值、本益比、殖利率").contents(contents).build();
     }
 
-//    @PostConstruct
+    //    @PostConstruct
 //    private void test() {
-//        String text = "股票 指數 20210501";
+//        String text = "股價 %SORT_PRICE_DOWN";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-//        getIndex(commandPO);
+//        execute(commandPO);
 //    }
 }
