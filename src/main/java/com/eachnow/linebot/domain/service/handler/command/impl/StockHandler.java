@@ -188,13 +188,13 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
 
         List<FlexComponent> listComponent = list.stream().map(po -> {
-            //取得股價
             String priceColor = po.getPrice().compareTo(po.getAvePrice()) > 0 ? "#ff0000" : "#228b22";
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
                     Text.builder().text(po.getCode() + " " + po.getName()).size(FlexFontSize.SM).flex(2).align(FlexAlign.START).build(),
                     Text.builder().text(po.getPrice() == -1d ? "---" : po.getPrice().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
                     Text.builder().text(po.getPbRatio().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
-                    Text.builder().text(po.getPeRatio() == -1d ? "---" : po.getPeRatio().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
+                    Text.builder().text(po.getPeRatio() == -1d ? "---" : po.getPeRatio().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
+                            .color(po.getPeRatio().compareTo(20d) < 0 ? "#ff0000" : "#111111").build(),
                     Text.builder().text(po.getDividendYield().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
                             .color(po.getDividendYield().compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
             )).build();
