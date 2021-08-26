@@ -165,8 +165,8 @@ public class StockHandler implements CommandHandler {
         }
         list = list.stream().sorted(comparator).collect(Collectors.toList());
 
-        //只顯示30筆資訊
-        int MAX_SIZE = 30;
+        //只顯示40筆資訊
+        int MAX_SIZE = 40;
         if (list.size() > MAX_SIZE)
             list = list.stream().limit(MAX_SIZE).collect(Collectors.toList());
 
@@ -177,7 +177,7 @@ public class StockHandler implements CommandHandler {
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
                 Text.builder().text("代號 名稱").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(2).align(FlexAlign.START).build(),
                 Text.builder().text("股價").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
-                Text.builder().text("淨值").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
+                Text.builder().text("淨值").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).build(),
                 Text.builder().text("本益比").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build(),
                 Text.builder().text("殖利率").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build()
         ).build();
