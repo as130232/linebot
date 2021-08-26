@@ -129,8 +129,8 @@ public class StockHandler implements CommandHandler {
      */
     private Message getRatioAndDividendYield(CommandPO commandPO) {
         String sortCondition = null;
-        if (commandPO.getText().contains("%SORT")) {    //取得排序條件，並重新組合text字串與params
-            String[] textArr = commandPO.getText().split("%SORT");
+        if (commandPO.getText().contains(" %SORT")) {    //取得排序條件，並重新組合text字串與params
+            String[] textArr = commandPO.getText().split(" %SORT");
             sortCondition = textArr[1];
             commandPO.setText(textArr[0]);
             commandPO.setParams(ParamterUtils.listParameter(textArr[0]));
@@ -154,14 +154,14 @@ public class StockHandler implements CommandHandler {
         //排序，預設殖利率
         Comparator<RatioAndDividendYieldPO> comparator = Comparator.comparing(RatioAndDividendYieldPO::getDividendYield).reversed();
         if (sortCondition != null) {
-            if (commandPO.getText().contains("_PRICE")) {
+            if (sortCondition.contains("_PRICE")) {
                 comparator = Comparator.comparing(RatioAndDividendYieldPO::getPrice);
-            } else if (commandPO.getText().contains("_PE")) {
+            } else if (sortCondition.contains("_PE")) {
                 comparator = Comparator.comparing(RatioAndDividendYieldPO::getPeRatio);
-            } else if (commandPO.getText().contains("_DY")) {
+            } else if (sortCondition.contains("_DY")) {
                 comparator = Comparator.comparing(RatioAndDividendYieldPO::getDividendYield);
             }
-            if (commandPO.getText().contains("_UP")) {
+            if (sortCondition.contains("_UP")) {
                 comparator = comparator.reversed();
             }
         }
