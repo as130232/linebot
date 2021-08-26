@@ -11,4 +11,6 @@ public class RatioAndDividendYieldPO {
     private String peRatio; //本益比
     private String pbRatio; //股價淨值比
     private String dividendYield;  //殖利率
+
+    private String price;   //股價
 }

@@ -121,8 +121,9 @@ public class TwseApiServiceImpl implements TwseApiService {
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
+                PricePO pricePO = this.getPrice(list.get(0));
                 return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(list.get(2))
-                        .peRatio(list.get(4)).pbRatio(list.get(5)).build();
+                        .peRatio(list.get(4)).pbRatio(list.get(5)).price(pricePO.getPrice()).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
