@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
@@ -297,11 +298,12 @@ public class StockHandler implements CommandHandler {
         List<FlexComponent> listComponent = list.stream().map(po -> {
             TradeValuePO preDatePO = preDateMap.get(po.getItem());
             Double differenceOfPreDate = po.getDifference() - preDatePO.getDifference();
+            String difference = convertTradeValue(po.getDifference());
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
                     Text.builder().text(parseName(po.getItem())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
                     Text.builder().text(convertTradeValue(po.getTotalBuy())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
                     Text.builder().text(convertTradeValue(po.getTotalSell())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
-                    Text.builder().text(convertTradeValue(po.getDifference())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
+                    Text.builder().text(difference.contains("-") ? difference : "+" + difference).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
                             .color(po.getDifference().compareTo(-1d) > 0 ? "#ff0000" : "#228b22").build(),
                     Text.builder().text(convertTradeValue(differenceOfPreDate)).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
                             .color(differenceOfPreDate.compareTo(-1d) > 0 ? "#ff0000" : "#228b22").build()
@@ -346,11 +348,20 @@ public class StockHandler implements CommandHandler {
 
     private String parseDateLabel(String title) {
         //民國年轉西元年
+        String label = "";
         title = title.split(" ")[0];
         String[] startAndEnd = title.split("至");
-        String label = DateUtils.parseByMinguo(startAndEnd[0], DateUtils.yyyyMMddSlash);
+        LocalDate localStartDate = DateUtils.parseByMinguo(startAndEnd[0]);
+        String startDate = localStartDate.format(DateUtils.yyyyMMddSlash);
+        String dayOfWeekNameStartDate = localStartDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
+        startDate += "({dayOfWeekName})".replace("{dayOfWeekName}", dayOfWeekNameStartDate);
+        label = startDate;
         if (startAndEnd.length > 2) {
-            label += "－" + DateUtils.parseByMinguo(startAndEnd[1], DateUtils.yyyyMMddSlash);
+            LocalDate localEndDate = DateUtils.parseByMinguo(startAndEnd[1]);
+            String endDate = localEndDate.format(DateUtils.yyyyMMddSlash);
+            String dayOfWeekNameEndDate = localEndDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
+            endDate += "({dayOfWeekName})".replace("{dayOfWeekName}", dayOfWeekNameEndDate);
+            label += "－" + endDate;
         }
         return label;
     }
@@ -372,9 +383,6 @@ public class StockHandler implements CommandHandler {
      */
     public String convertTradeValue(Double tradeValue) {
         BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000)).setScale(2, BigDecimal.ROUND_HALF_UP);
-        if (result.compareTo(BigDecimal.ZERO) > 0) {
-            return "+" + result.toString();
-        }
         return result.toString();
     }
 }

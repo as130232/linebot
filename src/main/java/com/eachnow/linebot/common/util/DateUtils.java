@@ -69,10 +69,9 @@ public class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).toInstant().toEpochMilli();
     }
 
-    public static String parseByMinguo(String date, DateTimeFormatter to){
+    public static LocalDate parseByMinguo(String date){
         ChronoLocalDate d1 = chronoByMinguo.date(minguo.parse(date));
-        LocalDate localDate = LocalDate.from(d1);
-        return localDate.format(to);
+        return LocalDate.from(d1);
     }
 
     /**
