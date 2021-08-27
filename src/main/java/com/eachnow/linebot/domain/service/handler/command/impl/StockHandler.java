@@ -47,9 +47,9 @@ public class StockHandler implements CommandHandler {
         this.twseApiService = twseApiService;
     }
 
-    //    @PostConstruct
+//        @PostConstruct
 //    private void test() {
-//        String text = "三大法人";
+//        String text = "三大法人 日報 20210827";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -245,8 +245,8 @@ public class StockHandler implements CommandHandler {
     }
 
     public Message getTradingOfForeignAndInvestors(CommandPO commandPO) {
-        String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
-        String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
+        String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
+        String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         //預設日報
         if (type == null)
             type = "日報";
@@ -397,7 +397,8 @@ public class StockHandler implements CommandHandler {
      * 單位從元轉為億
      */
     public String convertTradeValue(Double tradeValue) {
-        BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000))
+                .setScale(2, BigDecimal.ROUND_HALF_UP);
         return result.toString();
     }
 
