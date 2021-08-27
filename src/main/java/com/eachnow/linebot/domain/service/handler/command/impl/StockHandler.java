@@ -373,7 +373,7 @@ public class StockHandler implements CommandHandler {
         String dayOfWeekNameStartDate = localStartDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
         startDate += "({dayOfWeekName})".replace("{dayOfWeekName}", dayOfWeekNameStartDate);
         label = startDate;
-        if (startAndEnd.length > 2) {
+        if (startAndEnd.length > 1) {
             LocalDate localEndDate = DateUtils.parseByMinguo(startAndEnd[1]);
             String endDate = localEndDate.format(DateUtils.yyyyMMddSlash);
             String dayOfWeekNameEndDate = localEndDate.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.TAIWAN).replace("星期", "");
