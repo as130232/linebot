@@ -313,7 +313,7 @@ public class StockHandler implements CommandHandler {
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
 
         String label = parseDateLabel(tradeValuePO.getTitle());
-        String datetimepickerData = commandPO.getCommand() + ParamterUtils.CONTACT + date + ParamterUtils.CONTACT;
+        String datetimepickerData = commandPO.getCommand() + ParamterUtils.CONTACT + type + ParamterUtils.CONTACT + date + ParamterUtils.CONTACT;
         Box dateButton = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Button.builder().flex(2).height(Button.ButtonHeight.SMALL)
                 .style(Button.ButtonStyle.SECONDARY).action(DatetimePickerAction.OfLocalDate.builder()
                         .label(label).data(datetimepickerData + "datetimepicker").build()).build()
