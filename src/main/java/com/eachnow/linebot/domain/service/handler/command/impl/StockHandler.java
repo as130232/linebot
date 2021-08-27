@@ -24,11 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -46,12 +48,12 @@ public class StockHandler implements CommandHandler {
     }
 
     //    @PostConstruct
-    private void test() {
-        String text = "三大法人";
-        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-        execute(commandPO);
-    }
+//    private void test() {
+//        String text = "三大法人";
+//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+//        execute(commandPO);
+//    }
 
     @Override
     public Message execute(CommandPO commandPO) {
@@ -245,33 +247,46 @@ public class StockHandler implements CommandHandler {
     public Message getTradingOfForeignAndInvestors(CommandPO commandPO) {
         String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
-        String preDate = null;
-        if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
-            date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
-
         //預設日報
         if (type == null)
             type = "日報";
 
+        String preDate = null;
+        if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
+            date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
+        //預設取得昨日，若時間已經超過當天晚上七點，則取得當天日期
+        if (date == null)
+            date = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
+        LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
         boolean isDayType = false;
         boolean isWeekType = false;
         boolean isMonthType = false;
         switch (type) {
-            case "日報":    //預設取得昨日，若時間已經超過當天晚上七點，則取得當天日期
+            case "日報": {
                 isDayType = true;
-                Instant instant = Instant.now();
-                if (date != null) {
-                    instant = DateUtils.parseDate(date, DateUtils.yyyyMMdd).toInstant();
-                }
-                date = DateUtils.yyyyMMdd.format(instant.minus(1, ChronoUnit.DAYS));
-                preDate = DateUtils.yyyyMMdd.format(instant.minus(2, ChronoUnit.DAYS));
+                int minusDay = 1;
+                //若當天是星期一，則前一天交易日為三天前(上週五)
+                if (localDate.getDayOfWeek().getValue() == 1)
+                    minusDay = 3;
+                preDate = localDate.minus(minusDay, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
                 break;
-            case "週報":    //預設取得當週一
+            }
+            case "週報": {    //預設取得當週一
                 isWeekType = true;
+                LocalDate monday = localDate.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+                LocalDate preMonday = monday.minus(7, ChronoUnit.DAYS);
+                date = monday.format(DateUtils.yyyyMMdd);
+                preDate = preMonday.format(DateUtils.yyyyMMdd);
                 break;
-            case "月報":   //預設取得當月一號
+            }
+            case "月報": {   //預設取得當月一號
                 isMonthType = true;
+                LocalDate firstOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), 1);
+                LocalDate preFirstOfMonth = firstOfMonth.minus(1, ChronoUnit.MONTHS);
+                date = firstOfMonth.format(DateUtils.yyyyMMdd);
+                preDate = preFirstOfMonth.format(DateUtils.yyyyMMdd);
                 break;
+            }
         }
         TradeValueInfoPO tradeValuePO = twseApiService.getTradingOfForeignAndInvestors(parseDateType(type), date);
         List<TradeValuePO> list = tradeValuePO.getTradeValues();
@@ -348,7 +363,7 @@ public class StockHandler implements CommandHandler {
 
     private String parseDateLabel(String title) {
         //民國年轉西元年
-        String label = "";
+        String label;
         title = title.split(" ")[0];
         String[] startAndEnd = title.split("至");
         LocalDate localStartDate = DateUtils.parseByMinguo(startAndEnd[0]);
@@ -385,4 +400,21 @@ public class StockHandler implements CommandHandler {
         BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000)).setScale(2, BigDecimal.ROUND_HALF_UP);
         return result.toString();
     }
+
+//    public static void main(String[] args) {
+//        Instant instant = Instant.now();
+//        LocalDate localDate = instant.atZone(DateUtils.CST_ZONE_ID).toLocalDate();
+//        LocalDate monday = localDate.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+//        LocalDate preMonday = monday.minus(7, ChronoUnit.DAYS);
+//        System.out.println(monday);
+//        System.out.println(preMonday);
+//        LocalDate firstOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), 1);
+//        LocalDate preFirstOfMonth = firstOfMonth.minus(1, ChronoUnit.MONTHS);
+//        System.out.println(firstOfMonth);
+//        System.out.println(preFirstOfMonth);
+//        String test = "20210823";
+//        LocalDate testLocalDate = LocalDate.parse(test, DateUtils.yyyyMMdd);
+//        String preDate = testLocalDate.minus(3, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
+//        System.out.println(testLocalDate.getDayOfWeek());
+//    }
 }
