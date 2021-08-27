@@ -2,7 +2,13 @@ package com.eachnow.linebot.common.util;
 
 import java.sql.Timestamp;
 import java.time.*;
+import java.time.chrono.ChronoLocalDate;
+import java.time.chrono.Chronology;
+import java.time.chrono.MinguoChronology;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DecimalStyle;
+import java.util.Locale;
 
 public class DateUtils {
     //    public static final ZoneId DEFAULT_ZONE_ID = ZoneId.of("UTC-4");    //美東
@@ -14,6 +20,11 @@ public class DateUtils {
     public static final DateTimeFormatter yyyyMMddHHmmDash = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(CST_ZONE_ID);
     public static final DateTimeFormatter yyyyMMddHHmmssDash = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(CST_ZONE_ID);
     public static final DateTimeFormatter hhmmss = DateTimeFormatter.ofPattern("HH:mm:ss");
+    //民國年
+    public static final Chronology chronoByMinguo = MinguoChronology.INSTANCE;
+    public static final DateTimeFormatter minguo = new DateTimeFormatterBuilder().parseLenient()
+            .appendPattern("yyy年MM月dd日").toFormatter().withChronology(chronoByMinguo)
+            .withDecimalStyle(DecimalStyle.of(Locale.getDefault()));
 
     public static final String START_OF_DAY = LocalTime.MIN.format(hhmmss);
     public static final String END_OF_DAY = LocalTime.MAX.format(hhmmss);
@@ -56,6 +67,12 @@ public class DateUtils {
     public static long parseToEndOfDayMilli(String date, DateTimeFormatter formatter) {
         LocalDate localDate = LocalDate.parse(date, formatter);
         return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).toInstant().toEpochMilli();
+    }
+
+    public static String parseByMinguo(String date, DateTimeFormatter to){
+        ChronoLocalDate d1 = chronoByMinguo.date(minguo.parse(date));
+        LocalDate localDate = LocalDate.from(d1);
+        return localDate.format(to);
     }
 
     /**

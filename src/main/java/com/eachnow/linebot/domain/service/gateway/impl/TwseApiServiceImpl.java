@@ -74,10 +74,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/STOCK_DAY_AVG_ALL";
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
-            List<PricePO> result = twseDataPO.getData().stream().map(list -> {
-                return PricePO.builder().code(list.get(0)).name(list.get(1))
-                        .price(Double.valueOf(parseValue(list.get(2)))).avePrice(Double.valueOf(parseValue(list.get(3)))).build();
-            }).collect(Collectors.toList());
+            List<PricePO> result = twseDataPO.getData().stream().map(list -> PricePO.builder().code(list.get(0)).name(list.get(1))
+                    .price(Double.valueOf(parseValue(list.get(2)))).avePrice(Double.valueOf(parseValue(list.get(3)))).build()).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
             log.error("呼叫取得證交所-取得當日所有個股股價，失敗! error msg:{}", e.getMessage());
@@ -108,8 +106,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             for (int i = 0; i < twseDataPO.getData().size(); i++) {
                 List<String> listData = twseDataPO.getData().get(i);
                 String dataDate = listData.get(0);    //日期 110/05/03
-                Integer month = Integer.valueOf(dataDate.split("/")[1]);
-                Integer day = Integer.valueOf(dataDate.split("/")[2]);
+                int month = Integer.parseInt(dataDate.split("/")[1]);
+                int day = Integer.parseInt(dataDate.split("/")[2]);
                 if (localDate.getMonth().getValue() == month && localDate.getDayOfMonth() == day) {
                     return IndexPO.builder().tradeVolume(listData.get(1)).tradeValue(listData.get(2))
                             .transaction(listData.get(3)).taiex(listData.get(4)).change(Float.valueOf(listData.get(5)))
@@ -180,7 +178,7 @@ public class TwseApiServiceImpl implements TwseApiService {
     }
 
     @Override
-    public List<TradeValuePO> getTradingOfForeignAndInvestors(String type, String date) {
+    public TradeValueInfoPO getTradingOfForeignAndInvestors(String type, String date) {
         try {
             String url = TWSE_URL + "/fund/BFI82U?response=json&type=" + type;
             if (date != null)
@@ -188,18 +186,18 @@ public class TwseApiServiceImpl implements TwseApiService {
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
             if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
-                return new ArrayList<>(0);
-            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> {
-                return TradeValuePO.builder().item(list.get(0))
-                        .totalBuy(toDouble(list.get(1)))
-                        .totalSell(toDouble(list.get(2)))
-                        .difference(toDouble(list.get(3))).build();
-            }).collect(Collectors.toList());
-            return result;
+                return null;
+            List<TradeValuePO> listTradeValues = twseDataPO.getData().stream()
+                    .filter(list -> !"外資自營商".equals(list.get(0)))
+                    .map(list -> TradeValuePO.builder().item(list.get(0))
+                            .totalBuy(toDouble(list.get(1)))
+                            .totalSell(toDouble(list.get(2)))
+                            .difference(toDouble(list.get(3))).build()).collect(Collectors.toList());
+            return TradeValueInfoPO.builder().title(twseDataPO.getTitle()).tradeValues(listTradeValues).build();
         } catch (Exception e) {
             log.error("呼叫取得證交所-三大法人買賣金額統計表，失敗! type:{}, error msg:{}", type, e.getMessage());
         }
-        return new ArrayList<>(0);
+        return null;
     }
 
     @Override
@@ -208,14 +206,12 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/MI_MARGN?response=json&selectType=MS&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
-            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> {
-                return TradeValuePO.builder().item(list.get(0))
-                        .totalBuy(toDouble(list.get(1)))
-                        .totalSell(toDouble(list.get(2)))
-                        .balanceOfPreDay(toDouble(list.get(4)))
-                        .balance(toDouble(list.get(5)))
-                        .difference(toDouble(list.get(5)) - toDouble(list.get(4))).build();
-            }).collect(Collectors.toList());
+            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> TradeValuePO.builder().item(list.get(0))
+                    .totalBuy(toDouble(list.get(1)))
+                    .totalSell(toDouble(list.get(2)))
+                    .balanceOfPreDay(toDouble(list.get(4)))
+                    .balance(toDouble(list.get(5)))
+                    .difference(toDouble(list.get(5)) - toDouble(list.get(4))).build()).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
             log.error("呼叫取得證交所-融資融券餘額，失敗! date:{}, error msg:{}", date, e.getMessage());

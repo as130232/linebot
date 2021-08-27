@@ -65,7 +65,7 @@ public interface TwseApiService {
      * @param type 時間範圍單位: day、week、month
      * @param date 日期
      */
-    public List<TradeValuePO> getTradingOfForeignAndInvestors(String type, String date);
+    public TradeValueInfoPO getTradingOfForeignAndInvestors(String type, String date);
 
     /**
      * 取得融資融卷餘額

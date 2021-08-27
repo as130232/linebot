@@ -57,7 +57,7 @@ public class MessageHandler {
     }
 
 //    @PostConstruct
-//    private void test(){
+    private void test(){
 //        String text = "股票 指數 20210511 datetimepicker";
 //        DatetimepickerPO datetimepickerPO = null;
 //        if (text.contains("datetimepicker")) {
@@ -71,10 +71,10 @@ public class MessageHandler {
 //                log.error("parsedDatetimepicker failed! error msg:{}", e.getMessage());
 //            }
 //        }
-//        String text = "殖利率";
-//        //根據指令取得對應指令處理服務
-//        executeCommand("test", text, null);
-//    }
+        String text = "殖利率";
+        //根據指令取得對應指令處理服務
+        executeCommand("test", text, null);
+    }
 
     public Message executeCommand(String userId, String text, DatetimepickerPO datetimepicker) {
         if (userAndCacheCommand.get(userId) != null)

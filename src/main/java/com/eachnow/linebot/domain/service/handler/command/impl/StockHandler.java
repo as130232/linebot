@@ -4,6 +4,7 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.twse.IndexPO;
 import com.eachnow.linebot.common.po.twse.RatioAndDividendYieldPO;
+import com.eachnow.linebot.common.po.twse.TradeValueInfoPO;
 import com.eachnow.linebot.common.po.twse.TradeValuePO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.NumberUtils;
@@ -242,29 +243,39 @@ public class StockHandler implements CommandHandler {
 
     public Message getTradingOfForeignAndInvestors(CommandPO commandPO) {
         String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
-        String date = null;
+        String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
         String preDate = null;
         if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
             date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
 
         //預設日報
         if (type == null)
-            type = "day";
+            type = "日報";
 
-        if ("day".equals(type)) {   //預設取得昨日，若時間已經超過當天晚上七點，則取得當天日期
-            Instant instant = Instant.now();
-            if (date != null) {
-                instant = DateUtils.parseDate(date, DateUtils.yyyyMMdd).toInstant();
-            }
-            date = DateUtils.yyyyMMdd.format(instant.minus(1, ChronoUnit.DAYS));
-            preDate = DateUtils.yyyyMMdd.format(instant.minus(2, ChronoUnit.DAYS));
-        } else if ("week".equals(type)) {   //預設取得當週一
-
-        } else if ("month".equals(type)) {  //預設取得當月一號
-
+        boolean isDayType = false;
+        boolean isWeekType = false;
+        boolean isMonthType = false;
+        switch (type) {
+            case "日報":    //預設取得昨日，若時間已經超過當天晚上七點，則取得當天日期
+                isDayType = true;
+                Instant instant = Instant.now();
+                if (date != null) {
+                    instant = DateUtils.parseDate(date, DateUtils.yyyyMMdd).toInstant();
+                }
+                date = DateUtils.yyyyMMdd.format(instant.minus(1, ChronoUnit.DAYS));
+                preDate = DateUtils.yyyyMMdd.format(instant.minus(2, ChronoUnit.DAYS));
+                break;
+            case "週報":    //預設取得當週一
+                isWeekType = true;
+                break;
+            case "月報":   //預設取得當月一號
+                isMonthType = true;
+                break;
         }
-        List<TradeValuePO> list = twseApiService.getTradingOfForeignAndInvestors(type, date);
-        Map<String, TradeValuePO> preDateMap = twseApiService.getTradingOfForeignAndInvestors(type, preDate).stream().collect(Collectors.toMap(TradeValuePO::getItem, Function.identity()));
+        TradeValueInfoPO tradeValuePO = twseApiService.getTradingOfForeignAndInvestors(parseDateType(type), date);
+        List<TradeValuePO> list = tradeValuePO.getTradeValues();
+        Map<String, TradeValuePO> preDateMap = twseApiService.getTradingOfForeignAndInvestors(type, preDate).getTradeValues()
+                .stream().collect(Collectors.toMap(TradeValuePO::getItem, Function.identity()));
 
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
                 Text.builder().text("三大法人買賣統計").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
@@ -298,7 +309,26 @@ public class StockHandler implements CommandHandler {
         }).collect(Collectors.toList());
         bodyComponent.addAll(listComponent);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
-        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
+
+        String label = parseDateLabel(tradeValuePO.getTitle());
+        String datetimepickerData = commandPO.getCommand() + ParamterUtils.CONTACT + date + ParamterUtils.CONTACT;
+        Box dateButton = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Button.builder().flex(2).height(Button.ButtonHeight.SMALL)
+                .style(Button.ButtonStyle.SECONDARY).action(DatetimePickerAction.OfLocalDate.builder()
+                        .label(label).data(datetimepickerData + "datetimepicker").build()).build()
+        ).build();
+
+        String typeDate = commandPO.getCommand() + ParamterUtils.CONTACT;
+        Box typeButton = Box.builder().layout(FlexLayout.HORIZONTAL).contents(
+                Button.builder().height(Button.ButtonHeight.SMALL).style(isDayType ? Button.ButtonStyle.PRIMARY : Button.ButtonStyle.LINK)
+                        .action(PostbackAction.builder().label("日報").data(typeDate + "日報" + ParamterUtils.CONTACT + date).build()).build(),
+                Button.builder().height(Button.ButtonHeight.SMALL).style(isWeekType ? Button.ButtonStyle.PRIMARY : Button.ButtonStyle.LINK)
+                        .action(PostbackAction.builder().label("週報").data(typeDate + "週報" + ParamterUtils.CONTACT + date).build()).build(),
+                Button.builder().height(Button.ButtonHeight.SMALL).style(isMonthType ? Button.ButtonStyle.PRIMARY : Button.ButtonStyle.LINK)
+                        .action(PostbackAction.builder().label("月報").data(typeDate + "月報" + ParamterUtils.CONTACT + date).build()).build()
+        ).build();
+        Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(dateButton, typeButton)
+                .spacing(FlexMarginSize.MD).backgroundColor("e46a4a").build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
         return FlexMessage.builder().altText("三大法人買賣統計").contents(contents).build();
     }
 
@@ -312,6 +342,29 @@ public class StockHandler implements CommandHandler {
                 return "外資";
         }
         return name;
+    }
+
+    private String parseDateLabel(String title) {
+        //民國年轉西元年
+        title = title.split(" ")[0];
+        String[] startAndEnd = title.split("至");
+        String label = DateUtils.parseByMinguo(startAndEnd[0], DateUtils.yyyyMMddSlash);
+        if (startAndEnd.length > 2) {
+            label += "－" + DateUtils.parseByMinguo(startAndEnd[1], DateUtils.yyyyMMddSlash);
+        }
+        return label;
+    }
+
+    private String parseDateType(String type) {
+        switch (type) {
+            case "日報":
+                return "day";
+            case "週報":
+                return "week";
+            case "月報":
+                return "month";
+        }
+        return "day";   //default
     }
 
     /**
