@@ -44,13 +44,13 @@ public class StockHandler implements CommandHandler {
         this.twseApiService = twseApiService;
     }
 
-//    @PostConstruct
-//    private void test() {
-//        String text = "三大法人";
-//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-//        execute(commandPO);
-//    }
+    //    @PostConstruct
+    private void test() {
+        String text = "三大法人";
+        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+        execute(commandPO);
+    }
 
     @Override
     public Message execute(CommandPO commandPO) {
@@ -274,8 +274,8 @@ public class StockHandler implements CommandHandler {
         }
         TradeValueInfoPO tradeValuePO = twseApiService.getTradingOfForeignAndInvestors(parseDateType(type), date);
         List<TradeValuePO> list = tradeValuePO.getTradeValues();
-        Map<String, TradeValuePO> preDateMap = twseApiService.getTradingOfForeignAndInvestors(type, preDate).getTradeValues()
-                .stream().collect(Collectors.toMap(TradeValuePO::getItem, Function.identity()));
+        TradeValueInfoPO preTradeValuePO = twseApiService.getTradingOfForeignAndInvestors(parseDateType(type), preDate);
+        Map<String, TradeValuePO> preDateMap = preTradeValuePO.getTradeValues().stream().collect(Collectors.toMap(TradeValuePO::getItem, Function.identity()));
 
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
                 Text.builder().text("三大法人買賣統計").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
