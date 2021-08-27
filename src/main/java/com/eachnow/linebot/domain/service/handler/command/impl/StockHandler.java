@@ -327,7 +327,7 @@ public class StockHandler implements CommandHandler {
                         .action(PostbackAction.builder().label("月報").data(typeDate + "月報" + ParamterUtils.CONTACT + date).build()).build()
         ).build();
         Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(dateButton, typeButton)
-                .spacing(FlexMarginSize.MD).backgroundColor("e46a4a").build();
+                .spacing(FlexMarginSize.MD).backgroundColor("#e46a4a").build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
         return FlexMessage.builder().altText("三大法人買賣統計").contents(contents).build();
     }
