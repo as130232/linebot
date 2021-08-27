@@ -289,6 +289,8 @@ public class StockHandler implements CommandHandler {
             }
         }
         TradeValueInfoPO tradeValuePO = twseApiService.getTradingOfForeignAndInvestors(parseDateType(type), date);
+        if (tradeValuePO == null)
+            return new TextMessage("查無該日期資訊");
         List<TradeValuePO> list = tradeValuePO.getTradeValues();
         TradeValueInfoPO preTradeValuePO = twseApiService.getTradingOfForeignAndInvestors(parseDateType(type), preDate);
         Map<String, TradeValuePO> preDateMap = preTradeValuePO.getTradeValues().stream().collect(Collectors.toMap(TradeValuePO::getItem, Function.identity()));
@@ -398,7 +400,7 @@ public class StockHandler implements CommandHandler {
      */
     public String convertTradeValue(Double tradeValue) {
         BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000))
-                .setScale(2, BigDecimal.ROUND_HALF_UP);
+                .setScale(1, BigDecimal.ROUND_HALF_UP);
         return result.toString();
     }
 
