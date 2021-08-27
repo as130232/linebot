@@ -62,6 +62,12 @@ public class TwseApiServiceImpl implements TwseApiService {
         return value;
     }
 
+    private Double toDouble(String value) {
+        if (value.contains(","))
+            value = value.replace(",", "");
+        return Double.valueOf(value);
+    }
+
     @Override
     public List<PricePO> getStockPrice() {
         try {
@@ -76,7 +82,20 @@ public class TwseApiServiceImpl implements TwseApiService {
         } catch (Exception e) {
             log.error("呼叫取得證交所-取得當日所有個股股價，失敗! error msg:{}", e.getMessage());
         }
-        return new ArrayList<>();
+        return new ArrayList<>(0);
+    }
+
+    @Override
+    public TwseStockInfoDataPO getStockInfo(String code) {
+        try {
+            String stockId = "tse_{code}.tw".replace("{code}", code);
+            String url = String.format("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_%s.tw&json=1&delay=0", stockId);
+            ResponseEntity<TwseStockInfoDataPO> responseEntity = restTemplate.getForEntity(url, TwseStockInfoDataPO.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            log.error("呼叫取得證交所-個股當日即時狀況，失敗! stockId:{}, error msg:{}", code, e.getMessage());
+        }
+        return null;
     }
 
     @Override
@@ -120,7 +139,7 @@ public class TwseApiServiceImpl implements TwseApiService {
         } catch (Exception e) {
             log.error("呼叫取得證交所-各類指數日成交量值，失敗! date:{}, error msg:{}", date, e.getMessage());
         }
-        return new ArrayList<>();
+        return new ArrayList<>(0);
     }
 
     @Override
@@ -138,18 +157,71 @@ public class TwseApiServiceImpl implements TwseApiService {
         } catch (Exception e) {
             log.error("呼叫取得證交所-取得個股本益比、股價淨值比及殖利率，失敗! date:{}, error msg:{}", date, e.getMessage());
         }
-        return new ArrayList<>();
+        return new ArrayList<>(0);
     }
 
-    public TwseStockInfoDataPO getStockInfo(String stockId) {
+    @Override
+    public List<RatioAndDividendYieldPO> getRatioAndDividendYieldOnMonth(String code) {
         try {
-            String url = String.format("https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_%s.tw&json=1&delay=0", stockId);
-            ResponseEntity<TwseStockInfoDataPO> responseEntity = restTemplate.getForEntity(url, TwseStockInfoDataPO.class);
-            return responseEntity.getBody();
+            String url = TWSE_URL + "/exchangeReport/BWIBBU?response=json&stockNo" + code;
+            ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
+            TwseDataPO twseDataPO = responseEntity.getBody();
+            List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
+                PricePO pricePO = this.getPrice(list.get(0));
+                return RatioAndDividendYieldPO.builder().code(code).name(pricePO.getName()).price(pricePO.getPrice()).avePrice(pricePO.getAvePrice())
+                        .date(list.get(0)).dividendYield(Double.valueOf(parseValue(list.get(1))))
+                        .peRatio(Double.valueOf(parseValue(list.get(3)))).pbRatio(Double.valueOf(parseValue(list.get(4)))).build();
+            }).collect(Collectors.toList());
+            return result;
         } catch (Exception e) {
-            log.error("呼叫取得證交所-個股當日即時狀況，失敗! stockId:{}, error msg:{}", stockId, e.getMessage());
+            log.error("呼叫取得證交所-取得個股該月份本益比、殖利率及股價淨值比，失敗! code:{}, error msg:{}", code, e.getMessage());
         }
-        return null;
+        return new ArrayList<>(0);
     }
+
+    @Override
+    public List<TradeValuePO> getTradingOfForeignAndInvestors(String type, String date) {
+        try {
+            String url = TWSE_URL + "/fund/BFI82U?response=json&type=" + type;
+            if (date != null)
+                url += "&{type}Date={date}".replace("{type}", type).replace("{date}", date);
+            ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
+            TwseDataPO twseDataPO = responseEntity.getBody();
+            if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
+                return new ArrayList<>(0);
+            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> {
+                return TradeValuePO.builder().item(list.get(0))
+                        .totalBuy(toDouble(list.get(1)))
+                        .totalSell(toDouble(list.get(2)))
+                        .difference(toDouble(list.get(3))).build();
+            }).collect(Collectors.toList());
+            return result;
+        } catch (Exception e) {
+            log.error("呼叫取得證交所-三大法人買賣金額統計表，失敗! type:{}, error msg:{}", type, e.getMessage());
+        }
+        return new ArrayList<>(0);
+    }
+
+    @Override
+    public List<TradeValuePO> getMarginTradingAndShortSelling(String date) {
+        try {
+            String url = TWSE_URL + "/exchangeReport/MI_MARGN?response=json&selectType=MS&date=" + date;
+            ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
+            TwseDataPO twseDataPO = responseEntity.getBody();
+            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> {
+                return TradeValuePO.builder().item(list.get(0))
+                        .totalBuy(toDouble(list.get(1)))
+                        .totalSell(toDouble(list.get(2)))
+                        .balanceOfPreDay(toDouble(list.get(4)))
+                        .balance(toDouble(list.get(5)))
+                        .difference(toDouble(list.get(5)) - toDouble(list.get(4))).build();
+            }).collect(Collectors.toList());
+            return result;
+        } catch (Exception e) {
+            log.error("呼叫取得證交所-融資融券餘額，失敗! date:{}, error msg:{}", date, e.getMessage());
+        }
+        return new ArrayList<>(0);
+    }
+
 
 }

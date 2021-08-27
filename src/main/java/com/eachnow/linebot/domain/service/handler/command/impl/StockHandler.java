@@ -4,6 +4,7 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.twse.IndexPO;
 import com.eachnow.linebot.common.po.twse.RatioAndDividendYieldPO;
+import com.eachnow.linebot.common.po.twse.TradeValuePO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.NumberUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
@@ -21,15 +22,20 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Command({"stock", "股", "股票", "股價", "殖利率", "淨值", "本益比"})
+@Command({"stock", "股", "股票",
+        "股價", "殖利率", "淨值", "本益比",
+        "三大法人", "融資融卷"})
 public class StockHandler implements CommandHandler {
     private TwseApiService twseApiService;
 
@@ -37,6 +43,14 @@ public class StockHandler implements CommandHandler {
     public StockHandler(TwseApiService twseApiService) {
         this.twseApiService = twseApiService;
     }
+
+//    @PostConstruct
+//    private void test() {
+//        String text = "三大法人";
+//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
+//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
+//        execute(commandPO);
+//    }
 
     @Override
     public Message execute(CommandPO commandPO) {
@@ -47,6 +61,8 @@ public class StockHandler implements CommandHandler {
             //取得最新(昨日)個股本益比、殖利率及股價淨值比
         } else if (Arrays.asList("股價", "殖利率", "淨值", "本益比").contains(commandPO.getCommand())) {
             return this.getRatioAndDividendYield(commandPO);
+        } else if (text.contains("三大法人")) {
+            return this.getTradingOfForeignAndInvestors(commandPO);
         }
         //Todo 紀錄該股並自動換算停利停損價格
 
@@ -86,7 +102,7 @@ public class StockHandler implements CommandHandler {
                 Text.builder().text("數量(筆)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build(),
                 Text.builder().text("漲跌(%)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").align(FlexAlign.END).build()
         ).build();
-        Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
+        Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#666666").build();
 
         List<FlexComponent> bodyComponent = new ArrayList<>();
         bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
@@ -181,7 +197,7 @@ public class StockHandler implements CommandHandler {
                 Text.builder().text("本益比").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build(),
                 Text.builder().text("殖利率").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.END).gravity(FlexGravity.CENTER).build()
         ).build();
-        Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
+        Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#666666").build();
 
         List<FlexComponent> bodyComponent = new ArrayList<>();
         bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
@@ -194,7 +210,7 @@ public class StockHandler implements CommandHandler {
                     Text.builder().text(po.getPrice() == -1d ? "---" : po.getPrice().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).color(priceColor).build(),
                     Text.builder().text(po.getPbRatio().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END).build(),
                     Text.builder().text(po.getPeRatio() == -1d ? "---" : po.getPeRatio().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
-                            .color(po.getPeRatio().compareTo(20d) < 0 ? "#ff0000" : "#111111").build(),
+                            .color(po.getPeRatio().compareTo(12d) < 0 ? "#ff0000" : "#111111").build(),
                     Text.builder().text(po.getDividendYield().toString()).size(FlexFontSize.SM).flex(1).align(FlexAlign.END)
                             .color(po.getDividendYield().compareTo(8d) > 0 ? "#ff0000" : "#111111").build()
             )).build();
@@ -204,7 +220,7 @@ public class StockHandler implements CommandHandler {
 
         Box priceButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
                 Text.builder().text("▲").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_PRICE_UP").build()).build(),
-                Text.builder().text("股 價").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
+                Text.builder().text("股　價").size(FlexFontSize.Md).flex(0).weight(Text.TextWeight.BOLD).color("#ffffff").build(),
                 Text.builder().text("▼").color("#AAF1E1").flex(0).action(PostbackAction.builder().data(commandPO.getText() + " %SORT_PRICE_DOWN").build()).build()
         ).flex(1).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).build();
         Box peRatioButtonBox = Box.builder().layout(FlexLayout.BASELINE).contents(
@@ -225,11 +241,83 @@ public class StockHandler implements CommandHandler {
         return FlexMessage.builder().altText("個股股價、淨值、本益比、殖利率").contents(contents).build();
     }
 
-    //    @PostConstruct
-//    private void test() {
-//        String text = "股價 %SORT_PRICE_DOWN";
-//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-//        execute(commandPO);
-//    }
+    public Message getTradingOfForeignAndInvestors(CommandPO commandPO) {
+        String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
+        String date = null;
+        String preDate = null;
+        if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
+            date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
+
+        //預設日報
+        if (type == null)
+            type = "day";
+
+        if ("day".equals(type)) {   //預設取得昨日，若時間已經超過當天晚上七點，則取得當天日期
+            Instant instant = Instant.now();
+            if (date != null) {
+                instant = DateUtils.parseDate(date, DateUtils.yyyyMMdd).toInstant();
+            }
+            date = DateUtils.yyyyMMdd.format(instant.minus(1, ChronoUnit.DAYS));
+            preDate = DateUtils.yyyyMMdd.format(instant.minus(2, ChronoUnit.DAYS));
+        } else if ("week".equals(type)) {   //預設取得當週一
+
+        } else if ("month".equals(type)) {  //預設取得當月一號
+
+        }
+        List<TradeValuePO> list = twseApiService.getTradingOfForeignAndInvestors(type, date);
+        Map<String, TradeValuePO> preDateMap = twseApiService.getTradingOfForeignAndInvestors(type, preDate).stream().collect(Collectors.toMap(TradeValuePO::getItem, Function.identity()));
+
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
+                Text.builder().text("三大法人買賣統計").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
+        )).paddingAll(FlexPaddingSize.MD).backgroundColor("#e46a4a").build();
+
+        //Title
+        Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
+                Text.builder().text("單位(億)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("買進").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("賣出").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("現貨差").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("昨日差").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build()
+        ).build();
+        Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#666666").build();
+
+        List<FlexComponent> bodyComponent = new ArrayList<>();
+        bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
+                title, separator).build());
+        List<FlexComponent> listComponent = list.stream().map(po -> {
+            TradeValuePO preDatePO = preDateMap.get(po.getItem());
+            Double differenceOfPreDate = po.getDifference() - preDatePO.getDifference();
+            return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
+                    Text.builder().text(parseName(po.getItem())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
+                    Text.builder().text(convertTradeValue(po.getTotalBuy())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
+                    Text.builder().text(convertTradeValue(po.getTotalSell())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
+                    Text.builder().text(convertTradeValue(po.getDifference())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
+                            .color(po.getDifference().compareTo(-1d) > 0 ? "#ff0000" : "#111111").build(),
+                    Text.builder().text(convertTradeValue(differenceOfPreDate)).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
+                            .color(differenceOfPreDate.compareTo(-1d) > 0 ? "#ff0000" : "#111111").build()
+            )).build();
+        }).collect(Collectors.toList());
+        bodyComponent.addAll(listComponent);
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
+        return FlexMessage.builder().altText("三大法人買賣統計").contents(contents).build();
+    }
+
+    private String parseName(String name) {
+        switch (name) {
+            case "自營商(自行買賣)":
+                return "自營自買";
+            case "自營商(避險)":
+                return "自營避險";
+            case "外資及陸資(不含外資自營商)":
+                return "外資";
+        }
+        return name;
+    }
+
+    public String convertTradeValue(Double tradeValue) {
+        //單位從元轉為億
+        BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return result.toString();
+    }
 }

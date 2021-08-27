@@ -8,6 +8,7 @@ import lombok.Data;
 public class RatioAndDividendYieldPO {
     private String code;    //個股代號
     private String name;    //個股名稱
+    private String date;    //日期
     private Double pbRatio; //股價淨值比
     private Double peRatio; //本益比
     private Double dividendYield;  //殖利率

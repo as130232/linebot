@@ -213,7 +213,7 @@ public class BookkeepingHandler implements CommandHandler {
             Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneMonthContents).paddingTop(FlexPaddingSize.SM)
                     .action(PostbackAction.builder().label(date).data("記 查 " + startOfMonth + ParamterUtils.CONTACT + endOfMonth).build()).build();
             bodyContents.add(oneDateBox);
-            Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
+            Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#666666").build();
             bodyContents.add(separator);
         });
         return bodyContents;
@@ -257,7 +257,7 @@ public class BookkeepingHandler implements CommandHandler {
             }
             Box oneDateBox = Box.builder().layout(FlexLayout.VERTICAL).contents(oneDateContents).paddingTop(FlexPaddingSize.SM).build();
             bodyContents.add(oneDateBox);
-            Separator separator = Separator.builder().margin(FlexMarginSize.MD).color("#666666").build();
+            Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#666666").build();
             bodyContents.add(separator);
         });
         return bodyContents;
