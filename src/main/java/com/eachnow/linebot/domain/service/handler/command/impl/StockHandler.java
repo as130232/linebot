@@ -22,7 +22,6 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -273,7 +272,7 @@ public class StockHandler implements CommandHandler {
 
         //Title
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
-                Text.builder().text("單位(億)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("單位(億)").size(FlexFontSize.SM).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
                 Text.builder().text("買進").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
                 Text.builder().text("賣出").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
                 Text.builder().text("現貨差").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
@@ -292,9 +291,9 @@ public class StockHandler implements CommandHandler {
                     Text.builder().text(convertTradeValue(po.getTotalBuy())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
                     Text.builder().text(convertTradeValue(po.getTotalSell())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
                     Text.builder().text(convertTradeValue(po.getDifference())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
-                            .color(po.getDifference().compareTo(-1d) > 0 ? "#ff0000" : "#111111").build(),
+                            .color(po.getDifference().compareTo(-1d) > 0 ? "#ff0000" : "#228b22").build(),
                     Text.builder().text(convertTradeValue(differenceOfPreDate)).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
-                            .color(differenceOfPreDate.compareTo(-1d) > 0 ? "#ff0000" : "#111111").build()
+                            .color(differenceOfPreDate.compareTo(-1d) > 0 ? "#ff0000" : "#228b22").build()
             )).build();
         }).collect(Collectors.toList());
         bodyComponent.addAll(listComponent);
@@ -315,9 +314,14 @@ public class StockHandler implements CommandHandler {
         return name;
     }
 
+    /**
+     * 單位從元轉為億
+     */
     public String convertTradeValue(Double tradeValue) {
-        //單位從元轉為億
         BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        if (result.compareTo(BigDecimal.ZERO) > 0) {
+            return "+" + result.toString();
+        }
         return result.toString();
     }
 }
