@@ -63,10 +63,11 @@ public class PttApiServiceImp implements PttApiService {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
+//            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
             String result = responseEntity.getBody();
+            log.info("result size:", result.length());
             Document doc = Jsoup.parse(result);
             Elements elements = doc.select("div[class~=row2]");
             List<PttArticlePO> list = new ArrayList<>(20);
