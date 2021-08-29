@@ -12,6 +12,7 @@ import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
 public class PttCrawlerService {
     private WebDriverFactory webDriverFactory;
     private LineNotifySender lineNotifySender;
-
     @Autowired
     public PttCrawlerService(WebDriverFactory webDriverFactory,
                              LineNotifySender lineNotifySender) {
@@ -202,16 +202,19 @@ public class PttCrawlerService {
 
 //    @PostConstruct
     public void init() {
-        StopWatch sw1 = new StopWatch();
-        sw1.start();
-        List<PttArticlePO> list1 = crawler(PttEnum.GOSSIPING, 1, PttEnum.TYPE_ARTICLE);
-        sw1.stop();
-        StopWatch sw2 = new StopWatch();
-        sw2.start();
+//        StopWatch sw1 = new StopWatch();
+//        sw1.start();
+//        List<PttArticlePO> list1 = crawler(PttEnum.GOSSIPING, 1, PttEnum.TYPE_ARTICLE);
+//        sw1.stop();
+//        StopWatch sw2 = new StopWatch();
+//        sw2.start();
+//        List<PttArticlePO> list2 = crawlerByDisp(PttEnum.GOSSIPING, 1);
+//        sw2.stop();
+//        log.info("list1:{}, sw1:{}, list2:{}, sw2:{}", list1.size(), sw1.getTotalTimeMillis(), list2.size(), sw2.getTotalTimeMillis());
+//        System.out.println("a");
         List<PttArticlePO> list2 = crawlerByDisp(PttEnum.GOSSIPING, 1);
-        sw2.stop();
-        log.info("list1:{}, sw1:{}, list2:{}, sw2:{}", list1.size(), sw1.getTotalTimeMillis(), list2.size(), sw2.getTotalTimeMillis());
-        System.out.println("a");
-        List<PttArticlePO> sortList2 = list2.stream().sorted(Comparator.comparing(PttArticlePO::getPopularity).reversed()).collect(Collectors.toList());
+        System.out.println(list2);
     }
+
+
 }
