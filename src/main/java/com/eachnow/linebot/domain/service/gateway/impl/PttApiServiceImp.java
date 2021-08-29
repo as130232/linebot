@@ -66,9 +66,9 @@ public class PttApiServiceImp implements PttApiService {
 //            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
-            String result = responseEntity.getBody();
-            log.info("result size:", result.length());
-            Document doc = Jsoup.parse(result);
+            String response = responseEntity.getBody();
+            log.info("response length:", response.length());
+            Document doc = Jsoup.parse(response);
             Elements elements = doc.select("div[class~=row2]");
             List<PttArticlePO> list = new ArrayList<>(20);
             String name = doc.select("span[id~=board_div]").text();       //看版
@@ -79,7 +79,7 @@ public class PttApiServiceImp implements PttApiService {
             //上一頁網址
             for (Element element : elements) {
                 String title = element.select("span[class~=listTitle]").text();
-                if (title.contains("[公告]"))
+                if (title.contains("[公告]") || title.contains("[刪除]"))
                     continue;
                 String popularityStr = element.select("span[class~=R0 bgB]").text();
                 if (popularityStr.contains("/"))
