@@ -18,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,9 +32,9 @@ public class PttApiServiceImp implements PttApiService {
         this.restTemplate = restTemplate;
     }
 
-//    @PostConstruct
+    //    @PostConstruct
 //    private void test() {
-//        getPttInfoPO(PttEnum.CAR, 20);
+//        getPttInfoPO(PttEnum.GOSSIPING, 60);
 //    }
 
     @Override
@@ -61,13 +60,13 @@ public class PttApiServiceImp implements PttApiService {
     }
 
     private PttInfoPO getPttInfoPO(String url) {
-        try {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 //            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
-            HttpEntity<Void> request = new HttpEntity<>(headers);
-            ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
-            String response = responseEntity.getBody();
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
+        String response = responseEntity.getBody();
+        try {
             Document doc = Jsoup.parse(response);
             List<PttArticlePO> list = new ArrayList<>(20);
             Integer boardPopularity = 0;
@@ -88,8 +87,9 @@ public class PttApiServiceImp implements PttApiService {
                 if (title.contains("[公告]") || title.contains("[刪除]"))
                     continue;
                 String popularityStr = element.select("span[class~=R0 bgB]").text();
-                if (popularityStr.contains("/"))
-                    popularityStr = popularityStr.split("/")[1];
+                String[] popularityArr = popularityStr.split("/");
+                if (popularityArr.length > 1)
+                    popularityStr = popularityArr[1];
                 Integer popularity = parsePopularity(popularityStr);
                 String link = LINK + element.select("span[class~=listTitle]").select("a").attr("href");
                 String date = element.select("span[class~=L12]").attr("title");
@@ -115,4 +115,5 @@ public class PttApiServiceImp implements PttApiService {
         }
         return popularity;
     }
+
 }
