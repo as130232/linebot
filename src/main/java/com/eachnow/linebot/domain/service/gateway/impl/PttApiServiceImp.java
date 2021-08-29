@@ -56,6 +56,7 @@ public class PttApiServiceImp implements PttApiService {
         }
         List<PttArticlePO> articles = pttArticleMap.keySet().stream().map(key -> pttArticleMap.get(key)).collect(Collectors.toList());
         pttInfoPO.setArticles(articles);
+        pttInfoPO.setPttEnum(pttEnum);
         return pttInfoPO;
     }
 
