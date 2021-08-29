@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class PttApiServiceImp implements PttApiService {
 
 //    @PostConstruct
 //    private void test() {
-//        getPttInfoPO(PttEnum.GOSSIPING, 40);
+//        getPttInfoPO(PttEnum.CAR, 20);
 //    }
 
     @Override
@@ -67,13 +68,18 @@ public class PttApiServiceImp implements PttApiService {
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
             String response = responseEntity.getBody();
-            log.info("response length:", response.length());
             Document doc = Jsoup.parse(response);
-            Elements elements = doc.select("div[class~=row2]");
             List<PttArticlePO> list = new ArrayList<>(20);
+            Integer boardPopularity = 0;
+            if (doc.select("div[class~=topRight]").text().contains("進入看板")) {
+                return PttInfoPO.builder().link(url).pageUpLink(LINK + doc.select("div[class~=topRight]").select("a").attr("href")).boardPopularity(boardPopularity).articles(list).build();
+            }
+            Elements elements = doc.select("div[class~=row2]");
             String name = doc.select("span[id~=board_div]").text();       //看版
-            String boardPopularityStr = doc.select("span[class~=R0]").get(0).text();    //看板人氣:845 本日:102K 累積:987M
-            Integer boardPopularity = Integer.valueOf(boardPopularityStr.split(" ")[0].replace("看板人氣:", ""));
+            if (doc.select("span[class~=R0]").size() > 0) {
+                String boardPopularityStr = doc.select("span[class~=R0]").get(0).text();    //看板人氣:845 本日:102K 累積:987M
+                boardPopularity = Integer.valueOf(boardPopularityStr.split(" ")[0].replace("看板人氣:", ""));
+            }
             //取得上一頁連結
             String pageUpLink = LINK + doc.select("div[class~=topRight]").select("a").get(2).select("a").attr("href");
             //上一頁網址
