@@ -63,7 +63,7 @@ public class PttApiServiceImp implements PttApiService {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-//            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
+            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
             String result = responseEntity.getBody();
@@ -78,6 +78,8 @@ public class PttApiServiceImp implements PttApiService {
             //上一頁網址
             for (Element element : elements) {
                 String title = element.select("span[class~=listTitle]").text();
+                if (title.contains("[公告]"))
+                    continue;
                 String popularityStr = element.select("span[class~=R0 bgB]").text();
                 if (popularityStr.contains("/"))
                     popularityStr = popularityStr.split("/")[1];
