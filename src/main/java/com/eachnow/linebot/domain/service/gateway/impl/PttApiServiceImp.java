@@ -46,7 +46,6 @@ public class PttApiServiceImp implements PttApiService {
             pttInfoPO = getPttInfoPO(url);
             if (pttInfoPO == null)
                 return null;
-
             for (PttArticlePO pttArticlePO : pttInfoPO.getArticles()) {
                 if (pttArticleMap.size() == size)
                     continue;
@@ -68,7 +67,6 @@ public class PttApiServiceImp implements PttApiService {
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
             String result = responseEntity.getBody();
-            log.info("result:{}", result);
             Document doc = Jsoup.parse(result);
             Elements elements = doc.select("div[class~=row2]");
             List<PttArticlePO> list = new ArrayList<>(20);
