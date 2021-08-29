@@ -4,12 +4,15 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.PttArticlePO;
+import com.eachnow.linebot.common.po.PttInfoPO;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.crawler.PttCrawlerService;
+import com.eachnow.linebot.domain.service.gateway.PttApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
 import com.linecorp.bot.model.message.flex.component.FlexComponent;
 import com.linecorp.bot.model.message.flex.component.Text;
@@ -33,12 +36,15 @@ import java.util.stream.Collectors;
 public class PttArticleHandler implements CommandHandler {
     private final ThreadPoolExecutor pttCrawlerExecutor;
     private PttCrawlerService pttCrawlerService;
+    private PttApiService pttApiService;
 
     @Autowired
     public PttArticleHandler(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
-                             PttCrawlerService pttCrawlerService) {
+                             PttCrawlerService pttCrawlerService,
+                             PttApiService pttApiService) {
         this.pttCrawlerExecutor = pttCrawlerExecutor;
         this.pttCrawlerService = pttCrawlerService;
+        this.pttApiService = pttApiService;
     }
 
     @Override
@@ -46,7 +52,10 @@ public class PttArticleHandler implements CommandHandler {
         List<String> params = commandPO.getParams();
         String name = ParamterUtils.getValueByIndex(params, 0);
         PttEnum pttEnum = PttEnum.getPttEnum(name);
-        List<PttArticlePO> listPttArticle = pttCrawlerService.crawlerByDisp(pttEnum, 1);
+        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(pttEnum, 30);
+        if (pttInfoPO == null)
+            return new TextMessage("查無資訊");
+        List<PttArticlePO> listPttArticle = pttInfoPO.getArticles();
         List<PttArticlePO> sortListPttArticle = listPttArticle.stream().sorted(Comparator.comparing(PttArticlePO::getPopularity).reversed()).collect(Collectors.toList());
         List<FlexComponent> bodyComponent = new ArrayList<>();
         for (PttArticlePO pttArticlePO : sortListPttArticle) {

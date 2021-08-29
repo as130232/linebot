@@ -14,6 +14,17 @@ public enum PttEnum {
     STOCK("stock", "股票"),
     TECH_JOB("tech_job", "科技"),
     SOFT_JOB("soft_job", "軟體"),
+    PC_SHOPPING("PC_Shopping", "電蝦"),
+    E_SHOPPING("e-shopping", "購物"),
+    HATE_POLITICS("HatePolitics", "政黑"),
+    WOMEN_TALK("WomenTalk", "女人"),
+    JOKE("Joke", "就可"),
+    STUPID("Stupid", "笨版"),
+    CPLIFE("CPLife", "省錢"),
+    CAR("Car", "汽車"),
+    BOY_GIRL("Boy-Girl", "男女"),
+    NBA("NBA", "NBA"),
+
     ;
 
     private String value;

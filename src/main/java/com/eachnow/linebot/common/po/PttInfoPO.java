@@ -11,6 +11,8 @@ import java.util.List;
 public class PttInfoPO {
     private PttEnum pttEnum;
     private String name;
+    private String link;
+    private String pageUpLink;
     private Integer boardPopularity = 0;
     private List<PttArticlePO> articles;
 }

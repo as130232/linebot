@@ -18,10 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -35,12 +33,33 @@ public class PttApiServiceImp implements PttApiService {
     }
 
 //    @PostConstruct
-    private void test() {
-        getPttInfoPO(PttEnum.GOSSIPING);
+//    private void test() {
+//        getPttInfoPO(PttEnum.GOSSIPING, 40);
+//    }
+
+    @Override
+    public PttInfoPO getPttInfoPO(PttEnum pttEnum, int size) {
+        String url = PttEnum.getUrlByDisp(pttEnum);
+        Map<String, PttArticlePO> pttArticleMap = new HashMap<>(size);
+        PttInfoPO pttInfoPO = null;
+        while (pttArticleMap.size() < size) {
+            pttInfoPO = getPttInfoPO(url);
+            if (pttInfoPO == null)
+                return null;
+
+            for (PttArticlePO pttArticlePO : pttInfoPO.getArticles()) {
+                if (pttArticleMap.size() == size)
+                    continue;
+                pttArticleMap.put(pttArticlePO.getWebUrl(), pttArticlePO);
+            }
+            url = pttInfoPO.getPageUpLink();
+        }
+        List<PttArticlePO> articles = pttArticleMap.keySet().stream().map(key -> pttArticleMap.get(key)).collect(Collectors.toList());
+        pttInfoPO.setArticles(articles);
+        return pttInfoPO;
     }
 
-    public PttInfoPO getPttInfoPO(PttEnum pttEnum) {
-        String url = PttEnum.getUrlByDisp(pttEnum);
+    private PttInfoPO getPttInfoPO(String url) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -54,6 +73,9 @@ public class PttApiServiceImp implements PttApiService {
             String name = doc.select("span[id~=board_div]").text();       //看版
             String boardPopularityStr = doc.select("span[class~=R0]").get(0).text();    //看板人氣:845 本日:102K 累積:987M
             Integer boardPopularity = Integer.valueOf(boardPopularityStr.split(" ")[0].replace("看板人氣:", ""));
+            //取得上一頁連結
+            String pageUpLink = LINK + doc.select("div[class~=topRight]").select("a").get(2).select("a").attr("href");
+            //上一頁網址
             for (Element element : elements) {
                 String title = element.select("span[class~=listTitle]").text();
                 String popularityStr = element.select("span[class~=R0 bgB]").text();
@@ -65,7 +87,7 @@ public class PttApiServiceImp implements PttApiService {
                 String author = element.select("span[class~=L18]").text().replace("(", "").replace(".)", "");
                 list.add(PttArticlePO.builder().title(title).webUrl(link).author(author).date(date).popularity(popularity).build());
             }
-            return PttInfoPO.builder().pttEnum(pttEnum).name(name).boardPopularity(boardPopularity).articles(list).build();
+            return PttInfoPO.builder().link(url).pageUpLink(pageUpLink).boardPopularity(boardPopularity).articles(list).build();
         } catch (Exception e) {
             log.error("呼叫取得PTT文章，失敗! url:{}, error msg:{}", url, e.getMessage());
         }
