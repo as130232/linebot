@@ -40,6 +40,10 @@ import java.util.stream.Collectors;
         "股價", "殖利率", "淨值", "本益比",
         "三大法人", "融資融卷"})
 public class StockHandler implements CommandHandler {
+    private final String TYPE_DAY = "日報";
+    private final String TYPE_WEEK = "週報";
+    private final String TYPE_MONTH = "月報";
+
     private TwseApiService twseApiService;
 
     @Autowired
@@ -255,20 +259,27 @@ public class StockHandler implements CommandHandler {
         String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         //預設日報
         if (type == null)
-            type = "日報";
+            type = TYPE_DAY;
 
         String preDate = null;
         if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
             date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
         //預設取得昨日，若時間已經超過當天晚上七點，則取得當天日期
-        if (date == null)
-            date = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
+        if (date == null) {
+            ZonedDateTime now = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
+            if (now.getHour() > 19) {
+                date = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
+            } else {
+                LocalDate localDate = now.toLocalDate();
+                date = localDate.minus(1, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
+            }
+        }
         LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
         boolean isDayType = false;
         boolean isWeekType = false;
         boolean isMonthType = false;
         switch (type) {
-            case "日報": {
+            case TYPE_DAY: {
                 isDayType = true;
                 int minusDay = 1;
                 //若當天是星期一，則前一天交易日為三天前(上週五)
@@ -277,7 +288,7 @@ public class StockHandler implements CommandHandler {
                 preDate = localDate.minus(minusDay, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
                 break;
             }
-            case "週報": {    //預設取得當週一
+            case TYPE_WEEK: {    //預設取得當週一
                 isWeekType = true;
                 LocalDate monday = localDate.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
                 LocalDate preMonday = monday.minus(7, ChronoUnit.DAYS);
@@ -285,7 +296,7 @@ public class StockHandler implements CommandHandler {
                 preDate = preMonday.format(DateUtils.yyyyMMdd);
                 break;
             }
-            case "月報": {   //預設取得當月一號
+            case TYPE_MONTH: {   //預設取得當月一號
                 isMonthType = true;
                 LocalDate firstOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), 1);
                 LocalDate preFirstOfMonth = firstOfMonth.minus(1, ChronoUnit.MONTHS);
@@ -307,7 +318,7 @@ public class StockHandler implements CommandHandler {
 
         //Title
         Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
-                Text.builder().text("(億)").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("單位億").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
                 Text.builder().text("買進").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
                 Text.builder().text("賣出").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
                 Text.builder().text("現貨差").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
@@ -323,7 +334,7 @@ public class StockHandler implements CommandHandler {
             Double differenceOfPreDate = po.getDifference() - preDatePO.getDifference();
             String difference = convertTradeValue(po.getDifference());
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                    Text.builder().text(parseName(po.getItem())).size(FlexFontSize.SM).flex(1).align(FlexAlign.START).wrap(true).build(),
+                    Text.builder().text(parseName(po.getItem())).size(FlexFontSize.Md).flex(1).align(FlexAlign.START).wrap(true).build(),
                     Text.builder().text(convertTradeValue(po.getTotalBuy())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
                     Text.builder().text(convertTradeValue(po.getTotalSell())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
                     Text.builder().text(difference.contains("-") ? difference : "+" + difference).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
@@ -345,11 +356,11 @@ public class StockHandler implements CommandHandler {
         String typeDate = commandPO.getCommand() + ParamterUtils.CONTACT;
         Box typeButton = Box.builder().layout(FlexLayout.HORIZONTAL).contents(
                 Button.builder().height(Button.ButtonHeight.SMALL).style(isDayType ? Button.ButtonStyle.PRIMARY : Button.ButtonStyle.LINK)
-                        .action(PostbackAction.builder().label("日報").data(typeDate + "日報" + ParamterUtils.CONTACT + date).build()).build(),
+                        .action(PostbackAction.builder().label(TYPE_DAY).data(typeDate + TYPE_DAY + ParamterUtils.CONTACT + date).build()).build(),
                 Button.builder().height(Button.ButtonHeight.SMALL).style(isWeekType ? Button.ButtonStyle.PRIMARY : Button.ButtonStyle.LINK)
-                        .action(PostbackAction.builder().label("週報").data(typeDate + "週報" + ParamterUtils.CONTACT + date).build()).build(),
+                        .action(PostbackAction.builder().label(TYPE_WEEK).data(typeDate + TYPE_WEEK + ParamterUtils.CONTACT + date).build()).build(),
                 Button.builder().height(Button.ButtonHeight.SMALL).style(isMonthType ? Button.ButtonStyle.PRIMARY : Button.ButtonStyle.LINK)
-                        .action(PostbackAction.builder().label("月報").data(typeDate + "月報" + ParamterUtils.CONTACT + date).build()).build()
+                        .action(PostbackAction.builder().label(TYPE_MONTH).data(typeDate + TYPE_MONTH + ParamterUtils.CONTACT + date).build()).build()
         ).build();
         Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(dateButton, typeButton)
                 .spacing(FlexMarginSize.MD).backgroundColor("#e46a4a").build();
@@ -391,11 +402,11 @@ public class StockHandler implements CommandHandler {
 
     private String parseDateType(String type) {
         switch (type) {
-            case "日報":
+            case TYPE_DAY:
                 return "day";
-            case "週報":
+            case TYPE_WEEK:
                 return "week";
-            case "月報":
+            case TYPE_MONTH:
                 return "month";
         }
         return "day";   //default
