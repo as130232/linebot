@@ -271,7 +271,11 @@ public class StockHandler implements CommandHandler {
                 date = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
             } else {
                 LocalDate localDate = now.toLocalDate();
-                date = localDate.minus(1, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
+                int minusDay = 1;
+                //若當天是星期一，則前一天交易日為三天前(上週五)
+                if (localDate.getDayOfWeek().getValue() == 1)
+                    minusDay = 3;
+                date = localDate.minus(minusDay, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
             }
         }
         LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
