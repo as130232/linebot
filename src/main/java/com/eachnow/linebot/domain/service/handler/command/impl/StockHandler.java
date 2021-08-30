@@ -375,9 +375,9 @@ public class StockHandler implements CommandHandler {
     private String parseName(String name) {
         switch (name) {
             case "自營商(自行買賣)":
-                return "自營自買";
+                return "自營商自買";
             case "自營商(避險)":
-                return "自營避險";
+                return "自營商避險";
             case "外資及陸資(不含外資自營商)":
                 return "外資";
         }
