@@ -23,6 +23,7 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -51,9 +52,9 @@ public class StockHandler implements CommandHandler {
         this.twseApiService = twseApiService;
     }
 
-//        @PostConstruct
+//    @PostConstruct
 //    private void test() {
-//        String text = "股價 20210827";
+//        String text = "股價";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -156,7 +157,7 @@ public class StockHandler implements CommandHandler {
             commandPO.setText(textArr[0]);
             commandPO.setParams(ParamterUtils.listParameter(textArr[0]));
         }
-        String date = DateUtils.yyyyMMdd.format(Instant.now().minus(1, ChronoUnit.DAYS));
+        String date = getCurrentDateOrPreDate();
         List<String> params = commandPO.getParams();
         String dateOrStockCode = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);   //第一個參數有可能為日期或股票代號
         if (dateOrStockCode != null && dateOrStockCode.length() == 8) { //若長度為8則為日期(20210101)
@@ -265,19 +266,9 @@ public class StockHandler implements CommandHandler {
         if (commandPO.getDatetimepicker() != null && commandPO.getDatetimepicker().getDate() != null)
             date = DateUtils.parseDate(commandPO.getDatetimepicker().getDate(), DateUtils.yyyyMMddDash, DateUtils.yyyyMMdd);
         //預設取得昨日，若時間已經超過當天晚上七點，則取得當天日期
-        if (date == null) {
-            ZonedDateTime now = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
-            if (now.getHour() > 19) {
-                date = DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
-            } else {
-                LocalDate localDate = now.toLocalDate();
-                int minusDay = 1;
-                //若當天是星期一，則前一天交易日為三天前(上週五)
-                if (localDate.getDayOfWeek().getValue() == 1)
-                    minusDay = 3;
-                date = localDate.minus(minusDay, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
-            }
-        }
+        if (date == null)
+            date = getCurrentDateOrPreDate();
+
         LocalDate localDate = LocalDate.parse(date, DateUtils.yyyyMMdd);
         boolean isDayType = false;
         boolean isWeekType = false;
@@ -285,11 +276,7 @@ public class StockHandler implements CommandHandler {
         switch (type) {
             case TYPE_DAY: {
                 isDayType = true;
-                int minusDay = 1;
-                //若當天是星期一，則前一天交易日為三天前(上週五)
-                if (localDate.getDayOfWeek().getValue() == 1)
-                    minusDay = 3;
-                preDate = localDate.minus(minusDay, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
+                preDate = getPreTrandingDate(localDate);
                 break;
             }
             case TYPE_WEEK: {    //預設取得當週一
@@ -370,6 +357,29 @@ public class StockHandler implements CommandHandler {
                 .spacing(FlexMarginSize.MD).backgroundColor("#e46a4a").build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
         return FlexMessage.builder().altText("三大法人買賣統計").contents(contents).build();
+    }
+
+    /**
+     * 取得前一天日期，若是已經超過晚上七點則取得當日日期(因為證交所已更新當日資訊)
+     * @return
+     */
+    private String getCurrentDateOrPreDate() {
+        ZonedDateTime now = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
+        if (now.getHour() > 19) {
+            return DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
+        }
+        return getPreTrandingDate(now.toLocalDate());
+    }
+
+    /**
+     * 取得該日期上一個交易日
+     */
+    private String getPreTrandingDate(LocalDate localDate) {
+        int minusDay = 1;
+        //若當天是星期一，則前一天交易日為三天前(上週五)
+        if (localDate.getDayOfWeek().getValue() == 1)
+            minusDay = 3;
+        return localDate.minus(minusDay, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
     }
 
     private String parseName(String name) {
