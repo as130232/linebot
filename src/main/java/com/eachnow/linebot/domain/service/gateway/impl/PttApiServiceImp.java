@@ -84,7 +84,7 @@ public class PttApiServiceImp implements PttApiService {
             //上一頁網址
             for (Element element : elements) {
                 String title = element.select("span[class~=listTitle]").text();
-                if (title.contains("[公告]") || title.contains("[刪除]"))
+                if (title.contains("[公告]") || title.contains("[刪除]") || title.contains("···"))
                     continue;
                 String popularityStr = element.select("span[class~=R0 bgB]").text();
                 String[] popularityArr = popularityStr.split("/");
