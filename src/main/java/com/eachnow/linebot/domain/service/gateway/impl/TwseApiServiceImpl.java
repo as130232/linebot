@@ -74,6 +74,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/STOCK_DAY_AVG_ALL";
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
+            if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
+                return new ArrayList<>(0);
             List<PricePO> result = twseDataPO.getData().stream().map(list -> PricePO.builder().code(list.get(0)).name(list.get(1))
                     .price(Double.valueOf(parseValue(list.get(2)))).avePrice(Double.valueOf(parseValue(list.get(3)))).build()).collect(Collectors.toList());
             return result;
@@ -103,6 +105,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/FMTQIK?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
+            if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
+                return null;
             for (int i = 0; i < twseDataPO.getData().size(); i++) {
                 List<String> listData = twseDataPO.getData().get(i);
                 String dataDate = listData.get(0);    //日期 110/05/03
@@ -126,6 +130,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/BFIAMU?response=json&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
+            if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
+                return new ArrayList<>(0);
             List<IndexPO> result = new ArrayList<>(twseDataPO.getData().size());
             twseDataPO.getData().forEach(listData -> {
                 IndexPO indexPO = IndexPO.builder().name(listData.get(0)).tradeVolume(listData.get(1)).tradeValue(listData.get(2)).transaction(listData.get(3))
@@ -146,6 +152,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/BWIBBU_d?response=json&selectType=ALL&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
+            if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
+                return new ArrayList<>(0);
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 PricePO pricePO = this.getPrice(list.get(0));
                 return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(Double.valueOf(parseValue(list.get(2))))
@@ -164,6 +172,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/BWIBBU?response=json&stockNo" + code;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
+            if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
+                return new ArrayList<>(0);
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 PricePO pricePO = this.getPrice(list.get(0));
                 return RatioAndDividendYieldPO.builder().code(code).name(pricePO.getName()).price(pricePO.getPrice()).avePrice(pricePO.getAvePrice())
@@ -206,6 +216,8 @@ public class TwseApiServiceImpl implements TwseApiService {
             String url = TWSE_URL + "/exchangeReport/MI_MARGN?response=json&selectType=MS&date=" + date;
             ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
             TwseDataPO twseDataPO = responseEntity.getBody();
+            if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
+                return new ArrayList<>(0);
             List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> TradeValuePO.builder().item(list.get(0))
                     .totalBuy(toDouble(list.get(1)))
                     .totalSell(toDouble(list.get(2)))

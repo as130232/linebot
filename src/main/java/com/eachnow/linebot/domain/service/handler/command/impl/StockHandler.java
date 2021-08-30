@@ -49,7 +49,7 @@ public class StockHandler implements CommandHandler {
 
 //        @PostConstruct
 //    private void test() {
-//        String text = "三大法人 日報 20210827";
+//        String text = "股價 20210827";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -154,7 +154,7 @@ public class StockHandler implements CommandHandler {
         }
         String date = DateUtils.yyyyMMdd.format(Instant.now().minus(1, ChronoUnit.DAYS));
         List<String> params = commandPO.getParams();
-        String dateOrStockCode = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);   //第一個參數有可能為日期或股票代號
+        String dateOrStockCode = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);   //第一個參數有可能為日期或股票代號
         if (dateOrStockCode != null && dateOrStockCode.length() == 8) { //若長度為8則為日期(20210101)
             date = dateOrStockCode;
             params = params.stream().filter(param -> !param.equals(dateOrStockCode)).collect(Collectors.toList());
