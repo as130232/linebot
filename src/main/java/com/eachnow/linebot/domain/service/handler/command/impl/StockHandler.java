@@ -152,8 +152,14 @@ public class StockHandler implements CommandHandler {
             commandPO.setText(textArr[0]);
             commandPO.setParams(ParamterUtils.listParameter(textArr[0]));
         }
-        List<String> params = commandPO.getParams();
         String date = DateUtils.yyyyMMdd.format(Instant.now().minus(1, ChronoUnit.DAYS));
+        List<String> params = commandPO.getParams();
+        String dateOrStockCode = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);   //第一個參數有可能為日期或股票代號
+        if (dateOrStockCode != null && dateOrStockCode.length() == 8) { //若長度為8則為日期(20210101)
+            date = dateOrStockCode;
+            params = params.stream().filter(param -> !param.equals(dateOrStockCode)).collect(Collectors.toList());
+        }
+
         List<RatioAndDividendYieldPO> list = twseApiService.getRatioAndDividendYield(date);
         //篩選個股
         if (params.size() > 0) {
