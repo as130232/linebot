@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,12 +37,19 @@ public class JavdbCrawlerService {
 //    }
 
     public List<ArticlePO> getArticle(String type) {
+        List<ArticlePO> list;
         switch (type) {
             case TYPE_WEEKLY:
-                return listWeekly;
+                list = listWeekly;
+                break;
             case TYPE_MONTHLY:
-                return listMonthly;
+                list = listMonthly;
+                break;
+            default:
+                list = listDaily;
         }
+        if (list == null || list.size() == 0)
+            crawlerRankings(TYPE_DAILY);
         return listDaily;
     }
 
