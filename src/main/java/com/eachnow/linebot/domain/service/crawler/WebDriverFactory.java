@@ -37,7 +37,7 @@ public class WebDriverFactory {
         options.addArguments("blink-settings=imagesEnabled=false");
         driver = new ChromeDriver(options);
         driver.get(url);
-        log.info("webdriver連線url: {}", url);
+        log.info("webdriver連線 url:{}, headless:{}, options:{}", url, headless, options);
         return driver;
     }
 

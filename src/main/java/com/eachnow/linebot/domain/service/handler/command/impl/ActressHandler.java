@@ -29,7 +29,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Command({"女優", "av"})
+@Command({"女優"})
 public class ActressHandler implements CommandHandler {
     private ActressCrawlerService actressCrawlerService;
     private String currentPicture;
