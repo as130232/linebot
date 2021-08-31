@@ -108,7 +108,7 @@ public class ScheduledService {
         log.info("[schedule]爬取最新股價，完成。");
     }
     
-    @Scheduled(cron = "0 0 5 * * ?")
+//    @Scheduled(cron = "0 0 5 * * ?")
     public void javdbCrawler() {
         if (!CRON_EXECUTE)
             return;
