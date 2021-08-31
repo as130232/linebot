@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Command({"av"})
+@Command({"Av"})
 public class JavdbHandler implements CommandHandler {
     private JavdbCrawlerService javdbCrawlerService;
 

@@ -32,10 +32,10 @@ public class JavdbCrawlerService {
         this.webDriverFactory = webDriverFactory;
     }
 
-    @PostConstruct
-    private void test() {
-        crawlerRankings("monthly");
-    }
+//    @PostConstruct
+//    private void test() {
+//        crawlerRankings("monthly");
+//    }
 
     public List<ArticlePO> getArticle(String type) {
         switch (type) {
