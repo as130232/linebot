@@ -6,6 +6,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -28,17 +29,16 @@ public class WebDriverFactory {
             options.addArguments("--no-sandbox");   //關閉沙河模式
             options.addArguments("--disable-dev-shm-usage");
 //            options.setPageLoadStrategy(PageLoadStrategy.NONE);
-            //禁用圖片
-            HashMap<String, Object> prefs = new HashMap<>();
-            prefs.put("profile.default_content_settings", 2);
-            options.setExperimentalOption("prefs", prefs);
-            options.addArguments("blink-settings=imagesEnabled=false");
         }
+        //禁用圖片
+        HashMap<String, Object> prefs = new HashMap<>();
+        prefs.put("profile.default_content_settings", 2);
+        options.setExperimentalOption("prefs", prefs);
+        options.addArguments("blink-settings=imagesEnabled=false");
         driver = new ChromeDriver(options);
         driver.get(url);
         log.info("webdriver連線url: {}", url);
         return driver;
     }
-
 
 }
