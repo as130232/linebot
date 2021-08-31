@@ -107,8 +107,7 @@ public class ScheduledService {
         twseApiService.initPriceMap();
         log.info("[schedule]爬取最新股價，完成。");
     }
-
-    @PostConstruct
+    
     @Scheduled(cron = "0 0 5 * * ?")
     public void javdbCrawler() {
         if (!CRON_EXECUTE)
