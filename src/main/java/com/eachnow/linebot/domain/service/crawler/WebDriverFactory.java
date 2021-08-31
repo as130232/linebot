@@ -25,15 +25,14 @@ public class WebDriverFactory {
             options.addArguments("--no-sandbox");   //關閉沙河模式
             options.addArguments("--disable-dev-shm-usage");
 //            options.setPageLoadStrategy(PageLoadStrategy.NONE);
+            //禁用圖片
+            HashMap<String, Object> prefs = new HashMap<>();
+            prefs.put("profile.default_content_settings", 2);
+            options.setExperimentalOption("prefs", prefs);
+            options.addArguments("blink-settings=imagesEnabled=false");
         } else {
             options.addArguments("--window-size=1920,1080");
         }
-
-        //禁用圖片
-        HashMap<String, Object> prefs = new HashMap<>();
-        prefs.put("profile.default_content_settings", 2);
-        options.setExperimentalOption("prefs", prefs);
-        options.addArguments("blink-settings=imagesEnabled=false");
         driver = new ChromeDriver(options);
         driver.get(url);
         log.info("webdriver連線 url:{}, headless:{}", url, headless);
