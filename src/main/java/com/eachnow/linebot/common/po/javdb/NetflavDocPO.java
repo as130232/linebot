@@ -30,10 +30,11 @@ public class NetflavDocPO {
     }
 
     public String getCode() {
-        if (title != null && title.contains("[")) {
-            return title.substring(title.indexOf("[") + 1, title.indexOf("]"));
-        } else if (title != null && title.contains(" ")) {
-            String[] titleArr = title.split(" ");
+        String titleName = title.replace("[中文字幕]", "");
+        if (titleName != null && titleName.contains("[")) {
+            return titleName.substring(titleName.indexOf("[") + 1, title.indexOf("]"));
+        } else if (titleName != null && titleName.contains(" ")) {
+            String[] titleArr = titleName.split(" ");
             return titleArr[0];
         }
         return "---";

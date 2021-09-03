@@ -68,7 +68,7 @@ public class JavdbHandler implements CommandHandler {
         List<Bubble> listBubble = list.stream().map(po -> {
             URI uri = URI.create(po.getWebUrl());
             URI pictureUri = URI.create(po.getPictureUrl());
-            Image image = Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7)
+            Image image = Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 5)
                     .url(pictureUri).action(new URIAction("Picture URL", pictureUri, new URIAction.AltUri(uri))).build();
             Box codeAndDate = Box.builder().layout(FlexLayout.HORIZONTAL).contents(
                     Text.builder().text(po.getCode()).color("#1DB446").size(FlexFontSize.LG).flex(2).weight(Text.TextWeight.BOLD).build(),
