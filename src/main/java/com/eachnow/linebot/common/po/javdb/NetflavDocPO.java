@@ -23,7 +23,7 @@ public class NetflavDocPO {
     private String _id;
 
     public String getTitle() {
-        if (title != null && title.contains("[")) {
+        if (title != null && title.contains("[") && !title.contains("[中文字幕]")) {
             return title.substring(title.indexOf("]") + 1);
         }
         return title;
