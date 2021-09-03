@@ -2,7 +2,7 @@ package com.eachnow.linebot.domain.service.handler.command;
 
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.domain.service.handler.DefaultHandler;
-import com.eachnow.linebot.domain.service.handler.command.impl.*;
+import com.eachnow.linebot.domain.service.handler.command.impl.CloseCommandHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -15,44 +15,11 @@ import java.util.Map;
 @Slf4j
 public class CommandHandlerFactory {
     private Map<String, Class<? extends CommandHandler>> handlerMap;
+    @Autowired
     private ApplicationContext applicationContext;
 
     @Autowired
-    private ActressHandler actressHandler;
-    @Autowired
-    private BeautyHandler beautyHandler;
-    @Autowired
-    private PttArticleHandler pttArticleHandler;
-    @Autowired
-    private InstagramHandler instagramHandler;
-    @Autowired
-    private TranslationHandler translationHandler;
-    @Autowired
-    private WeatherHandler weatherHandler;
-    @Autowired
-    private EatWhatHandler eatWhatHandler;
-    @Autowired
-    private RestaurantHandler restaurantHandler;
-    @Autowired
-    private BarHandler barHandler;
-    @Autowired
-    private PlaceHandler placeHandler;
-    @Autowired
-    private HelloHandler helloHandler;
-    @Autowired
-    private BookkeepingHandler bookkeepingHandler;
-    @Autowired
-    private CurrencyHandler currencyHandler;
-    @Autowired
-    private RemindHandler remindHandler;
-    @Autowired
-    private StockHandler stockHandler;
-
-    @Autowired
-    private FuntionHandler funtionHandler;
-    @Autowired
     private DefaultHandler defaultHandler;
-
     @Autowired
     private CloseCommandHandler closeCommandHandler;
 
@@ -76,45 +43,6 @@ public class CommandHandlerFactory {
             log.warn("Can not get the Class of CommandHandler, command:{}", command);
             return commandHandler;
         }
-        if (BeautyHandler.class.equals(commandHandlerClass)) {
-            commandHandler = beautyHandler;
-        } else if (ActressHandler.class.equals(commandHandlerClass)) {
-            commandHandler = actressHandler;
-        } else if (PttArticleHandler.class.equals(commandHandlerClass)) {
-            commandHandler = pttArticleHandler;
-        } else if (InstagramHandler.class.equals(commandHandlerClass)) {
-            commandHandler = instagramHandler;
-        } else if (BookkeepingHandler.class.equals(commandHandlerClass)) {
-            commandHandler = bookkeepingHandler;
-        } else if (CurrencyHandler.class.equals(commandHandlerClass)) {
-            commandHandler = currencyHandler;
-        } else if (WeatherHandler.class.equals(commandHandlerClass)) {
-            commandHandler = weatherHandler;
-        } else if (EatWhatHandler.class.equals(commandHandlerClass)) {
-            commandHandler = eatWhatHandler;
-        } else if (RestaurantHandler.class.equals(commandHandlerClass)) {
-            commandHandler = restaurantHandler;
-        } else if (BarHandler.class.equals(commandHandlerClass)) {
-            commandHandler = barHandler;
-        } else if (PlaceHandler.class.equals(commandHandlerClass)) {
-            commandHandler = placeHandler;
-        } else if (HelloHandler.class.equals(commandHandlerClass)) {
-            commandHandler = helloHandler;
-        } else if (TranslationHandler.class.equals(commandHandlerClass)) {
-            commandHandler = translationHandler;
-        } else if (FuntionHandler.class.equals(commandHandlerClass)) {
-            commandHandler = funtionHandler;
-        } else if (RemindHandler.class.equals(commandHandlerClass)) {
-            commandHandler = remindHandler;
-        } else if (StockHandler.class.equals(commandHandlerClass)) {
-            commandHandler = stockHandler;
-        }
-        return commandHandler;
-//        try {
-//            return applicationContext.getBean(commandHandlerClass);
-//            result = commandHandlerClass.newInstance();
-//        } catch (Exception e) {
-//            log.warn("CommandHandler newInstance failed! command:{}", command);
-//        }
+        return applicationContext.getBean(commandHandlerClass);
     }
 }

@@ -3,12 +3,15 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.javdb.ArticlePO;
+import com.eachnow.linebot.common.po.javdb.NetflavDataPO;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.crawler.JavdbCrawlerService;
+import com.eachnow.linebot.domain.service.gateway.JavdbApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.linecorp.bot.model.action.URIAction;
 import com.linecorp.bot.model.message.FlexMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.message.flex.component.Box;
 import com.linecorp.bot.model.message.flex.component.FlexComponent;
 import com.linecorp.bot.model.message.flex.component.Image;
@@ -29,18 +32,32 @@ import java.util.stream.Collectors;
 @Command({"av"})
 public class JavdbHandler implements CommandHandler {
     private JavdbCrawlerService javdbCrawlerService;
+    private JavdbApiService javdbApiService;
 
     @Autowired
-    private JavdbHandler(JavdbCrawlerService javdbCrawlerService) {
+    private JavdbHandler(JavdbCrawlerService javdbCrawlerService,
+                         JavdbApiService javdbApiService) {
         this.javdbCrawlerService = javdbCrawlerService;
+        this.javdbApiService = javdbApiService;
     }
 
     @Override
     public Message execute(CommandPO commandPO) {
-        String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
-        if (type == null)
-            type = JavdbCrawlerService.TYPE_DAILY;
-        List<ArticlePO> list = javdbCrawlerService.getArticle(type);
+        String code = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
+        NetflavDataPO netflavDataPO = javdbApiService.search(code);
+        if (netflavDataPO == null) {
+            return new TextMessage("找無資料");
+        }
+        String altText = "搜尋結果";
+        List<ArticlePO> list = netflavDataPO.getResult().getDocs().stream().map(doc -> {
+            return ArticlePO.builder().code(doc.getCode()).date(doc.getDate()).author(doc.getAuthor()).title(doc.getTitle()).pictureUrl(doc.getPreview()).webUrl(doc.getWebUrl()).build();
+        }).collect(Collectors.toList());
+//        String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
+//        if (type == null) {
+//            type = JavdbCrawlerService.TYPE_DAILY;
+//            altText = "排行榜-" + javdbCrawlerService.getTypeName(type);
+//        }
+//        List<ArticlePO> list = javdbCrawlerService.getArticle(type);
         //只留12筆
         list = list.stream().limit(12).collect(Collectors.toList());
         List<Bubble> listBubble = list.stream().map(po -> {
@@ -63,7 +80,7 @@ public class JavdbHandler implements CommandHandler {
             return bubble;
         }).collect(Collectors.toList());
         FlexContainer contents = Carousel.builder().contents(listBubble).build();
-        return new FlexMessage("排行榜-" + javdbCrawlerService.getTypeName(type), contents);
+        return new FlexMessage(altText, contents);
     }
 
 
