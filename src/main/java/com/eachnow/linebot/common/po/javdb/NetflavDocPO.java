@@ -36,7 +36,7 @@ public class NetflavDocPO {
             String[] titleArr = title.split(" ");
             return titleArr[0];
         }
-        return null;
+        return "---";
     }
 
     public String getAuthor() {
@@ -44,21 +44,21 @@ public class NetflavDocPO {
             String[] titleArr = title.split(" ");
             return titleArr[titleArr.length - 1];
         }
-        return null;
+        return " ";
     }
 
     public String getWebUrl() {
         String code = getCode();
         if (code != null) {
-            return "https://jable.tv/videos/{code}/".replace("{code}", code);
+            return "https://www.netflav.com/video?id=" + videoId;
         }
-        return "https://jable.tv/new-release/";
+        return "https://www.netflav.com/";
     }
 
     public String getDate() {
         if (sourceDate != null) {
             return sourceDate.split("T")[0].replace("-", "/");
         }
-        return null;
+        return " ";
     }
 }
