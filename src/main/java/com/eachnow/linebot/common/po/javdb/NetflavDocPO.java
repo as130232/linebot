@@ -26,7 +26,7 @@ public class NetflavDocPO {
         if (title != null && title.contains("[")) {
             return title.substring(title.indexOf("]") + 1);
         }
-        return "";
+        return title;
     }
 
     public String getCode() {

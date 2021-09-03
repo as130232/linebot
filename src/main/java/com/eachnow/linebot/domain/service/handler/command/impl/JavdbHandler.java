@@ -44,20 +44,25 @@ public class JavdbHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         String code = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
+        if (commandPO.getText().contains("排行榜")) {
+            String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
+            if (type == null)
+                type = JavdbCrawlerService.TYPE_DAILY;
+            List<ArticlePO> list = javdbCrawlerService.getArticle(type);
+            return random("排行榜-" + javdbCrawlerService.getTypeName(type), list);
+        }
+
         NetflavDataPO netflavDataPO = javdbApiService.search(code);
         if (netflavDataPO == null) {
             return new TextMessage("找無資料");
         }
-        String altText = "搜尋結果";
         List<ArticlePO> list = netflavDataPO.getResult().getDocs().stream().map(doc -> {
             return ArticlePO.builder().code(doc.getCode()).date(doc.getDate()).author(doc.getAuthor()).title(doc.getTitle()).pictureUrl(doc.getPreview()).webUrl(doc.getWebUrl()).build();
         }).collect(Collectors.toList());
-//        String type = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
-//        if (type == null) {
-//            type = JavdbCrawlerService.TYPE_DAILY;
-//            altText = "排行榜-" + javdbCrawlerService.getTypeName(type);
-//        }
-//        List<ArticlePO> list = javdbCrawlerService.getArticle(type);
+        return random("搜尋結果", list);
+    }
+
+    private Message random(String altText, List<ArticlePO> list) {
         //只留12筆
         list = list.stream().limit(12).collect(Collectors.toList());
         List<Bubble> listBubble = list.stream().map(po -> {
@@ -82,6 +87,5 @@ public class JavdbHandler implements CommandHandler {
         FlexContainer contents = Carousel.builder().contents(listBubble).build();
         return new FlexMessage(altText, contents);
     }
-
 
 }
