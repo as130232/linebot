@@ -323,14 +323,14 @@ public class StockHandler implements CommandHandler {
         List<FlexComponent> listComponent = list.stream().map(po -> {
             TradeValuePO preDatePO = preDateMap.get(po.getItem());
             Double differenceOfPreDate = po.getDifference() - preDatePO.getDifference();
-            String difference = convertTradeValue(po.getDifference());
+            String difference = convertTradeValue(po.getDifference(), 1);
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
                     Text.builder().text(parseName(po.getItem())).size(FlexFontSize.Md).flex(1).align(FlexAlign.START).wrap(true).build(),
-                    Text.builder().text(convertTradeValue(po.getTotalBuy())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
-                    Text.builder().text(convertTradeValue(po.getTotalSell())).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
+                    Text.builder().text(convertTradeValue(po.getTotalBuy(), 1)).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
+                    Text.builder().text(convertTradeValue(po.getTotalSell(), 1)).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
                     Text.builder().text(difference.contains("-") ? difference : "+" + difference).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
                             .color(po.getDifference().compareTo(-1d) > 0 ? "#ff0000" : "#228b22").build(),
-                    Text.builder().text(convertTradeValue(differenceOfPreDate)).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
+                    Text.builder().text(convertTradeValue(differenceOfPreDate, 1)).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
                             .color(differenceOfPreDate.compareTo(-1d) > 0 ? "#ff0000" : "#228b22").build()
             )).build();
         }).collect(Collectors.toList());
@@ -383,12 +383,12 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
         List<FlexComponent> listComponent = list.stream().map(po -> {
             String unit = " 張";
-            String difference = po.getDifference().toString() + unit;
             String balance = po.getBalance().toString() + unit;
+            String difference = po.getDifference().toString() + unit;
             if (po.getItem().contains("融資金額")) {
                 unit = " 億";
-                difference = convertTradeValue(po.getDifference()) + unit;
-                balance = convertTradeValue(po.getBalance()) + unit;
+                balance = convertTradeValue(po.getBalance(), 0) + unit;
+                difference = convertTradeValue(po.getDifference(), 1) + unit;
             }
             return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
                     Text.builder().text(parseName(po.getItem())).size(FlexFontSize.Md).flex(1).align(FlexAlign.START).wrap(true).build(),
@@ -416,7 +416,6 @@ public class StockHandler implements CommandHandler {
     /**
      * 取得前一天日期，若是已經超過晚上七點則取得當日日期(因為證交所已更新當日資訊)
      *
-     * @return
      */
     private String getCurrentDateOrPreDate() {
         ZonedDateTime now = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
@@ -490,9 +489,9 @@ public class StockHandler implements CommandHandler {
     /**
      * 單位從元轉為億
      */
-    public String convertTradeValue(Double tradeValue) {
+    public String convertTradeValue(Double tradeValue, Integer scale) {
         BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000))
-                .setScale(1, BigDecimal.ROUND_HALF_UP);
+                .setScale(scale, BigDecimal.ROUND_HALF_UP);
         return result.toString();
     }
 
