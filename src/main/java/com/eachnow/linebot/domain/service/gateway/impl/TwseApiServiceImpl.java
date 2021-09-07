@@ -218,12 +218,18 @@ public class TwseApiServiceImpl implements TwseApiService {
             TwseDataPO twseDataPO = responseEntity.getBody();
             if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
                 return new ArrayList<>(0);
-            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> TradeValuePO.builder().item(list.get(0))
-                    .totalBuy(toDouble(list.get(1)))
-                    .totalSell(toDouble(list.get(2)))
-                    .balanceOfPreDay(toDouble(list.get(4)))
-                    .balance(toDouble(list.get(5)))
-                    .difference(toDouble(list.get(5)) - toDouble(list.get(4))).build()).collect(Collectors.toList());
+            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> {
+                double unit = 1l;
+                //單位換算成元
+                if("融資金額(仟元)".equals(list.get(0)))
+                    unit = 1000l;
+                return TradeValuePO.builder().item(list.get(0))
+                        .totalBuy(toDouble(list.get(1)) * unit)
+                        .totalSell(toDouble(list.get(2)) * unit)
+                        .balanceOfPreDay(toDouble(list.get(4)) * unit)
+                        .balance(toDouble(list.get(5)) * unit)
+                        .difference(toDouble(list.get(5)) - toDouble(list.get(4)) * unit).build();
+            }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
             log.error("呼叫取得證交所-融資融券餘額，失敗! date:{}, error msg:{}", date, e.getMessage());

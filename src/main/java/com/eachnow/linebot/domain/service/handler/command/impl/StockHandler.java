@@ -23,10 +23,8 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.TextStyle;
@@ -71,6 +69,8 @@ public class StockHandler implements CommandHandler {
             return this.getRatioAndDividendYield(commandPO);
         } else if (text.contains("三大法人")) {
             return this.getTradingOfForeignAndInvestors(commandPO);
+        } else if (text.contains("融資融卷")) {
+            return this.getMarginTradingAndShortSelling(commandPO);
         }
         //Todo 紀錄該股並自動換算停利停損價格
 
@@ -359,13 +359,68 @@ public class StockHandler implements CommandHandler {
         return FlexMessage.builder().altText("三大法人買賣統計").contents(contents).build();
     }
 
+    public Message getMarginTradingAndShortSelling(CommandPO commandPO) {
+        String date = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
+        if (date == null)
+            date = getCurrentDateOrPreDate();
+        List<TradeValuePO> list = twseApiService.getMarginTradingAndShortSelling(date);
+        if (list.isEmpty())
+            return new TextMessage("查無該日期資訊");
+
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
+                Text.builder().text("融資融卷餘額").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
+        )).paddingAll(FlexPaddingSize.MD).backgroundColor("#e46a4a").build();
+
+        //Title
+        Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
+                Text.builder().text("單位億").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("餘額").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("昨日差").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build()
+        ).build();
+        Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#666666").build();
+        List<FlexComponent> bodyComponent = new ArrayList<>();
+        bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
+                title, separator).build());
+        List<FlexComponent> listComponent = list.stream().map(po -> {
+            String unit = " 張";
+            String difference = po.getDifference().toString() + unit;
+            String balance = po.getBalance().toString() + unit;
+            if (po.getItem().contains("融資金額")) {
+                unit = " 億";
+                difference = convertTradeValue(po.getDifference()) + unit;
+                balance = convertTradeValue(po.getBalance()) + unit;
+            }
+            return Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
+                    Text.builder().text(parseName(po.getItem())).size(FlexFontSize.Md).flex(1).align(FlexAlign.START).wrap(true).build(),
+                    Text.builder().text(balance).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER).build(),
+                    Text.builder().text(difference.contains("-") ? difference : "+" + difference).size(FlexFontSize.SM).flex(1).align(FlexAlign.CENTER)
+                            .color(po.getDifference().compareTo(-1d) > 0 ? "#ff0000" : "#228b22").build()
+            )).build();
+        }).collect(Collectors.toList());
+        bodyComponent.addAll(listComponent);
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
+
+        String label = DateUtils.parseDate(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddSlash);
+        String datetimepickerData = commandPO.getCommand() + ParamterUtils.CONTACT + date + ParamterUtils.CONTACT;
+        Box dateButton = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Button.builder().flex(2).height(Button.ButtonHeight.SMALL)
+                .style(Button.ButtonStyle.SECONDARY).action(DatetimePickerAction.OfLocalDate.builder()
+                        .label(label).data(datetimepickerData + "datetimepicker").build()).build()
+        ).build();
+
+        Box footer = Box.builder().layout(FlexLayout.VERTICAL).contents(dateButton)
+                .spacing(FlexMarginSize.MD).backgroundColor("#e46a4a").build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
+        return FlexMessage.builder().altText("融資融券餘額").contents(contents).build();
+    }
+
     /**
      * 取得前一天日期，若是已經超過晚上七點則取得當日日期(因為證交所已更新當日資訊)
+     *
      * @return
      */
     private String getCurrentDateOrPreDate() {
         ZonedDateTime now = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
-        if (now.getHour() > 19) {
+        if (now.getHour() > 18) {
             return DateUtils.getCurrentDate(DateUtils.yyyyMMdd);
         }
         return getPreTrandingDate(now.toLocalDate());
@@ -390,6 +445,12 @@ public class StockHandler implements CommandHandler {
                 return "自營商避險";
             case "外資及陸資(不含外資自營商)":
                 return "外資";
+            case "融資(交易單位)":
+                return "融資";
+            case "融券(交易單位)":
+                return "融券";
+            case "融資金額(仟元)":
+                return "融資金額(億)";
         }
         return name;
     }
