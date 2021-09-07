@@ -383,7 +383,7 @@ public class StockHandler implements CommandHandler {
                 title, separator).build());
         List<FlexComponent> listComponent = list.stream().map(po -> {
             String unit = " 張";
-            String balance = convertTradeValue(po.getBalance(), 0) + unit;
+            String balance = po.getBalance().toString().replace(".0", "") + unit;
             String difference = po.getDifference().toString() + unit;
             if (po.getItem().contains("融資金額")) {
                 unit = " 億";
