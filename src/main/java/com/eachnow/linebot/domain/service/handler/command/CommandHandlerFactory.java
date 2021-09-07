@@ -39,7 +39,7 @@ public class CommandHandlerFactory {
             return commandHandler;
 
         Class<? extends CommandHandler> commandHandlerClass = handlerMap.get(command.toLowerCase());
-        if (handlerMap == null) {
+        if (handlerMap == null || commandHandlerClass == null) {
             log.warn("Can not get the Class of CommandHandler, command:{}", command);
             return commandHandler;
         }

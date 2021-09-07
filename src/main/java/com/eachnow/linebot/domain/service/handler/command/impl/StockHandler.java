@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Command({"stock", "股", "股票",
         "股價", "殖利率", "淨值", "本益比",
-        "三大法人", "融資融卷"})
+        "三大法人", "融資融券"})
 public class StockHandler implements CommandHandler {
     private final String TYPE_DAY = "日報";
     private final String TYPE_WEEK = "週報";
@@ -50,9 +50,9 @@ public class StockHandler implements CommandHandler {
         this.twseApiService = twseApiService;
     }
 
-//    @PostConstruct
+    //    @PostConstruct
 //    private void test() {
-//        String text = "股價";
+//        String text = "融資融卷 20210906";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
