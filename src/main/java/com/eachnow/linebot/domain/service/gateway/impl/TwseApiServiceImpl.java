@@ -214,11 +214,11 @@ public class TwseApiServiceImpl implements TwseApiService {
     public List<TradeValuePO> getMarginTradingAndShortSelling(String date) {
         try {
             String url = TWSE_URL + "/exchangeReport/MI_MARGN?response=json&selectType=MS&date=" + date;
-            ResponseEntity<TwseDataPO> responseEntity = restTemplate.getForEntity(url, TwseDataPO.class);
-            TwseDataPO twseDataPO = responseEntity.getBody();
+            ResponseEntity<TwseDataCreditPO> responseEntity = restTemplate.getForEntity(url, TwseDataCreditPO.class);
+            TwseDataCreditPO twseDataPO = responseEntity.getBody();
             if ("很抱歉，沒有符合條件的資料!".equals(twseDataPO.getStat()))
                 return new ArrayList<>(0);
-            List<TradeValuePO> result = twseDataPO.getData().stream().map(list -> {
+            List<TradeValuePO> result = twseDataPO.getCreditList().stream().map(list -> {
                 double unit = 1l;
                 //單位換算成元
                 if("融資金額(仟元)".equals(list.get(0)))
