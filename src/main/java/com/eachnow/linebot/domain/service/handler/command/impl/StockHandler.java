@@ -37,7 +37,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Command({"stock", "股", "股票",
         "股價", "殖利率", "淨值", "本益比",
-        "三大法人", "融資融券"})
+        "三大法人", "融資融券", "融資融卷"})
 public class StockHandler implements CommandHandler {
     private final String TYPE_DAY = "日報";
     private final String TYPE_WEEK = "週報";
@@ -69,7 +69,7 @@ public class StockHandler implements CommandHandler {
             return this.getRatioAndDividendYield(commandPO);
         } else if (text.contains("三大法人")) {
             return this.getTradingOfForeignAndInvestors(commandPO);
-        } else if (text.contains("融資融券")) {
+        } else if (Arrays.asList("融資融券", "融資融卷").contains(commandPO.getCommand())) {
             return this.getMarginTradingAndShortSelling(commandPO);
         }
         //Todo 紀錄該股並自動換算停利停損價格

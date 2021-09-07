@@ -228,7 +228,7 @@ public class TwseApiServiceImpl implements TwseApiService {
                         .totalSell(toDouble(list.get(2)) * unit)
                         .balanceOfPreDay(toDouble(list.get(4)) * unit)
                         .balance(toDouble(list.get(5)) * unit)
-                        .difference(toDouble(list.get(5)) - toDouble(list.get(4)) * unit).build();
+                        .difference((toDouble(list.get(5)) - toDouble(list.get(4))) * unit).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
