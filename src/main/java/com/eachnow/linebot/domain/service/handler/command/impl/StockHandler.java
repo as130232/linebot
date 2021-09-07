@@ -69,7 +69,7 @@ public class StockHandler implements CommandHandler {
             return this.getRatioAndDividendYield(commandPO);
         } else if (text.contains("三大法人")) {
             return this.getTradingOfForeignAndInvestors(commandPO);
-        } else if (text.contains("融資融卷")) {
+        } else if (text.contains("融資融券")) {
             return this.getMarginTradingAndShortSelling(commandPO);
         }
         //Todo 紀錄該股並自動換算停利停損價格
