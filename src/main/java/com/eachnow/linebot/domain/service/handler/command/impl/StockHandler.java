@@ -449,7 +449,7 @@ public class StockHandler implements CommandHandler {
             case "融券(交易單位)":
                 return "融券";
             case "融資金額(仟元)":
-                return "融資金額(億)";
+                return "融資金額";
         }
         return name;
     }
@@ -490,8 +490,7 @@ public class StockHandler implements CommandHandler {
      * 單位從元轉為億
      */
     public String convertTradeValue(Double tradeValue, Integer scale) {
-        BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000))
-                .setScale(scale, BigDecimal.ROUND_HALF_UP);
+        BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000), scale, BigDecimal.ROUND_HALF_UP);
         return result.toString();
     }
 
