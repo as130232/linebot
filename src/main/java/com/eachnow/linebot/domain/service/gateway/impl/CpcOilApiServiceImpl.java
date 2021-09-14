@@ -4,6 +4,7 @@ import com.eachnow.linebot.common.po.opendata.CpcOilPricePO;
 import com.eachnow.linebot.domain.service.gateway.CpcOilApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -18,7 +19,7 @@ public class CpcOilApiServiceImpl implements CpcOilApiService {
     private RestTemplate restTemplate;
 
     @Autowired
-    public CpcOilApiServiceImpl(RestTemplate restTemplate) {
+    public CpcOilApiServiceImpl(@Qualifier("converter-resttemplate") RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
