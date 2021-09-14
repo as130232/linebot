@@ -97,6 +97,6 @@ public class OilPriceHandler implements CommandHandler {
                 Text.builder().text("資料更新於 " + cpcOilPricePO.getPriceUpdate()).style(Text.TextStyle.ITALIC).align(FlexAlign.END).offsetEnd(FlexOffsetSize.SM).build()
         ).backgroundColor("#1889D6").build();
         FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(footer).build();
-        return FlexMessage.builder().altText("台股各類指數日成交量").contents(contents).build();
+        return FlexMessage.builder().altText("中油即時油價").contents(contents).build();
     }
 }
