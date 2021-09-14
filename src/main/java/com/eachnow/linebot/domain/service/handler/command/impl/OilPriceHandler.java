@@ -67,9 +67,9 @@ public class OilPriceHandler implements CommandHandler {
         List<FlexComponent> bodyComponent = new ArrayList<>();
         //本週汽油調整
         Box adjustmentThisWeek = Box.builder().layout(FlexLayout.VERTICAL).contents(
-                Text.builder().text(content).color("#ffffff").size(FlexFontSize.XL).align(FlexAlign.CENTER).gravity(FlexGravity.CENTER).margin(FlexMarginSize.SM).build()
+                Text.builder().text(content).color("#ffffff").size(FlexFontSize.XL).align(FlexAlign.CENTER).gravity(FlexGravity.CENTER).build()
         ).backgroundColor("#039920").margin(FlexMarginSize.MD).cornerRadius(FlexCornerRadiusSize.MD).build();
-        Separator separator = Separator.builder().margin(FlexMarginSize.SM).build();
+        Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#ffffff").build();
         Box title1 = Box.builder().layout(FlexLayout.HORIZONTAL).contents(
                 Text.builder().text("92無鉛").flex(1).size(FlexFontSize.Md).align(FlexAlign.CENTER).margin(FlexMarginSize.SM).weight(Text.TextWeight.BOLD).build(),
                 Text.builder().text("95無鉛").flex(1).size(FlexFontSize.Md).align(FlexAlign.CENTER).margin(FlexMarginSize.SM).weight(Text.TextWeight.BOLD).build(),
