@@ -29,13 +29,7 @@ public class LinebotController {
     @PostMapping(value = "/message/text/push")
     public void messageTextPush(@RequestParam(value = "type") String type, @RequestParam(value = "text") String text) throws Exception {
         String to = "Uf52a57f7e6ba861c05be8837bfbcf0c6";
-        messageSender.send(to, type, text);
-    }
-
-    @PostMapping(value = "/messagePush")
-    public void messagePush(@RequestBody PushMessagePO pushMessagePO) throws Exception {
-        pushMessagePO.setTo("Uf52a57f7e6ba861c05be8837bfbcf0c6");
-        messageSender.send(pushMessagePO);
+        messageSender.pushByRest(to, type, text);
     }
 
     /**
