@@ -31,7 +31,10 @@ public class TwseApiServiceImpl implements TwseApiService {
 
     @Override
     public void initPriceMap() {
-        priceMap = this.getStockPrice().stream().collect(Collectors.toMap(PricePO::getCode, Function.identity()));
+        List<PricePO> list = this.getStockPrice();
+        if (list.size() > 0){
+            priceMap = list.stream().collect(Collectors.toMap(PricePO::getCode, Function.identity()));
+        }
     }
 
     @Override
