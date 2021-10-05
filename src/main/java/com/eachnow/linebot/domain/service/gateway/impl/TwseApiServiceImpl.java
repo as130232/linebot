@@ -159,10 +159,9 @@ public class TwseApiServiceImpl implements TwseApiService {
                 return new ArrayList<>(0);
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 PricePO pricePO = this.getPrice(list.get(0));
-                if (pricePO == null)
-                    return null;
                 return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(Double.valueOf(parseValue(list.get(2))))
-                        .peRatio(Double.valueOf(parseValue(list.get(4)))).pbRatio(Double.valueOf(parseValue(list.get(5)))).price(pricePO.getPrice()).avePrice(pricePO.getAvePrice()).build();
+                        .peRatio(Double.valueOf(parseValue(list.get(4)))).pbRatio(Double.valueOf(parseValue(list.get(5))))
+                        .price(pricePO == null ? -1l : pricePO.getPrice()).avePrice(pricePO == null ? -1l : pricePO.getAvePrice()).build();
             }).collect(Collectors.toList());
             return result;
         } catch (Exception e) {
