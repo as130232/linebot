@@ -32,7 +32,7 @@ public class TwseApiServiceImpl implements TwseApiService {
     @Override
     public void initPriceMap() {
         List<PricePO> list = this.getStockPrice();
-        if (list.size() > 0){
+        if (list.size() > 0) {
             priceMap = list.stream().collect(Collectors.toMap(PricePO::getCode, Function.identity()));
         }
     }
@@ -159,6 +159,8 @@ public class TwseApiServiceImpl implements TwseApiService {
                 return new ArrayList<>(0);
             List<RatioAndDividendYieldPO> result = twseDataPO.getData().stream().map(list -> {
                 PricePO pricePO = this.getPrice(list.get(0));
+                if (pricePO == null)
+                    return null;
                 return RatioAndDividendYieldPO.builder().code(list.get(0)).name(list.get(1)).dividendYield(Double.valueOf(parseValue(list.get(2))))
                         .peRatio(Double.valueOf(parseValue(list.get(4)))).pbRatio(Double.valueOf(parseValue(list.get(5)))).price(pricePO.getPrice()).avePrice(pricePO.getAvePrice()).build();
             }).collect(Collectors.toList());
@@ -224,7 +226,7 @@ public class TwseApiServiceImpl implements TwseApiService {
             List<TradeValuePO> result = twseDataPO.getCreditList().stream().map(list -> {
                 double unit = 1l;
                 //單位換算成元
-                if("融資金額(仟元)".equals(list.get(0)))
+                if ("融資金額(仟元)".equals(list.get(0)))
                     unit = 1000l;
                 return TradeValuePO.builder().item(list.get(0))
                         .totalBuy(toDouble(list.get(1)) * unit)
