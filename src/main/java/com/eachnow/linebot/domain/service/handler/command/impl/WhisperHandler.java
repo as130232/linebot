@@ -41,7 +41,7 @@ public class WhisperHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         String text = commandPO.getText();
-        String sendMessage = text.replace(commandPO.getCommand() + " ", "[" + commandPO.getCommand() + "]");
+        String sendMessage = text.replace(commandPO.getCommand() + " ", "");
         String code = commandPO.getCommand();
 
         LineUserPO lineUserPO = userMap.get(code);
