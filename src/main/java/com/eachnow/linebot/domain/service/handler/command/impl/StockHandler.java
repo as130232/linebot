@@ -23,6 +23,7 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -50,9 +51,9 @@ public class StockHandler implements CommandHandler {
         this.twseApiService = twseApiService;
     }
 
-    //    @PostConstruct
+//    @PostConstruct
 //    private void test() {
-//        String text = "融資融卷 20210906";
+//        String text = "股價 20211004";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);

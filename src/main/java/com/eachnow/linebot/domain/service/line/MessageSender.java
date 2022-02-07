@@ -28,27 +28,23 @@ public class MessageSender {
     private LineConfig lineConfig;
     private LineMessagingClient client;
 
-    private MessageHandler messageHandler;
-
     @Autowired
-    public MessageSender(RestTemplate restTemplate, LineConfig lineConfig,
-                         MessageHandler messageHandler) {
+    public MessageSender(RestTemplate restTemplate, LineConfig lineConfig) {
         this.restTemplate = restTemplate;
         this.lineConfig = lineConfig;
-        this.messageHandler = messageHandler;
         client = LineMessagingClient.builder(lineConfig.getChannelToken()).build();
     }
 
 //    @PostConstruct
-    private void test(){
-        Message message = messageHandler.executeCommand("test", "匯率", null);
-        Message message2 = messageHandler.executeCommand("test", "中油", null);
-        List<Message> messages = new ArrayList<>();
-        messages.add(message);
-        messages.add(message2);
-        BotApiResponse botApiResponse = push("Uf52a57f7e6ba861c05be8837bfbcf0c6", messages);
-        System.out.println(botApiResponse);
-    }
+//    private void test(){
+//        Message message = messageHandler.executeCommand("test", "匯率", null);
+//        Message message2 = messageHandler.executeCommand("test", "中油", null);
+//        List<Message> messages = new ArrayList<>();
+//        messages.add(message);
+//        messages.add(message2);
+//        BotApiResponse botApiResponse = push("Uf52a57f7e6ba861c05be8837bfbcf0c6", messages);
+//        System.out.println(botApiResponse);
+//    }
 
     public BotApiResponse push(String to, List<Message> messages){
         PushMessage pushMessage = new PushMessage(to, messages);
