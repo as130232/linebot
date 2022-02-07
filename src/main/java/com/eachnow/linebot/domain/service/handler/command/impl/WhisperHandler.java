@@ -48,7 +48,7 @@ public class WhisperHandler implements CommandHandler {
         if (lineUserPO == null) {
             Optional<LineUserPO> optional = lineUserRepository.findByCode(code);
             if (!optional.isPresent()) {
-                return null;
+                return new TextMessage("send failed.");
             }
             lineUserPO = optional.get();
             userMap.put(code, lineUserPO);
@@ -61,6 +61,6 @@ public class WhisperHandler implements CommandHandler {
         } else {
             lineNotifySender.send(lineUserPO.getNotifyToken(), sendMessage);
         }
-        return new TextMessage("傳送成功");
+        return new TextMessage("send success.");
     }
 }
