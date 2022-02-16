@@ -11,7 +11,6 @@ public class PushMessagePO {
 //    private String roomId;
 //    private String accountId;
 //    private SimpleContentPO content;
-
     private String to;
     private List<MessagePO> messages;
 }

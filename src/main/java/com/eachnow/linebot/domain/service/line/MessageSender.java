@@ -57,17 +57,25 @@ public class MessageSender {
         }
     }
 
+    /**
+     * @param to line token
+     * @param type: text, sticker, image..(com.linecorp.bot.model.message.Message.@Type)
+     */
     public void pushByRest(String to, String type, String text) {
+        List<MessagePO> messages = new ArrayList<>();
+        messages.add(MessagePO.builder().type(type).text(text).build());
+        PushMessagePO pushMessagePO = PushMessagePO.builder().to(to).messages(messages).build();
+        pushByRest(pushMessagePO);
+    }
+
+    public void pushByRest(PushMessagePO pushMessagePO) {
         try {
-            List<MessagePO> messages = new ArrayList<>();
-            messages.add(MessagePO.builder().type(type).text(text).build());
-            PushMessagePO pushMessagePO = PushMessagePO.builder().to(to).messages(messages).build();
             String json = JsonUtils.toJsonString(pushMessagePO);
             HttpEntity<String> entity = new HttpEntity<>(json, getHttpHeaders());
             ResponseEntity<String> response = restTemplate.exchange(PUSH_URL, HttpMethod.POST, entity, String.class);
             log.info("發送訊息，成功。json:{}", json);
         } catch (Exception e) {
-            log.error("發送訊息，失敗! type:{}, text:{}, error msg:{}", type, text, e.getMessage());
+            log.error("發送訊息，失敗! pushMessagePO:{}, error msg:{}", pushMessagePO, e.getMessage());
         }
     }
 

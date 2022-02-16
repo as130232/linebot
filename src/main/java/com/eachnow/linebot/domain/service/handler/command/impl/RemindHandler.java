@@ -76,10 +76,10 @@ public class RemindHandler implements CommandHandler {
         String text = commandPO.getText();
         //先取得notify token，若還未訂閱line notify，則導向驗證notify token
         String notifyToken = lineUserService.getNotifyToken(commandPO.getUserId());
-        if (notifyToken == null) {
+        if (notifyToken == null || notifyToken.isEmpty()) {
             return getAuthMessage(commandPO.getUserId());
         }
-        if (commandPO.getParams().size() == 0){
+        if (commandPO.getParams().size() == 0) {
             //
         }
         //查詢提醒
