@@ -79,12 +79,8 @@ public class RemindHandler implements CommandHandler {
         if (notifyToken == null || notifyToken.isEmpty()) {
             return getAuthMessage(commandPO.getUserId());
         }
-        if (commandPO.getParams().size() == 0) {
-            //
-        }
         //查詢提醒
         if (text.contains("查") || text.contains("check")) {
-
         }
         //提醒 繳房租 $$$$$$15 0900
         String label = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
@@ -92,6 +88,8 @@ public class RemindHandler implements CommandHandler {
         String time = ParamterUtils.getValueByIndex(commandPO.getParams(), 2);
         if (time == null)
             time = "000000";    //default 00:00:00
+        if (time.length() == 4)
+            time += "00";       //輸入省略秒數則自動補上
         if (label == null || date == null) {
             return new TextMessage("請輸入正確格式:提醒 {標頭} {日期} {時間}，例:提醒 繳房租 $$$$$$15 0900，注意需空格隔開！");
         }

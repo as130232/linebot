@@ -1,18 +1,26 @@
 package com.eachnow.linebot.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpException;
+import org.apache.http.HttpHost;
+import org.apache.http.HttpRequest;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.protocol.HttpContext;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -122,5 +130,44 @@ public class RestTemplateConfig {
             log.error("generate HttpsRequestFactory failed! error msg:{}", e.getMessage());
             throw new RuntimeException();
         }
+    }
+
+    public RestTemplate restTemplateBuilder(String host, int port) {
+        return new RestTemplateBuilder(new RestTemplateCustomizer() {
+            @Override
+            public void customize(RestTemplate restTemplate) {
+                PoolingHttpClientConnectionManager pollingConnectionManager = new PoolingHttpClientConnectionManager(30, TimeUnit.SECONDS);
+                //最大连接数
+                pollingConnectionManager.setMaxTotal(500);
+                //单路由的并发数
+                pollingConnectionManager.setDefaultMaxPerRoute(100);
+                //設定proxy
+                HttpHost proxy = new HttpHost(host, port);
+                HttpRoutePlanner httpRoutePlanner = new DefaultProxyRoutePlanner(proxy) {
+                    @Override
+                    public HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
+                        return super.determineProxy(target, request, context);
+                    }
+                };
+                HttpClient httpClient = HttpClientBuilder.create()
+                        .setRoutePlanner(httpRoutePlanner)
+                        .setConnectionManager(pollingConnectionManager)
+                        // 保持长连接配置，需要在头添加Keep-Alive
+//                        .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
+                        // disable expect continue 不然188會回417
+//                        .setDefaultRequestConfig(RequestConfig.custom().setExpectContinueEnabled(false).build())
+                        .build();
+                HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+                // 连接超时时长配置
+                clientHttpRequestFactory.setConnectTimeout(3000);
+                // 数据读取超时时长配置
+                clientHttpRequestFactory.setReadTimeout(3000);
+                // 连接不够用的等待时间，不宜过长，必须设置，比如连接不够用时，时间过长将是灾难性的
+                clientHttpRequestFactory.setConnectionRequestTimeout(200);
+                // 缓冲请求数据，默认值是true。通过POST或者PUT大量发送数据时，建议将此属性更改为false，以免耗尽内存。
+                clientHttpRequestFactory.setBufferRequestBody(false);
+                restTemplate.setRequestFactory(clientHttpRequestFactory);
+            }
+        }).build();
     }
 }

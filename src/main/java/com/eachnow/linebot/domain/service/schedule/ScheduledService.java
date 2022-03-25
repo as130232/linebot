@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -70,7 +70,7 @@ public class ScheduledService {
         return CRON_EXECUTE;
     }
 
-    @Scheduled(cron = "${schedule.beauty.cron}")
+    @Scheduled(cron = "0 0 8,14,20 * * ?")
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
             return;
@@ -107,21 +107,24 @@ public class ScheduledService {
         twseApiService.initPriceMap();
         log.info("[schedule]爬取最新股價，完成。");
     }
-    
-//    @Scheduled(cron = "0 0 5 * * ?")
+
+    //    @Scheduled(cron = "0 0 5 * * ?")
     public void javdbCrawler() {
         if (!CRON_EXECUTE)
             return;
         List<String> list = Arrays.asList(JavdbCrawlerService.TYPE_DAILY, JavdbCrawlerService.TYPE_WEEKLY, JavdbCrawlerService.TYPE_MONTHLY);
+        List<CompletableFuture<Void>> futureList = new ArrayList<>(list.size());
         for (String type : list) {
-            CompletableFuture.runAsync(() -> {
+            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
                 javdbCrawlerService.crawlerRankings(type);
             }, crawlerExecutor).exceptionally(e -> {
                         log.error("爬取javdb，失敗! error msg:{}", e.getMessage());
                         return null;
                     }
             );
+            futureList.add(future);
         }
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         log.info("[schedule]爬取javdb，完成。");
     }
 }

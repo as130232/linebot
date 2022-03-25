@@ -126,8 +126,11 @@
             <artifactId>json</artifactId>
             <version>20180813</version>
         </dependency>
-
-
+        <!-- local cache緩存-->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -33,7 +32,7 @@ public class BeautyCrawlerService {
         this.pttCrawlerService = pttCrawlerService;
     }
 
-//    @PostConstruct
+    //    @PostConstruct
     public void init() {
         listPicture = new ArrayList<>(MAX_SIZE);
         crawler(2);
