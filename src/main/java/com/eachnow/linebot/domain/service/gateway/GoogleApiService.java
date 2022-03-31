@@ -17,10 +17,10 @@ public interface GoogleApiService {
      *
      * @param latitude  緯度
      * @param longitude 經度
-     * @param type      GooglePlaceTypeEnum
+     * @param searchWord   關鍵字(沒有給type的值)
      * @param language  語言
      */
-    public ResultLocationPO getLocation(String latitude, String longitude, GooglePlaceTypeEnum type, String language);
+    public ResultLocationPO getLocation(String latitude, String longitude, String searchWord, String language);
 
     public String parseMapUrl(String lat, String lng, String placeId);
 

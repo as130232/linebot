@@ -1,6 +1,5 @@
 package com.eachnow.linebot.domain.service.handler.location.impl;
 
-import com.eachnow.linebot.common.constant.GooglePlaceTypeEnum;
 import com.eachnow.linebot.common.constant.LanguageEnum;
 import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 import com.eachnow.linebot.common.po.google.map.ResultPO;
@@ -41,8 +40,7 @@ public class GoogleLocationHandler implements LocationHandler {
 
     @Override
     public Message execute(LocationMessageContent content) {
-        GooglePlaceTypeEnum typeEnum = LocationHandlerFactory.type;
-        ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), typeEnum, LanguageEnum.TW.getLang());
+        ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), LocationHandlerFactory.search, LanguageEnum.TW.getLang());
         //排序，評分高、評論高的在前，並指定上限數量
         List<ResultPO> results = resultLocationPO.getResults().stream()
                 .sorted(Comparator.comparing(ResultPO::getRating).thenComparing(ResultPO::getUserRatingsTotal).reversed())
@@ -93,7 +91,7 @@ public class GoogleLocationHandler implements LocationHandler {
             return bubble;
         }).collect(Collectors.toList());
         FlexContainer contents = Carousel.builder().contents(listBubble).build();
-        return new FlexMessage(typeEnum.getName() + "精選", contents);
+        return new FlexMessage(LocationHandlerFactory.search + "精選", contents);
     }
 
 }

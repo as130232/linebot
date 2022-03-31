@@ -9,8 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LocationHandlerFactory {
-    public static GooglePlaceTypeEnum type;
-
+    public static String search;
     @Autowired
     private RestaurantLocationHandler restaurantLocationHandler;
     @Autowired
@@ -20,9 +19,9 @@ public class LocationHandlerFactory {
 
     public LocationHandler getLocationHandler() {
         LocationHandler locationHandler;
-        if (type == null)
+        if (search == null)
             return defaultHandler;
-        if (GooglePlaceTypeEnum.RESTAURANT.equals(type)) {
+        if (GooglePlaceTypeEnum.RESTAURANT.getName().equals(search)) {
             locationHandler = restaurantLocationHandler;
         } else {
             locationHandler = googleLocationHandler;

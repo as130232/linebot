@@ -40,7 +40,7 @@ public class RestaurantLocationHandler implements LocationHandler {
 
     @Override
     public Message execute(LocationMessageContent content) {
-        ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), GooglePlaceTypeEnum.RESTAURANT, LanguageEnum.TW.getLang());
+        ResultLocationPO resultLocationPO = googleApiService.getLocation(String.valueOf(content.getLatitude()), String.valueOf(content.getLongitude()), GooglePlaceTypeEnum.RESTAURANT.getName(), LanguageEnum.TW.getLang());
         //排序，評分高、評論高的在前，並指定推薦餐廳數量
         List<ResultPO> results = resultLocationPO.getResults().stream()
                 .sorted(Comparator.comparing(ResultPO::getRating).thenComparing(ResultPO::getUserRatingsTotal).reversed())

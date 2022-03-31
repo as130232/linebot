@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.po.google.map.ResultLocationPO;
 import com.eachnow.linebot.common.po.google.translation.InputTranslationPO;
 import com.eachnow.linebot.common.po.google.translation.OutputTranslationPO;
 import com.eachnow.linebot.common.util.JsonUtils;
+import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Objects;
 
 @Slf4j
 @Component
@@ -57,16 +60,21 @@ public class GoogleApiServiceImpl implements GoogleApiService {
     }
 
     @Override
-    public ResultLocationPO getLocation(String latitude, String longitude, GooglePlaceTypeEnum type, String language) {
+    public ResultLocationPO getLocation(String latitude, String longitude, String searchWord, String language) {
         if (language == null)
             language = LanguageEnum.TW.getLang();   //default
+        GooglePlaceTypeEnum typeEnum = GooglePlaceTypeEnum.parse(searchWord);
         try {
             String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?" +
                     "key={key}".replace("{key}", GOOGLE_API_KEY) +
                     "&location={latitude},{longitude}".replace("{latitude}", latitude).replace("{longitude}", longitude) +
                     "&rankby=distance" +
-                    "&type={type}".replace("{type}", type.toString().toLowerCase()) +
                     "&language={language}".replace("{language}", language);
+            if (Objects.nonNull(typeEnum)) {
+                url += "&type={type}".replace("{type}", typeEnum.toString().toLowerCase());
+            } else {
+                url += "&keyword=" + searchWord;
+            }
             ResponseEntity<ResultLocationPO> responseEntity = restTemplate.getForEntity(url, ResultLocationPO.class);
             ResultLocationPO result = responseEntity.getBody();
             log.info("getLocation result:{}", JsonUtils.toJsonString(result));

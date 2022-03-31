@@ -30,12 +30,9 @@ public class PlaceHandler implements CommandHandler {
 
     @Override
     public Message execute(CommandPO commandPO) {
-        String text = commandPO.getText();
-        GooglePlaceTypeEnum typeEnum = GooglePlaceTypeEnum.parse(ParamterUtils.getIndexOneParameter(text));
-        if (typeEnum == null)
-            return new TextMessage("Incorrect location. Please input again.\n找不到該地點請重新輸入.");
-        LocationHandlerFactory.type = typeEnum;
-        return LineTemplateUtils.getLocationButtonsTemplate(typeEnum.getName());
+        String searchText = ParamterUtils.getIndexOneParameter(commandPO.getText());
+        LocationHandlerFactory.search = ParamterUtils.getIndexOneParameter(searchText);
+        return LineTemplateUtils.getLocationButtonsTemplate(searchText);
     }
 
 }
