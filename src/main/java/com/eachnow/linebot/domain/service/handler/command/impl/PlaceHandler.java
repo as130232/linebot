@@ -31,7 +31,7 @@ public class PlaceHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         String searchText = ParamterUtils.getIndexOneParameter(commandPO.getText());
-        LocationHandlerFactory.search = ParamterUtils.getIndexOneParameter(searchText);
+        LocationHandlerFactory.search = searchText;
         return LineTemplateUtils.getLocationButtonsTemplate(searchText);
     }
 

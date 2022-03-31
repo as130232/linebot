@@ -75,9 +75,10 @@ public class GoogleApiServiceImpl implements GoogleApiService {
             } else {
                 url += "&keyword=" + searchWord;
             }
+            log.info("google getLocation url:{}", url);
             ResponseEntity<ResultLocationPO> responseEntity = restTemplate.getForEntity(url, ResultLocationPO.class);
             ResultLocationPO result = responseEntity.getBody();
-            log.info("getLocation result:{}", JsonUtils.toJsonString(result));
+            log.info("google getLocation result:{}", JsonUtils.toJsonString(result));
             return result;
         } catch (Exception e) {
             log.error("呼叫Google Map API，失敗! error msg:{}", e.getMessage());
