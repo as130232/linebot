@@ -20,8 +20,8 @@ public class BarHandler implements CommandHandler {
 
     @Override
     public Message execute(CommandPO commandPO) {
-        LocationHandlerFactory.type = GooglePlaceTypeEnum.BAR;
-        return LineTemplateUtils.getLocationButtonsTemplate(LocationHandlerFactory.type.getName());
+        LocationHandlerFactory.search = GooglePlaceTypeEnum.BAR.getName();
+        return LineTemplateUtils.getLocationButtonsTemplate(GooglePlaceTypeEnum.BAR.getName());
     }
 
 }
