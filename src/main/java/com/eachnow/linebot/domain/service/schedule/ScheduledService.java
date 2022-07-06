@@ -81,7 +81,7 @@ public class ScheduledService {
     /**
      * 下雨警報
      */
-    @Scheduled(cron = "0 0 7,23 * * ?")
+    @Scheduled(cron = "0 0 23 * * ?")
     public void rainAlarm() {
         if (!CRON_EXECUTE)
             return;

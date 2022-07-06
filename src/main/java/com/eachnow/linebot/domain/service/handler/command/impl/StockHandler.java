@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Command({"stock", "股", "股票",
         "股價", "殖利率", "淨值", "本益比",
+        "指數", "大盤",
         "三大法人", "融資融券", "融資融卷"})
 public class StockHandler implements CommandHandler {
     private final String TYPE_DAY = "日報";
@@ -53,7 +54,7 @@ public class StockHandler implements CommandHandler {
 
 //    @PostConstruct
 //    private void test() {
-//        String text = "股價 20211004";
+//        String text = "股價 634";
 //        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
 //                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
 //        execute(commandPO);
@@ -65,9 +66,12 @@ public class StockHandler implements CommandHandler {
         //指數，取得大盤及各類指數
         if (text.contains("指數") || text.contains("大盤")) {
             return this.getIndex(commandPO);
+        } else if (Arrays.asList("股", "股票", "殖利率", "淨值", "本益比").contains(commandPO.getCommand())) {
             //取得最新(昨日)個股本益比、殖利率及股價淨值比
-        } else if (Arrays.asList("股價", "殖利率", "淨值", "本益比").contains(commandPO.getCommand())) {
             return this.getRatioAndDividendYield(commandPO);
+        } else if (Arrays.asList("股價", "損益", "停利停損").contains(commandPO.getCommand())) {
+            //計算停利停損
+            return this.getPriceRate(commandPO);
         } else if (text.contains("三大法人")) {
             return this.getTradingOfForeignAndInvestors(commandPO);
         } else if (Arrays.asList("融資融券", "融資融卷").contains(commandPO.getCommand())) {
@@ -414,9 +418,14 @@ public class StockHandler implements CommandHandler {
         return FlexMessage.builder().altText("融資融券餘額").contents(contents).build();
     }
 
+    public Message getPriceRate(CommandPO commandPO) {
+        List<Integer> rates = Arrays.asList(3, 6, 12, 30);  //漲跌%數
+        Integer buyPrice = Integer.valueOf(ParamterUtils.getValueByIndex(commandPO.getParams(), 0));
+        return FlexMessage.builder().altText("股價停損停利").contents(null).build();
+    }
+
     /**
      * 取得前一天日期，若是已經超過晚上七點則取得當日日期(因為證交所已更新當日資訊)
-     *
      */
     private String getCurrentDateOrPreDate() {
         ZonedDateTime now = ZonedDateTime.now(DateUtils.CST_ZONE_ID);
