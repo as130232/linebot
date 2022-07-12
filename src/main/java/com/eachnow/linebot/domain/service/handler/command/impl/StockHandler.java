@@ -24,7 +24,6 @@ import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.DayOfWeek;
@@ -48,7 +47,7 @@ public class StockHandler implements CommandHandler {
     private final String TYPE_MONTH = "月報";
     private static final BigDecimal SHARE = new BigDecimal(1000); //1張 = 1000股
 
-    private TwseApiService twseApiService;
+    private final TwseApiService twseApiService;
 
     @Autowired
     public StockHandler(TwseApiService twseApiService) {
