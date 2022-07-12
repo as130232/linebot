@@ -2,6 +2,7 @@ package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.po.CommandPO;
+import com.eachnow.linebot.common.po.stock.PriceRatePO;
 import com.eachnow.linebot.common.po.twse.IndexPO;
 import com.eachnow.linebot.common.po.twse.RatioAndDividendYieldPO;
 import com.eachnow.linebot.common.po.twse.TradeValueInfoPO;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
@@ -36,14 +38,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Command({"stock", "股", "股票",
-        "股價", "殖利率", "淨值", "本益比",
+@Command({"stock", "股", "股票", "殖利率", "淨值", "本益比",
+        "股價", "損益", "停利停損",
         "指數", "大盤",
         "三大法人", "融資融券", "融資融卷"})
 public class StockHandler implements CommandHandler {
     private final String TYPE_DAY = "日報";
     private final String TYPE_WEEK = "週報";
     private final String TYPE_MONTH = "月報";
+    private static final BigDecimal SHARE = new BigDecimal(1000); //1張 = 1000股
 
     private TwseApiService twseApiService;
 
@@ -52,21 +55,13 @@ public class StockHandler implements CommandHandler {
         this.twseApiService = twseApiService;
     }
 
-//    @PostConstruct
-//    private void test() {
-//        String text = "股價 634";
-//        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-//                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-//        execute(commandPO);
-//    }
-
     @Override
     public Message execute(CommandPO commandPO) {
         String text = commandPO.getText();
         //指數，取得大盤及各類指數
         if (text.contains("指數") || text.contains("大盤")) {
             return this.getIndex(commandPO);
-        } else if (Arrays.asList("股", "股票", "殖利率", "淨值", "本益比").contains(commandPO.getCommand())) {
+        } else if (Arrays.asList("stock", "股", "股票", "殖利率", "淨值", "本益比").contains(commandPO.getCommand())) {
             //取得最新(昨日)個股本益比、殖利率及股價淨值比
             return this.getRatioAndDividendYield(commandPO);
         } else if (Arrays.asList("股價", "損益", "停利停損").contains(commandPO.getCommand())) {
@@ -77,7 +72,9 @@ public class StockHandler implements CommandHandler {
         } else if (Arrays.asList("融資融券", "融資融卷").contains(commandPO.getCommand())) {
             return this.getMarginTradingAndShortSelling(commandPO);
         }
-        //Todo 紀錄該股並自動換算停利停損價格
+        //Todo 站上月線、跌出月線通知
+
+        //Todo 紀錄該股並自動換算停利停損價格後，當價格已達通知用戶
 
         return null;
     }
@@ -419,9 +416,87 @@ public class StockHandler implements CommandHandler {
     }
 
     public Message getPriceRate(CommandPO commandPO) {
-        List<Integer> rates = Arrays.asList(3, 6, 12, 30);  //漲跌%數
-        Integer buyPrice = Integer.valueOf(ParamterUtils.getValueByIndex(commandPO.getParams(), 0));
-        return FlexMessage.builder().altText("股價停損停利").contents(null).build();
+        List<String> rates = Arrays.asList("0.6", "3", "6", "12", "30");
+        String buyPriceStr = ParamterUtils.getValueByIndex(commandPO.getParams(), 0);
+        String rateStr = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
+        if (Objects.nonNull(rateStr) && rateStr.contains("%")) {
+            rateStr = rateStr.replace("%", "");
+            rates = Collections.singletonList(rateStr);
+        }
+        BigDecimal buyPriceBigDecimal = new BigDecimal(buyPriceStr);
+        boolean isShortSelling = false;
+        List<PriceRatePO> list = rates.stream().map(rate -> getPriceRate(isShortSelling, buyPriceBigDecimal, rate)).collect(Collectors.toList());
+
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
+                Text.builder().text("股價停損停利").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
+        )).paddingAll(FlexPaddingSize.MD).backgroundColor("#e472b9").build();
+        //Title
+        Box title = Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).spacing(FlexMarginSize.SM).contents(
+                Text.builder().text("百分比").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("做多").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("做空").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build(),
+                Text.builder().text("損益").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).color("#111111").flex(1).align(FlexAlign.CENTER).build()
+        ).build();
+        Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#666666").build();
+
+        List<FlexComponent> bodyComponent = new ArrayList<>();
+        bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
+                title, separator).build());
+        List<FlexComponent> listComponent = list.stream().map(po -> Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
+                Text.builder().text(po.getRate() + " %").size(FlexFontSize.Md).flex(1).align(FlexAlign.START).wrap(true).build(),
+                Text.builder().text(po.getPriceHigh().toString()).size(FlexFontSize.SM).flex(1).color("#ff0000").align(FlexAlign.CENTER).build(),
+                Text.builder().text(po.getPriceLow().toString()).size(FlexFontSize.SM).flex(1).color("#228b22").align(FlexAlign.CENTER).build(),
+                Text.builder().text(po.getIncome().toString()).size(FlexFontSize.SM).flex(1).color("#ff0000").align(FlexAlign.CENTER).build()
+        )).build()).collect(Collectors.toList());
+        bodyComponent.addAll(listComponent);
+        Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(body).footer(null).build();
+        return FlexMessage.builder().altText("股價停損停利").contents(contents).build();
+    }
+
+    private static PriceRatePO getPriceRate(boolean isShortSelling, BigDecimal buyPriceBigDecimal, String rate) {
+        BigDecimal divide = new BigDecimal(rate).divide(BigDecimal.valueOf(100));
+        BigDecimal rateHigh = divide.add(BigDecimal.ONE);
+        BigDecimal priceHigh = parsePrice(buyPriceBigDecimal.multiply(rateHigh));
+        BigDecimal rateLow = divide.subtract(BigDecimal.ONE).abs();
+        BigDecimal priceLow = parsePrice(buyPriceBigDecimal.multiply(rateLow));
+        //手續費 = 購買價格 * 1000 股 * 0.1425% (買賣各扣一次)
+        BigDecimal buyHandlingFee = buyPriceBigDecimal.multiply(SHARE).multiply(new BigDecimal("0.001425"));
+        if (buyHandlingFee.intValue() < 20) {
+            buyHandlingFee = new BigDecimal(20);
+        }
+        BigDecimal selfHandlingFee = priceLow.multiply(SHARE).multiply(new BigDecimal("0.001425"));
+        if (selfHandlingFee.intValue() < 20) {
+            selfHandlingFee = new BigDecimal(20);
+        }
+        BigDecimal handlingFee = buyHandlingFee.add(selfHandlingFee);
+        //證券稅 = 0.3% (賣出時只扣一次)
+        BigDecimal tax = buyPriceBigDecimal.multiply(SHARE).multiply(new BigDecimal("0.003"));
+        //融劵會有 0.1% 的劵費
+        BigDecimal shortSelling = BigDecimal.ZERO;
+        if (isShortSelling) {
+            shortSelling = buyPriceBigDecimal.multiply(SHARE).multiply(new BigDecimal("0.001"));
+        }
+        BigDecimal cost = tax.add(handlingFee).add(shortSelling);
+        //收入 = 價差 - 成本
+        Integer income = (buyPriceBigDecimal.multiply(SHARE).multiply(divide)).subtract(cost).intValue();
+        return PriceRatePO.builder().rate(rate).price(buyPriceBigDecimal).priceHigh(priceHigh).priceLow(priceLow).income(income).build();
+    }
+
+    private static BigDecimal parsePrice(BigDecimal price) {
+        int priceInt = price.intValue();
+        int scale = 2;
+        if (priceInt >= 100 && priceInt < 500) {
+            //0.50元
+            scale = 1;
+        } else if (priceInt >= 500 && priceInt < 1000) {
+            //1.00元
+            scale = 0;
+        } else if (priceInt >= 1000) {
+            //5.00元
+            scale = 0;
+        }
+        return price.setScale(scale, RoundingMode.HALF_UP);
     }
 
     /**
@@ -500,24 +575,7 @@ public class StockHandler implements CommandHandler {
      * 單位從元轉為億
      */
     public String convertTradeValue(Double tradeValue, Integer scale) {
-        BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000), scale, BigDecimal.ROUND_HALF_UP);
+        BigDecimal result = (new BigDecimal(tradeValue)).divide(new BigDecimal(100000000), scale, RoundingMode.HALF_UP);
         return result.toString();
     }
-
-//    public static void main(String[] args) {
-//        Instant instant = Instant.now();
-//        LocalDate localDate = instant.atZone(DateUtils.CST_ZONE_ID).toLocalDate();
-//        LocalDate monday = localDate.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
-//        LocalDate preMonday = monday.minus(7, ChronoUnit.DAYS);
-//        System.out.println(monday);
-//        System.out.println(preMonday);
-//        LocalDate firstOfMonth = LocalDate.of(localDate.getYear(), localDate.getMonth(), 1);
-//        LocalDate preFirstOfMonth = firstOfMonth.minus(1, ChronoUnit.MONTHS);
-//        System.out.println(firstOfMonth);
-//        System.out.println(preFirstOfMonth);
-//        String test = "20210823";
-//        LocalDate testLocalDate = LocalDate.parse(test, DateUtils.yyyyMMdd);
-//        String preDate = testLocalDate.minus(3, ChronoUnit.DAYS).format(DateUtils.yyyyMMdd);
-//        System.out.println(testLocalDate.getDayOfWeek());
-//    }
 }
