@@ -442,7 +442,7 @@ public class StockHandler implements CommandHandler {
         bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
                 title, separator).build());
         List<FlexComponent> listComponent = list.stream().map(po -> Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                Text.builder().text(po.getRate() + " %").size(FlexFontSize.Md).flex(1).align(FlexAlign.START).wrap(true).build(),
+                Text.builder().text(po.getRate() + "%").size(FlexFontSize.Md).flex(1).align(FlexAlign.CENTER).wrap(true).build(),
                 Text.builder().text(po.getPriceHigh().toString()).size(FlexFontSize.SM).flex(1).color("#ff0000").align(FlexAlign.CENTER).build(),
                 Text.builder().text(po.getPriceLow().toString()).size(FlexFontSize.SM).flex(1).color("#228b22").align(FlexAlign.CENTER).build(),
                 Text.builder().text(po.getIncome().toString()).size(FlexFontSize.SM).flex(1).color("#ff0000").align(FlexAlign.CENTER).build()
