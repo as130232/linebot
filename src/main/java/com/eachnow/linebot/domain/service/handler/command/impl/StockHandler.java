@@ -454,7 +454,7 @@ public class StockHandler implements CommandHandler {
     }
 
     private static PriceRatePO getPriceRate(boolean isShortSelling, BigDecimal buyPriceBigDecimal, String rate) {
-        BigDecimal divide = new BigDecimal(rate).divide(BigDecimal.valueOf(100));
+        BigDecimal divide = new BigDecimal(rate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal rateHigh = divide.add(BigDecimal.ONE);
         BigDecimal priceHigh = parsePrice(buyPriceBigDecimal.multiply(rateHigh));
         BigDecimal rateLow = divide.subtract(BigDecimal.ONE).abs();
