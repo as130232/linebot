@@ -400,7 +400,6 @@ public class StockHandler implements CommandHandler {
         }).collect(Collectors.toList());
         bodyComponent.addAll(listComponent);
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyComponent).paddingAll(FlexPaddingSize.MD).paddingTop(FlexPaddingSize.NONE).build();
-
         String label = DateUtils.parseDate(date, DateUtils.yyyyMMdd, DateUtils.yyyyMMddSlash);
         String datetimepickerData = commandPO.getCommand() + ParamterUtils.CONTACT + date + ParamterUtils.CONTACT;
         Box dateButton = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Button.builder().flex(2).height(Button.ButtonHeight.SMALL)
@@ -442,7 +441,7 @@ public class StockHandler implements CommandHandler {
         bodyComponent.add(Box.builder().layout(FlexLayout.VERTICAL).margin(FlexMarginSize.NONE).spacing(FlexMarginSize.SM).contents(
                 title, separator).build());
         List<FlexComponent> listComponent = list.stream().map(po -> Box.builder().layout(FlexLayout.HORIZONTAL).margin(FlexMarginSize.MD).contents(Arrays.asList(
-                Text.builder().text(po.getRate() + " %").size(FlexFontSize.Md).flex(1).align(FlexAlign.START).wrap(true).build(),
+                Text.builder().text(po.getRate() + "%").size(FlexFontSize.Md).flex(1).align(FlexAlign.CENTER).wrap(true).build(),
                 Text.builder().text(po.getPriceHigh().toString()).size(FlexFontSize.SM).flex(1).color("#ff0000").align(FlexAlign.CENTER).build(),
                 Text.builder().text(po.getPriceLow().toString()).size(FlexFontSize.SM).flex(1).color("#228b22").align(FlexAlign.CENTER).build(),
                 Text.builder().text(po.getIncome().toString()).size(FlexFontSize.SM).flex(1).color("#ff0000").align(FlexAlign.CENTER).build()
@@ -454,7 +453,7 @@ public class StockHandler implements CommandHandler {
     }
 
     private static PriceRatePO getPriceRate(boolean isShortSelling, BigDecimal buyPriceBigDecimal, String rate) {
-        BigDecimal divide = new BigDecimal(rate).divide(BigDecimal.valueOf(100));
+        BigDecimal divide = new BigDecimal(rate).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
         BigDecimal rateHigh = divide.add(BigDecimal.ONE);
         BigDecimal priceHigh = parsePrice(buyPriceBigDecimal.multiply(rateHigh));
         BigDecimal rateLow = divide.subtract(BigDecimal.ONE).abs();
