@@ -25,6 +25,7 @@ import com.linecorp.bot.model.message.flex.container.Carousel;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
@@ -76,7 +77,7 @@ public class RemindHandler implements CommandHandler {
         String text = commandPO.getText();
         //先取得notify token，若還未訂閱line notify，則導向驗證notify token
         String notifyToken = lineUserService.getNotifyToken(commandPO.getUserId());
-        if (notifyToken == null || notifyToken.isEmpty()) {
+        if (Strings.isEmpty(notifyToken)) {
             return getAuthMessage(commandPO.getUserId());
         }
         //查詢提醒
@@ -171,7 +172,7 @@ public class RemindHandler implements CommandHandler {
     }
 
     private static String getCron(String date, String time) {
-        if (date == null || time == null)
+        if (Strings.isEmpty(date) || Strings.isEmpty(time))
             return null;
         try {
             //20210408 161800 -> 0 18 16 8 4 ? 2021

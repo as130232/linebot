@@ -18,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Command({"天氣"})
@@ -38,7 +35,7 @@ public class WeatherHandler implements CommandHandler {
     public Message execute(CommandPO commandPO) {
         List<String> params = commandPO.getParams();
         String locationName = ParamterUtils.getValueByIndex(params, 0).replace("台", "臺");
-        if (locationName == null)
+        if (Objects.isNull(locationName))
             locationName = "臺北市";
         String elementName = WeatherElementEnum.getElement(ParamterUtils.getValueByIndex(params, 1));
         WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, elementName);
@@ -105,11 +102,4 @@ public class WeatherHandler implements CommandHandler {
         return zonetime.format(DateUtils.yyyyMMddHHmmDash);
     }
 
-//    @PostConstruct
-    private void test() {
-        String text = "天氣 臺北市";
-        CommandPO commandPO = CommandPO.builder().userId("Uf52a57f7e6ba861c05be8837bfbcf0c6").text(text)
-                .command(ParamterUtils.parseCommand(text)).params(ParamterUtils.listParameter(text)).build();
-        execute(commandPO);
-    }
 }

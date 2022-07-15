@@ -8,6 +8,7 @@ import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageSender;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +43,9 @@ public class RemindJob implements Job {
         String label = "『提醒』 " + jobExecutionContext.getMergedJobDataMap().get("label").toString();
         Integer remindId = Integer.valueOf(jobExecutionContext.getMergedJobDataMap().get("remindId").toString());
         String token = lineUserService.getNotifyToken(userId);
-        if (token == null)
-            token = lineConfig.getLineNotifyKeyOwn();
+        if (Strings.isEmpty(token)) {
+            return;
+        }
         lineNotifySender.send(token, label);
 //        messageSender.send(userId, "text", label);
         Optional<RemindPO> optional = remindRepository.findById(remindId);

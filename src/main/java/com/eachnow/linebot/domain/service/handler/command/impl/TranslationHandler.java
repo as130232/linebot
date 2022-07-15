@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -83,9 +84,9 @@ public class TranslationHandler implements CommandHandler {
         LanguageEnum lang = LanguageEnum.parse(ParamterUtils.getValueByIndex(commandPO.getParams(), 0));
         String word = ParamterUtils.getValueByIndex(commandPO.getParams(), 1);
         //設置緩存
-        if (lang != null)
+        if (Objects.nonNull(lang))
             MessageHandler.setUserAndCacheCommand(commandPO.getUserId(), commandPO.getCommand() + ParamterUtils.CONTACT + lang.getCode() + ParamterUtils.CONTACT);
-        if (lang != null && word == null) {
+        if (Objects.nonNull(lang) && Objects.nonNull(word)) {
             List<FlexComponent> headerContents = Arrays.asList(Text.builder().text("已開啟翻譯模式").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
             Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#A17DF5").build();
             List<FlexComponent> bodyContents = Arrays.asList(

@@ -7,6 +7,8 @@ import com.eachnow.linebot.domain.service.handler.location.impl.RestaurantLocati
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 public class LocationHandlerFactory {
     public static String search;
@@ -19,7 +21,7 @@ public class LocationHandlerFactory {
 
     public LocationHandler getLocationHandler() {
         LocationHandler locationHandler;
-        if (search == null)
+        if (Objects.isNull(search))
             return defaultHandler;
         if (GooglePlaceTypeEnum.RESTAURANT.getName().equals(search)) {
             locationHandler = restaurantLocationHandler;

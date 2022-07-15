@@ -1,5 +1,7 @@
 package com.eachnow.linebot.common.util;
 
+import org.apache.logging.log4j.util.Strings;
+
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
 
@@ -11,7 +13,7 @@ public class NumberUtils {
      * @return 是返回true 否則返回false
      */
     public static boolean isNumber(String input) {
-        if (input == null || "".equals(input)) {
+        if (Strings.isEmpty(input)) {
             return false;
         }
         return Pattern.matches("[0-9]*(\\.?)[0-9]*", input);

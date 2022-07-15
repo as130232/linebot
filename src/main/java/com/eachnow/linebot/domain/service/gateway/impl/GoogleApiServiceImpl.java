@@ -9,6 +9,7 @@ import com.eachnow.linebot.common.util.JsonUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.GoogleApiService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -41,7 +42,7 @@ public class GoogleApiServiceImpl implements GoogleApiService {
 
     @Override
     public String translate(String text, String lang) {
-        if (text == null || "".equals(text) || lang == null)
+        if (Strings.isEmpty(text) || Strings.isEmpty(lang))
             return "";
         try {
             String url = BASE_URL + "?key=" + GOOGLE_API_KEY;

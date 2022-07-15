@@ -1,6 +1,7 @@
 package com.eachnow.linebot.common.constant;
 
 import lombok.Getter;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,7 +36,7 @@ public enum CurrencyEnum {
     }
 
     public static CurrencyEnum parse(String name) {
-        if (name == null || "".equals(name))
+        if (Strings.isEmpty(name))
             return null;
         Optional<CurrencyEnum> optional = Arrays.stream(CurrencyEnum.values()).filter(langEnum -> langEnum.getName().contains(name)).findFirst();
         if (optional.isPresent()) {
@@ -45,7 +46,7 @@ public enum CurrencyEnum {
     }
 
     public static CurrencyEnum parseByEnumName(String enumName) {
-        if (enumName == null || "".equals(enumName))
+        if (Strings.isEmpty(enumName))
             return null;
         Optional<CurrencyEnum> optional = Arrays.stream(CurrencyEnum.values()).filter(langEnum -> langEnum.toString().contains(enumName.toUpperCase())).findFirst();
         if (optional.isPresent()) {

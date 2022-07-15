@@ -1,6 +1,7 @@
 package com.eachnow.linebot.common.constant;
 
 import lombok.Getter;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -27,7 +28,7 @@ public enum WeatherElementEnum {
     }
 
     public static String getElement(String name) {
-        if (name == null)
+        if (Strings.isEmpty(name))
             return null;
         Optional<WeatherElementEnum> optional = Arrays.stream(WeatherElementEnum.values())
                 .filter(langEnum -> langEnum.getName().contains(name)).findFirst();
@@ -38,7 +39,7 @@ public enum WeatherElementEnum {
     }
 
     public static String getName(String element) {
-        if (element == null)
+        if (Strings.isEmpty(element))
         return null;
         Optional<WeatherElementEnum> optional = Arrays.stream(WeatherElementEnum.values())
                 .filter(langEnum -> langEnum.getElement().contains(element)).findFirst();

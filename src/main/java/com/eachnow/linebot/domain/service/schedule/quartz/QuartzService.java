@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 @Slf4j
@@ -77,7 +78,7 @@ public class QuartzService {
             JobKey jobKey = getJobKey(remindId);
             TriggerKey triggerKey = TriggerKey.triggerKey(TRIGGER_NAME, TRIGGER_GROUP);
             Trigger trigger = scheduler.getTrigger(triggerKey);
-            if (trigger == null)
+            if (Objects.isNull(trigger))
                 return;
             // 停止觸發器
 //            scheduler.pauseTrigger(triggerKey);

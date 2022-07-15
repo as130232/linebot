@@ -45,7 +45,7 @@ public class WhisperHandler implements CommandHandler {
         String code = commandPO.getCommand();
 
         LineUserPO lineUserPO = userMap.get(code);
-        if (lineUserPO == null) {
+        if (Objects.isNull(lineUserPO)) {
             Optional<LineUserPO> optional = lineUserRepository.findByCode(code);
             if (!optional.isPresent()) {
                 return new TextMessage("send failed.");
