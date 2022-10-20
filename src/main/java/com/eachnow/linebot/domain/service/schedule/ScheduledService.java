@@ -9,6 +9,7 @@ import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.crawler.JavdbCrawlerService;
 import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
+import com.eachnow.linebot.domain.service.gateway.OrderfoodApiService;
 import com.eachnow.linebot.domain.service.gateway.TwseApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +39,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ScheduledService {
     @Value("${cron.flag:false}")
     private boolean CRON_EXECUTE;
-
     private final ThreadPoolExecutor crawlerExecutor;
     private LineConfig lineConfig;
     private LineNotifySender lineNotifySender;
@@ -44,6 +46,7 @@ public class ScheduledService {
     private OpenWeatherService openWeatherService;
     private TwseApiService twseApiService;
     private JavdbCrawlerService javdbCrawlerService;
+    private OrderfoodApiService orderfoodApiService;
 
     @Autowired
     public ScheduledService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor crawlerExecutor,
@@ -52,7 +55,8 @@ public class ScheduledService {
                             BeautyCrawlerService beautyCrawlerService,
                             OpenWeatherService openWeatherService,
                             TwseApiService twseApiService,
-                            JavdbCrawlerService javdbCrawlerService) {
+                            JavdbCrawlerService javdbCrawlerService,
+                            OrderfoodApiService orderfoodApiService) {
         this.crawlerExecutor = crawlerExecutor;
         this.lineConfig = lineConfig;
         this.lineNotifySender = lineNotifySender;
@@ -60,6 +64,7 @@ public class ScheduledService {
         this.openWeatherService = openWeatherService;
         this.twseApiService = twseApiService;
         this.javdbCrawlerService = javdbCrawlerService;
+        this.orderfoodApiService = orderfoodApiService;
     }
 
     public void switchCron(boolean isOpen) {
@@ -81,6 +86,7 @@ public class ScheduledService {
     /**
      * 下雨警報
      */
+    @PostConstruct
     @Scheduled(cron = "0 0 23 * * ?")
     public void rainAlarm() {
         if (!CRON_EXECUTE)
@@ -126,5 +132,16 @@ public class ScheduledService {
         }
         CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
         log.info("[schedule]爬取javdb，完成。");
+    }
+
+    /**
+     * 周一 至 周五 早上09:00 至 12:00，每25分鐘呼叫一次
+     */
+    @Scheduled(cron = "0 */25 15,16,17,18 ? * MON,TUE,WED,THU,FRI *")
+//    @Scheduled(cron = "0 */25 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
+    public void orderfoodHeartbeat(){
+        if (!CRON_EXECUTE)
+            return;
+        orderfoodApiService.preventDormancy();
     }
 }
