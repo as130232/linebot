@@ -134,11 +134,11 @@ public class ScheduledService {
     /**
      * 周一 至 周五 早上09:00 至 12:00，每25分鐘呼叫一次
      */
-    @Scheduled(cron = "0 */20 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
-    public void orderfoodHeartbeat() {
-        if (!CRON_EXECUTE)
-            return;
-        orderfoodApiService.preventDormancy();
-        log.info("[schedule] orderfoodHeartbeat，完成。");
-    }
+//    @Scheduled(cron = "0 */20 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
+//    public void orderfoodHeartbeat() {
+//        if (!CRON_EXECUTE)
+//            return;
+//        orderfoodApiService.preventDormancy();
+//        log.info("[schedule] orderfoodHeartbeat，完成。");
+//    }
 }
