@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -80,13 +78,12 @@ public class ScheduledService {
         if (!CRON_EXECUTE)
             return;
         beautyCrawlerService.crawler(2);
-        log.info("[schedule]爬取表特版，完成。");
+        log.info("[schedule] 爬取表特版，完成。");
     }
 
     /**
      * 下雨警報
      */
-    @PostConstruct
     @Scheduled(cron = "0 0 23 * * ?")
     public void rainAlarm() {
         if (!CRON_EXECUTE)
@@ -111,7 +108,7 @@ public class ScheduledService {
         if (!CRON_EXECUTE)
             return;
         twseApiService.initPriceMap();
-        log.info("[schedule]爬取最新股價，完成。");
+        log.info("[schedule] 爬取最新股價，完成。");
     }
 
     //    @Scheduled(cron = "0 0 5 * * ?")
@@ -131,17 +128,17 @@ public class ScheduledService {
             futureList.add(future);
         }
         CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
-        log.info("[schedule]爬取javdb，完成。");
+        log.info("[schedule] 爬取javdb，完成。");
     }
 
     /**
      * 周一 至 周五 早上09:00 至 12:00，每25分鐘呼叫一次
      */
-    @Scheduled(cron = "0 */25 15,16,17,18 ? * MON,TUE,WED,THU,FRI *")
-//    @Scheduled(cron = "0 */25 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
-    public void orderfoodHeartbeat(){
+    @Scheduled(cron = "0 */20 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
+    public void orderfoodHeartbeat() {
         if (!CRON_EXECUTE)
             return;
         orderfoodApiService.preventDormancy();
+        log.info("[schedule] orderfoodHeartbeat，完成。");
     }
 }
