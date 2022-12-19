@@ -61,4 +61,5 @@ public class TestController {
     public void crawlerRankings() {
         javdbCrawlerService.crawlerRankings(JavdbCrawlerService.TYPE_DAILY);
     }
+    
 }
