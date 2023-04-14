@@ -13,7 +13,7 @@ public class TelegramMessagePO {
     @JsonAlias("from")
     private TelegramFromPO from;
     @JsonAlias("chat")
-    private Long chat;
+    private TelegramChatPO chat;
     @JsonAlias("date")
     private Long date;
     @JsonAlias("text")
