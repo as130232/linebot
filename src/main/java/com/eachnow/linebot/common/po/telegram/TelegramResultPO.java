@@ -9,5 +9,7 @@ import lombok.NoArgsConstructor;
 public class TelegramResultPO {
     @JsonAlias("update_id")
     private Long updateId;
+
+    @JsonAlias("message")
     private TelegramMessagePO message;
 }

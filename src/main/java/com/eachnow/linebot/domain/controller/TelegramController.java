@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * telegram有兩種獲取用戶訊息方式
+ * telegram有兩種獲取用戶訊息方式，只允許兩者選其一
  * 1.主動獲取，打API輪詢方式
- * https://api.telegram.org/bot{bot_token}/getUpdates
+ * <a href="https://api.telegram.org/bot{bot_token}/getUpdates">...</a>
  * 2.被動獲取，當有新訊息telegram會推播至URL後的API
- * https://api.telegram.org/bot{bot_token}/setWebhook?url=https://linebotmuyu.herokuapp.com/telegram/message/text/push
+ * <a href="https://api.telegram.org/bot{bot_token}/setWebhook?url=https://linebotmuyu.herokuapp.com/telegram/message/text/push">...</a>
  */
 @Slf4j
 @RestController

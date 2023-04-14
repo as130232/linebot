@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class TelegramFromPO {
+    @JsonAlias("id")
     private Integer id;
     @JsonAlias("is_bot")
     private Boolean isBot;

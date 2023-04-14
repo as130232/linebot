@@ -10,10 +10,12 @@ public class TelegramMessagePO {
 
     @JsonAlias("message_id")
     private Integer id;
-    @JsonAlias("update_id")
+    @JsonAlias("from")
     private TelegramFromPO from;
-    @JsonAlias("update_id")
+    @JsonAlias("chat")
     private Long chat;
+    @JsonAlias("date")
     private Long date;
+    @JsonAlias("text")
     private String text;
 }
