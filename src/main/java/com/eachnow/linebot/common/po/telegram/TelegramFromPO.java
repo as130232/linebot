@@ -1,0 +1,19 @@
+package com.eachnow.linebot.common.po.telegram;
+
+import com.fasterxml.jackson.annotation.JsonAlias;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
+@Data
+public class TelegramFromPO {
+    private Integer id;
+    @JsonAlias("is_bot")
+    private Boolean isBot;
+    @JsonAlias("first_name")
+    private String firstName;
+    @JsonAlias("last_name")
+    private String lastName;
+    @JsonAlias("language_code")
+    private String languageCode;
+}
