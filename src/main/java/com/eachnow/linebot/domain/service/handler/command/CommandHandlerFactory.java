@@ -6,6 +6,7 @@ import com.eachnow.linebot.domain.service.handler.DefaultHandler;
 import com.eachnow.linebot.domain.service.handler.command.impl.CloseCommandHandler;
 import com.eachnow.linebot.domain.service.handler.command.impl.WhisperHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -43,7 +44,7 @@ public class CommandHandlerFactory {
         if (command.length() == 2 && NumberUtils.isNumber(command))
             return whisperHandler;
 
-        if (command == null || "".equals(command))
+        if (Strings.isEmpty(command))
             return commandHandler;
 
         Class<? extends CommandHandler> commandHandlerClass = handlerMap.get(command.toLowerCase());
