@@ -4,11 +4,10 @@ import com.eachnow.linebot.common.annotation.Command;
 import com.eachnow.linebot.common.constant.WeatherElementEnum;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
-import com.eachnow.linebot.common.po.openweather.WeatherPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
-import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
+import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.linecorp.bot.model.message.Message;
@@ -16,19 +15,18 @@ import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
 import java.util.*;
 
 @Slf4j
 @Command({"天氣"})
 public class WeatherHandler implements CommandHandler {
-    private OpenWeatherService openWeatherService;
+    private WeatherApiService weatherApiService;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public WeatherHandler(OpenWeatherService openWeatherService) {
-        this.openWeatherService = openWeatherService;
+    public WeatherHandler(WeatherApiService weatherApiService) {
+        this.weatherApiService = weatherApiService;
     }
 
     @Override
@@ -38,7 +36,7 @@ public class WeatherHandler implements CommandHandler {
         if (Objects.isNull(locationName))
             locationName = "臺北市";
         String elementName = WeatherElementEnum.getElement(ParamterUtils.getValueByIndex(params, 1));
-        WeatherResultPO weatherResultPO = openWeatherService.getWeatherInfo(locationName, elementName);
+        WeatherResultPO weatherResultPO = weatherApiService.getWeatherInfo(locationName, elementName);
         if (weatherResultPO.getRecords().getLocation().size() == 0)
             return new TextMessage("查無此地:" + locationName);
         StringBuilder sb = new StringBuilder();
@@ -99,7 +97,7 @@ public class WeatherHandler implements CommandHandler {
 
     private String parseDate(String time) {
         ZonedDateTime zonetime = ZonedDateTime.parse(time, DateUtils.yyyyMMddHHmmssDash);
-        return zonetime.format(DateUtils.yyyyMMddHHmmDash);
+        return zonetime.format(DateUtils.yyyyMMddHHmmSlash);
     }
 
 }

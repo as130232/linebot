@@ -14,20 +14,23 @@ public class DateUtils {
     //    public static final ZoneId DEFAULT_ZONE_ID = ZoneId.of("UTC-4");    //美東
     public static final ZoneId CST_ZONE_ID = ZoneId.of("Asia/Taipei");  //台北
     public static final DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd").withZone(CST_ZONE_ID);
+    public static final DateTimeFormatter yyyyMMddHHmmss = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(CST_ZONE_ID);
     public static final DateTimeFormatter yyyyMMDash = DateTimeFormatter.ofPattern("yyyy-MM").withZone(CST_ZONE_ID);
     public static final DateTimeFormatter yyyyMMddDash = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(CST_ZONE_ID);
-    public static final DateTimeFormatter yyyyMMddSlash = DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(CST_ZONE_ID);
-    public static final DateTimeFormatter yyyyMMddHHmmDash = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(CST_ZONE_ID);
+    public static final DateTimeFormatter yyyyMMddHHmmDash = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(CST_ZONE_ID);
     public static final DateTimeFormatter yyyyMMddHHmmssDash = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(CST_ZONE_ID);
-    public static final DateTimeFormatter hhmmss = DateTimeFormatter.ofPattern("HH:mm:ss");
+    public static final DateTimeFormatter yyyyMMddSlash = DateTimeFormatter.ofPattern("yyyy/MM/dd").withZone(CST_ZONE_ID);
+    public static final DateTimeFormatter yyyyMMddHHmmSlash = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm").withZone(CST_ZONE_ID);
+    public static final DateTimeFormatter hhmmss = DateTimeFormatter.ofPattern("HHmmss");
+    public static final DateTimeFormatter hhmmssSemicolon = DateTimeFormatter.ofPattern("HH:mm:ss");
     //民國年
     public static final Chronology chronoByMinguo = MinguoChronology.INSTANCE;
     public static final DateTimeFormatter minguo = new DateTimeFormatterBuilder().parseLenient()
             .appendPattern("yyy年MM月dd日").toFormatter().withChronology(chronoByMinguo)
             .withDecimalStyle(DecimalStyle.of(Locale.getDefault()));
 
-    public static final String START_OF_DAY = LocalTime.MIN.format(hhmmss);
-    public static final String END_OF_DAY = LocalTime.MAX.format(hhmmss);
+    public static final String START_OF_DAY = LocalTime.MIN.format(hhmmssSemicolon);
+    public static final String END_OF_DAY = LocalTime.MAX.format(hhmmssSemicolon);
 
     public static String format(Timestamp timestamp, DateTimeFormatter formatter) {
         return formatter.format(timestamp.toLocalDateTime());

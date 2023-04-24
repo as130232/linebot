@@ -47,5 +47,8 @@ public class LineNotifySender {
         }
     }
 
+    public void sendToCharles(String message){
+        send(lineConfig.getLineNotifyKeyOwn(), message);
+    }
 
 }

@@ -1,7 +1,7 @@
 package com.eachnow.linebot.domain.service.gateway.impl;
 
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
-import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
+import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Component
-public class OpenWeatherServiceImpl implements OpenWeatherService {
+public class WeatherApiServiceImpl implements WeatherApiService {
     @Value("${open.weather.auth.code}")
     private String AUTH_CODE;
     private final String BASE_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001";
@@ -19,7 +19,7 @@ public class OpenWeatherServiceImpl implements OpenWeatherService {
 
 
     @Autowired
-    public OpenWeatherServiceImpl(RestTemplate restTemplate) {
+    public WeatherApiServiceImpl(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 

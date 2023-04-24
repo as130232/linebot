@@ -46,15 +46,16 @@ public class RemindJob implements Job {
         if (Strings.isEmpty(token)) {
             return;
         }
-        lineNotifySender.send(token, label);
+        lineNotifySender.sendToCharles(label);
 //        messageSender.send(userId, "text", label);
-        Optional<RemindPO> optional = remindRepository.findById(remindId);
-        if (optional.isPresent()) {
-            RemindPO remindPO = optional.get();
-            if (CommonConstant.ONCE.equals(remindPO.getType())) {
-                remindPO.setValid(CommonConstant.DONE);
-                remindRepository.save(remindPO);
-            }
-        }
+        //更新DB排程狀態
+//        Optional<RemindPO> optional = remindRepository.findById(remindId);
+//        if (optional.isPresent()) {
+//            RemindPO remindPO = optional.get();
+//            if (CommonConstant.ONCE.equals(remindPO.getType())) {
+//                remindPO.setValid(CommonConstant.DONE);
+//                remindRepository.save(remindPO);
+//            }
+//        }
     }
 }

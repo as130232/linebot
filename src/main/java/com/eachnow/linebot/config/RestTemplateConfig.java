@@ -87,7 +87,6 @@ public class RestTemplateConfig {
         //单路由的并发数
         pollingConnectionManager.setDefaultMaxPerRoute(1000);
         HttpClientBuilder httpClientBuilder = HttpClients.custom();
-//        httpClientBuilder.setProxy(new HttpHost("newproxy-java.innotech.me",3129));
         httpClientBuilder.setConnectionManager(pollingConnectionManager);
         // disable expect continue 不然188會回417
         RequestConfig defaultRequestConfig = RequestConfig.custom().setExpectContinueEnabled(false).build();

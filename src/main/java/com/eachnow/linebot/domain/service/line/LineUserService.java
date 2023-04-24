@@ -5,6 +5,7 @@ import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.db.repository.LineGroupUserRepository;
 import com.eachnow.linebot.common.db.repository.LineUserRepository;
 import com.eachnow.linebot.common.util.DateUtils;
+import com.eachnow.linebot.config.LineConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,12 +17,15 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class LineUserService {
-    private LineUserRepository lineUserRepository;
-    private LineGroupUserRepository lineGroupUserRepository;
+    private final LineConfig lineConfig;
+    private final LineUserRepository lineUserRepository;
+    private final LineGroupUserRepository lineGroupUserRepository;
 
     @Autowired
-    public LineUserService(LineUserRepository lineUserRepository,
+    public LineUserService(LineConfig lineConfig,
+                           LineUserRepository lineUserRepository,
                            LineGroupUserRepository lineGroupUserRepository) {
+        this.lineConfig = lineConfig;
         this.lineUserRepository = lineUserRepository;
         this.lineGroupUserRepository = lineGroupUserRepository;
     }
@@ -63,11 +67,12 @@ public class LineUserService {
     }
 
     public String getNotifyToken(String userId) {
-        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
-        if (optional.isPresent()) {
-            return optional.get().getNotifyToken();
-        }
-        return null;
+//        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
+//        if (optional.isPresent()) {
+//            return optional.get().getNotifyToken();
+//        }
+//        return null;
+        return lineConfig.getLineNotifyKeyOwn();
     }
 
     public void updateNotifyToken(String userId, String token) {

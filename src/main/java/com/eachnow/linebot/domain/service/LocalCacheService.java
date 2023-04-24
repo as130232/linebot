@@ -1,5 +1,7 @@
 package com.eachnow.linebot.domain.service;
 
+import com.eachnow.linebot.common.po.femas.FemasPeriodPO;
+import com.eachnow.linebot.common.po.femas.FemasRecordPO;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.extern.slf4j.Slf4j;
@@ -10,19 +12,24 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class LocalCacheService {
-    private static final Cache<Integer, String> MATCH_CLOSE_CACHE = Caffeine.newBuilder().expireAfterAccess(30, TimeUnit.MINUTES).build();
 
-    public void setMatchClose(Integer mid) {
-        MATCH_CLOSE_CACHE.put(mid, new String());
+    //key: date, value:上下班紀錄
+    private static final Cache<String, FemasRecordPO> WORK_RECORD_CACHE = Caffeine.newBuilder().expireAfterAccess(15, TimeUnit.HOURS).build();
+
+    public FemasRecordPO getRecord(String date) {
+        return WORK_RECORD_CACHE.getIfPresent(date);
     }
-    public void removeMatchClose(Integer mid) {
-        MATCH_CLOSE_CACHE.asMap().remove(mid);
+
+    public void setRecord(String date, FemasRecordPO po){
+        WORK_RECORD_CACHE.put(date, po);
     }
-    public boolean isMatchClose(Integer mid) {
-        return null != MATCH_CLOSE_CACHE.getIfPresent(mid);
+
+    public boolean isRecordExist(String date){
+        return null != WORK_RECORD_CACHE.getIfPresent(date);
     }
-    public String getMatchOddsTime(Integer mid) {
-        return MATCH_CLOSE_CACHE.getIfPresent(mid);
+
+    public void removeRecord(String date){
+        WORK_RECORD_CACHE.asMap().remove(date);
     }
 
 }

@@ -6,11 +6,11 @@ import com.eachnow.linebot.common.db.repository.RemindRepository;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.schedule.quartz.job.RemindJob;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -22,8 +22,8 @@ public class QuartzService {
     private final String JOB_GROUP = "quartz_job_group";
     private final String TRIGGER_NAME = "quartz_trigger_name";
     private final String TRIGGER_GROUP = "quartz_trigger_group";
-    private RemindRepository remindRepository;
-    private Scheduler scheduler;
+    private final RemindRepository remindRepository;
+    private final Scheduler scheduler;
 
     @Autowired
     public QuartzService(Scheduler scheduler,
@@ -32,7 +32,7 @@ public class QuartzService {
         this.remindRepository = remindRepository;
     }
 
-    @PostConstruct
+    //    @PostConstruct
     public void init() {
         try {
             scheduler.start();
@@ -40,7 +40,7 @@ public class QuartzService {
             //取得資料庫中所有有效的提醒任務
             List<RemindPO> listRemind = remindRepository.findByValid(CommonConstant.VALID);
             listRemind.forEach(po -> {
-                this.addJob(po.getId(), po.getUserId(), po.getLabel(), po.getCron());
+                this.addRemindJob(String.valueOf(po.getId()), po.getUserId(), po.getLabel(), po.getCron());
             });
         } catch (Exception e) {
             log.error("Quartz scheduler加載任務列表，失敗! error msg:{}", e.getMessage());
@@ -48,19 +48,21 @@ public class QuartzService {
     }
 
     public JobKey getJobKey(String remindId) {
-        JobKey jobKey = new JobKey(remindId, JOB_GROUP);
-        return jobKey;
+        return new JobKey(remindId, JOB_GROUP);
     }
 
-    public void addJob(Integer remindId, String userId, String label, String cron) {
+    /**
+     * 新增line通知提醒排程
+     */
+    public void addRemindJob(String remindId, String userId, String label, String cron) {
         try {
-            JobKey jobKey = getJobKey(remindId.toString());
+            JobKey jobKey = getJobKey(remindId);
             if (scheduler.checkExists(jobKey)) {
                 return;
             }
             JobDetail jobDetail = JobBuilder.newJob(RemindJob.class)
                     .withIdentity(jobKey)  //任務ID
-                    .usingJobData("remindId", remindId.toString())
+                    .usingJobData("remindId", remindId)
                     .usingJobData("userId", userId)
                     .usingJobData("label", label)
                     .build();
@@ -89,5 +91,45 @@ public class QuartzService {
         } catch (Exception e) {
             log.error("removeJob failed! error msg:{}", e.getMessage());
         }
+    }
+
+    /**
+     * 解析成cron格式
+     *
+     * @param date 20230424
+     * @param time 09000000
+     * @return 0 0 9 24 4 ? 2023
+     */
+    public static String getCron(String date, String time) {
+        if (Strings.isEmpty(date) || Strings.isEmpty(time))
+            return null;
+        try {
+            //20210408 161800 -> 0 18 16 8 4 ? 2021
+            String cron = "{second} {minute} {hour} {day} {month} ? {year}";
+            String cronOfYear = parseCronParam(date.substring(0, 4));
+            String cronOfMonth = parseCronParam(date.substring(4, 6));
+            String cronOfDay = parseCronParam(date.substring(6, 8));
+            String cronOfHour = parseCronParam(time.substring(0, 2));
+            String cronOfMinute = parseCronParam(time.substring(2, 4));
+            String cronOfSecond = parseCronParam(time.substring(4, 6));
+            return cron.replace("{year}", cronOfYear).replace("{month}", cronOfMonth).replace("{day}", cronOfDay)
+                    .replace("{hour}", cronOfHour).replace("{minute}", cronOfMinute).replace("{second}", cronOfSecond);
+        } catch (Exception e) {
+            log.error("getCron failed! date:{}, time:{}, error msg:{}", date, time, e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 解析cron 每一個時間參數 > 0 0 8 15 * ? *
+     */
+    private static String parseCronParam(String cron) {
+        if (cron.contains("$") || cron.contains("＄")) {
+            return "*";
+        }
+        if (cron.indexOf("0") == 0) {
+            cron = cron.substring(1);
+        }
+        return cron;
     }
 }

@@ -6,9 +6,11 @@ import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.config.LineConfig;
+import com.eachnow.linebot.domain.service.FemasService;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.crawler.JavdbCrawlerService;
-import com.eachnow.linebot.domain.service.gateway.OpenWeatherService;
+import com.eachnow.linebot.domain.service.gateway.FemasApiService;
+import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import com.eachnow.linebot.domain.service.gateway.OrderfoodApiService;
 import com.eachnow.linebot.domain.service.gateway.TwseApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
@@ -38,31 +40,34 @@ public class ScheduledService {
     @Value("${cron.flag:false}")
     private boolean CRON_EXECUTE;
     private final ThreadPoolExecutor crawlerExecutor;
-    private LineConfig lineConfig;
-    private LineNotifySender lineNotifySender;
-    private BeautyCrawlerService beautyCrawlerService;
-    private OpenWeatherService openWeatherService;
-    private TwseApiService twseApiService;
-    private JavdbCrawlerService javdbCrawlerService;
-    private OrderfoodApiService orderfoodApiService;
+    private final LineConfig lineConfig;
+    private final LineNotifySender lineNotifySender;
+    private final BeautyCrawlerService beautyCrawlerService;
+    private final WeatherApiService weatherApiService;
+    private final TwseApiService twseApiService;
+    private final JavdbCrawlerService javdbCrawlerService;
+    private final OrderfoodApiService orderfoodApiService;
 
+    private final FemasService femasService;
     @Autowired
     public ScheduledService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor crawlerExecutor,
                             LineConfig lineConfig,
                             LineNotifySender lineNotifySender,
                             BeautyCrawlerService beautyCrawlerService,
-                            OpenWeatherService openWeatherService,
+                            WeatherApiService weatherApiService,
                             TwseApiService twseApiService,
                             JavdbCrawlerService javdbCrawlerService,
-                            OrderfoodApiService orderfoodApiService) {
+                            OrderfoodApiService orderfoodApiService,
+                            FemasService femasService) {
         this.crawlerExecutor = crawlerExecutor;
         this.lineConfig = lineConfig;
         this.lineNotifySender = lineNotifySender;
         this.beautyCrawlerService = beautyCrawlerService;
-        this.openWeatherService = openWeatherService;
+        this.weatherApiService = weatherApiService;
         this.twseApiService = twseApiService;
         this.javdbCrawlerService = javdbCrawlerService;
         this.orderfoodApiService = orderfoodApiService;
+        this.femasService = femasService;
     }
 
     public void switchCron(boolean isOpen) {
@@ -89,15 +94,15 @@ public class ScheduledService {
         if (!CRON_EXECUTE)
             return;
         String loactionName = "臺北市";
-        WeatherResultPO po = openWeatherService.getWeatherInfo(loactionName, WeatherElementEnum.POP.getElement());
+        WeatherResultPO po = weatherApiService.getWeatherInfo(loactionName, WeatherElementEnum.POP.getElement());
         for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
             for (TimePO timePO : weatherElementPO.getTime()) {   //取得隔天早上06:00 ~ 18:00 的機率
-                Integer unit = Integer.valueOf(timePO.getParameter().getParameterName());
+                int unit = Integer.parseInt(timePO.getParameter().getParameterName());
                 //降雨機率大於70% 則通知
                 if (unit >= 70) {
-                    String start = DateUtils.parseDateTime(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmDash);
-                    String end = (DateUtils.parseDateTime(timePO.getEndTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmDash)).split(" ")[1];
-                    lineNotifySender.send(lineConfig.getLineNotifyKeyOwn(), start + " - " + end + "，降雨機率為: {unit}%，出門請帶傘。".replace("{unit}", unit.toString()));
+                    String start = DateUtils.parseDateTime(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmSlash);
+                    String end = (DateUtils.parseDateTime(timePO.getEndTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmSlash)).split(" ")[1];
+                    lineNotifySender.sendToCharles(start + " - " + end + "，降雨機率為: {unit}%，出門請帶傘。".replace("{unit}", Integer.toString(unit)));
                 }
             }
         }
@@ -132,7 +137,7 @@ public class ScheduledService {
     }
 
     /**
-     * 周一 至 周五 早上09:00 至 12:00，每25分鐘呼叫一次
+     * 周一 至 周五 早上09:00 至 12:00，每20分鐘呼叫一次
      */
 //    @Scheduled(cron = "0 */20 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
 //    public void orderfoodHeartbeat() {
@@ -141,4 +146,29 @@ public class ScheduledService {
 //        orderfoodApiService.preventDormancy();
 //        log.info("[schedule] orderfoodHeartbeat，完成。");
 //    }
+
+
+    /**
+     * 上班未打卡提醒
+     * 周一 至 周五 早上 09:50 檢查是否有打卡記錄
+     */
+    @Scheduled(cron = "0 50 9 ? * MON,TUE,WED,THU,FRI *")
+    public void remindPunchIn() {
+        if (!CRON_EXECUTE)
+            return;
+        femasService.remindPunchIn();
+        log.info("[schedule] remindPunchIn，完成。");
+    }
+    /**
+     * 設置下班提醒
+     * 周一 至 周五 早上09:00 至 18:00，每20分鐘呼叫一次
+     */
+    @Scheduled(cron = "0 */20 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
+    public void remindPunchOut() {
+        if (!CRON_EXECUTE)
+            return;
+        femasService.remindPunchOut();
+        log.info("[schedule] remindPunchOut，完成。");
+    }
+
 }
