@@ -152,7 +152,7 @@ public class ScheduledService {
      * 上班未打卡提醒
      * 周一 至 周五 早上 09:50 檢查是否有打卡記錄
      */
-    @Scheduled(cron = "0 50 9 ? * MON,TUE,WED,THU,FRI *")
+    @Scheduled(cron = "0 50 9 * * MON-FRI")
     public void remindPunchIn() {
         if (!CRON_EXECUTE)
             return;
@@ -163,7 +163,7 @@ public class ScheduledService {
      * 設置下班提醒
      * 周一 至 周五 早上09:00 至 18:00，每20分鐘呼叫一次
      */
-    @Scheduled(cron = "0 */20 9,10,11,12 ? * MON,TUE,WED,THU,FRI *")
+    @Scheduled(cron = "0 */20 9-12 ? * MON-FRI")
     public void remindPunchOut() {
         if (!CRON_EXECUTE)
             return;
