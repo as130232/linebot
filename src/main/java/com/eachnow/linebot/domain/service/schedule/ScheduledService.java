@@ -161,7 +161,7 @@ public class ScheduledService {
     }
     /**
      * 設置下班提醒
-     * 周一 至 周五 早上09:00 至 18:00，每20分鐘呼叫一次
+     * 周一 至 周五 早上09:00 至 12:00，每20分鐘呼叫一次
      */
     @Scheduled(cron = "0 */20 9-12 ? * MON-FRI")
     public void remindPunchOut() {

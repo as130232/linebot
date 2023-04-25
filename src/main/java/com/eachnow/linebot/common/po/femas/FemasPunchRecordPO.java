@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FemasRecordPO {
+public class FemasPunchRecordPO {
     private String date;
     private String startTime;
     private String endTime;         // 預期可下班時間

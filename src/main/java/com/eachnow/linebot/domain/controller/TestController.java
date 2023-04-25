@@ -39,7 +39,7 @@ public class TestController {
     }
 
     @GetMapping(value = "/command")
-    public Result testCommand(@RequestParam(value = "text") String text) {
+    public Result<String> testCommand(@RequestParam(value = "text") String text) {
         Result<String> result = new Result<>();
         result.setData("test by charles:" + messageHandler.executeCommand(null, text, null));
         return result;
