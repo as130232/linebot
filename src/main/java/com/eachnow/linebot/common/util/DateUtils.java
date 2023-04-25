@@ -46,8 +46,13 @@ public class DateUtils {
         return localDate.format(to);
     }
 
-    public static String parseDateTime(String date, DateTimeFormatter from, DateTimeFormatter to) {
-        LocalDateTime localDateTime = LocalDateTime.parse(date, from);
+    public static ZonedDateTime parseDateTime(String dateTime, DateTimeFormatter from) {
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTime, from);
+        return localDateTime.atZone(CST_ZONE_ID);
+    }
+
+    public static String parseDateTime(String dateTime, DateTimeFormatter from, DateTimeFormatter to) {
+        LocalDateTime localDateTime = LocalDateTime.parse(dateTime, from);
         return localDateTime.atZone(CST_ZONE_ID).format(to);
     }
 

@@ -86,23 +86,24 @@ public class FemasService {
             FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);     //取得第一筆當天資訊
             if (datePO.getIs_holiday() || Strings.isEmpty(datePO.getFirst_in())) {  //  若當天放假 或 還未有打卡記錄
                 log.info("remindPunchOut termination. date:{}, isHoliday:{}, firstIn:{}", currentDate, datePO.getIs_holiday(), datePO.getFirst_in());
-            } else {
-                String startDatetimeStr = currentDate + " " + datePO.getFirst_in();    //2023-04-24 08:52
-                ZonedDateTime startDatetime = DateUtils.parseDate(startDatetimeStr, DateUtils.yyyyMMddHHmmDash);
-                ZonedDateTime endDatetime = startDatetime.plusHours(9);
-                String endDatetimeStr = endDatetime.format(DateUtils.yyyyMMddHHmmDash);
-                FemasPunchRecordPO po = FemasPunchRecordPO.builder().date(currentDate).startTime(startDatetimeStr)
-                        .endTime(endDatetimeStr).build();
-                localCacheService.setPunchRecord(currentDate, po);
-                //新增下班提醒排程
-                String cron = QuartzService.getCron(endDatetime.format(DateUtils.yyyyMMdd), endDatetime.format(DateUtils.hhmmss));
-                log.info("set remindPunchOut startDatetimeStr:{}, endDatetime:{}, cron:{}", startDatetimeStr, endDatetime, cron);
-                quartzService.addRemindJob(getRemindId(currentDate), "system", "打卡下班囉！ " + endDatetimeStr, cron);
+                return;
             }
+            String startDatetimeStr = currentDate + " " + datePO.getFirst_in();    //2023-04-24 08:52
+            ZonedDateTime startDatetime = DateUtils.parseDateTime(startDatetimeStr, DateUtils.yyyyMMddHHmmDash);
+            ZonedDateTime endDatetime = startDatetime.plusHours(9);
+            String endDatetimeStr = endDatetime.format(DateUtils.yyyyMMddHHmmDash);
+            FemasPunchRecordPO po = FemasPunchRecordPO.builder().date(currentDate).startTime(startDatetimeStr)
+                    .endTime(endDatetimeStr).build();
+            localCacheService.setPunchRecord(currentDate, po);
+            //新增下班提醒排程
+            String cron = QuartzService.getCron(endDatetime.format(DateUtils.yyyyMMdd), endDatetime.format(DateUtils.hhmmss));
+            log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", startDatetimeStr, endDatetimeStr, cron);
+            quartzService.addRemindJob(getRemindId(currentDate), "system", "打卡下班囉！ " + endDatetimeStr, cron);
         }
     }
 
     public String getRemindId(String date) {
         return "PUNCH_" + date;
     }
+
 }
