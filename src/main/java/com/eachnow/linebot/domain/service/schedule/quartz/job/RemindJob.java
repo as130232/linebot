@@ -41,11 +41,11 @@ public class RemindJob implements Job {
         log.info("trigger remind job. jobExecutionContext:{}", jobExecutionContext);
         String userId = jobExecutionContext.getMergedJobDataMap().get("userId").toString();
         String label = "『提醒』 " + jobExecutionContext.getMergedJobDataMap().get("label").toString();
-        Integer remindId = Integer.valueOf(jobExecutionContext.getMergedJobDataMap().get("remindId").toString());
-        String token = lineUserService.getNotifyToken(userId);
-        if (Strings.isEmpty(token)) {
-            return;
-        }
+//        Integer remindId = Integer.valueOf(jobExecutionContext.getMergedJobDataMap().get("remindId").toString());
+//        String token = lineUserService.getNotifyToken(userId);
+//        if (Strings.isEmpty(token)) {
+//            return;
+//        }
         lineNotifySender.sendToCharles(label);
 //        messageSender.send(userId, "text", label);
         //更新DB排程狀態
