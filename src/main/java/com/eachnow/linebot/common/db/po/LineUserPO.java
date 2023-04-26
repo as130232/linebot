@@ -27,6 +27,4 @@ public class LineUserPO {
     private Timestamp createTime;
     @Column(length = 33)
     private String notifyToken;
-    @Column(length = 3)
-    private String code;
 }
