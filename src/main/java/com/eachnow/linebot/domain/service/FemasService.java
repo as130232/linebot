@@ -58,7 +58,7 @@ public class FemasService {
             }
             // 還未有打卡記錄則提醒
             if (Strings.isEmpty(datePO.getFirst_in())) {
-                lineNotifySender.sendToCharles("偵測到未打卡，請趕緊打卡。");
+                lineNotifySender.sendToCharles("偵測到未打卡，剩十分鐘請趕緊打卡！");
             }
         }
     }
@@ -98,7 +98,7 @@ public class FemasService {
             //新增下班提醒排程
             String cron = QuartzService.getCron(endDatetime.format(DateUtils.yyyyMMdd), endDatetime.format(DateUtils.hhmmss));
             log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", startDatetimeStr, endDatetimeStr, cron);
-            quartzService.addRemindJob(getRemindId(currentDate), "system", "打卡下班囉！ " + endDatetimeStr, cron);
+            quartzService.addRemindJob(getRemindId(currentDate), null, "打卡下班囉！ " + endDatetimeStr, cron);
         }
     }
 

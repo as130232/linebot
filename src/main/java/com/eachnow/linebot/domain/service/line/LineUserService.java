@@ -67,12 +67,9 @@ public class LineUserService {
     }
 
     public String getNotifyToken(String userId) {
-//        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
-//        if (optional.isPresent()) {
-//            return optional.get().getNotifyToken();
-//        }
-//        return null;
-        return lineConfig.getLineNotifyKeyOwn();
+        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
+        return optional.map(LineUserPO::getNotifyToken).orElse(null);
+        //        return lineConfig.getLineNotifyKeyOwn();
     }
 
     public void updateNotifyToken(String userId, String token) {

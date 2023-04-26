@@ -49,8 +49,7 @@ public class MessageSender {
     public BotApiResponse push(String to, List<Message> messages){
         PushMessage pushMessage = new PushMessage(to, messages);
         try {
-            BotApiResponse botApiResponse = client.pushMessage(pushMessage).get();
-            return botApiResponse;
+            return client.pushMessage(pushMessage).get();
         } catch (InterruptedException | ExecutionException e) {
             log.error("發送訊息，失敗! to:{}, messages:{}, error msg:{}", to, messages, e.getMessage());
             return null;
