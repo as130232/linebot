@@ -61,6 +61,7 @@ public class FemasService {
                 lineNotifySender.sendToCharles("偵測到未打卡，剩十分鐘請趕緊打卡！");
             }
         }
+        log.info("remindPunchIn success.");
     }
 
     /**
@@ -100,6 +101,7 @@ public class FemasService {
             log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", startDatetimeStr, endDatetimeStr, cron);
             quartzService.addRemindJob(jobKey, null, null, "打卡下班囉！ " + endDatetimeStr, cron);
         }
+        log.info("remindPunchOut success.");
     }
 
     public String getJobKeyStr(String date) {
