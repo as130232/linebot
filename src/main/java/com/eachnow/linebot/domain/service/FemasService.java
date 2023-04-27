@@ -50,7 +50,7 @@ public class FemasService {
         String searchEnd = today.format(DateUtils.yyyyMMddDash);
         //取得當天打卡紀錄
         FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(searchEnd);
-        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getStartTime())) {
+        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
             FemasResultPO femasResultPO = femasApiService.getRecords(searchStart, searchEnd);
             FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);
             if (datePO.getIs_holiday()) { //  若當天放假
@@ -82,23 +82,24 @@ public class FemasService {
         String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
         //取得當天紀錄
         FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate);
-        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getStartTime())) {
+        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
             FemasResultPO femasResultPO = femasApiService.getRecords(searchStart, currentDate);
             FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);     //取得第一筆當天資訊
             if (datePO.getIs_holiday() || Strings.isEmpty(datePO.getFirst_in())) {  //  若當天放假 或 還未有打卡記錄
                 log.info("remindPunchOut termination. date:{}, isHoliday:{}, firstIn:{}", currentDate, datePO.getIs_holiday(), datePO.getFirst_in());
                 return;
             }
-            String startDatetimeStr = currentDate + " " + datePO.getFirst_in();    //2023-04-24 08:52
-            ZonedDateTime startDatetime = DateUtils.parseDateTime(startDatetimeStr, DateUtils.yyyyMMddHHmmDash);
-            ZonedDateTime endDatetime = startDatetime.plusHours(9);
-            String endDatetimeStr = endDatetime.format(DateUtils.yyyyMMddHHmmDash);
-            FemasPunchRecordPO po = FemasPunchRecordPO.builder().date(currentDate).startTime(startDatetimeStr)
-                    .endTime(endDatetimeStr).build();
+            String punchInStr = currentDate + " " + datePO.getFirst_in();       //2023-04-24 08:52
+            String actualPunchOut = currentDate + " " + datePO.getFirst_out();
+            ZonedDateTime punchIn = DateUtils.parseDateTime(punchInStr, DateUtils.yyyyMMddHHmmDash);
+            ZonedDateTime punchOut = punchIn.plusHours(9);
+            String endDatetimeStr = punchOut.format(DateUtils.yyyyMMddHHmmDash);
+            FemasPunchRecordPO po = FemasPunchRecordPO.builder().date(currentDate).punchIn(punchInStr)
+                    .punchOut(endDatetimeStr).actualPunchOut(actualPunchOut).build();
             localCacheService.setPunchRecord(currentDate, po);
             //新增下班提醒排程
-            String cron = QuartzService.getCron(endDatetime.format(DateUtils.yyyyMMdd), endDatetime.format(DateUtils.hhmmss));
-            log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", startDatetimeStr, endDatetimeStr, cron);
+            String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
+            log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", punchInStr, endDatetimeStr, cron);
             quartzService.addRemindJob(jobKey, null, null, "打卡下班囉！ " + endDatetimeStr, cron);
         }
         log.info("remindPunchOut success.");

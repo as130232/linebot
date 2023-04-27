@@ -29,8 +29,8 @@ public class FemasHandler implements CommandHandler {
             case "打卡":
                 femasService.remindPunchOut();
                 FemasPunchRecordPO po = localCacheService.getPunchRecord(DateUtils.getCurrentDate());
-                String sb = "上班時間：" + po.getStartTime() + "\n" +
-                        "下班時間：" + po.getEndTime();
+                String sb = "上班時間：" + po.getPunchIn() + "\n" +
+                        "下班時間：" + po.getPunchOut();
                 return new TextMessage(sb);
         }
         return null;

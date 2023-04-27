@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class FemasPunchRecordPO {
     private String date;
-    private String startTime;
-    private String endTime;         // 預期可下班時間
-    private String actualEndTime;   // 實際下班時間
+    private String punchIn;         // 打卡上班時間
+    private String punchOut;        // 預期可打卡下班時間
+    private String actualPunchOut;  // 最後一次打卡下班時間
 }
