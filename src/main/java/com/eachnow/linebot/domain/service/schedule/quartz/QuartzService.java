@@ -11,6 +11,7 @@ import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -32,7 +33,7 @@ public class QuartzService {
         this.remindRepository = remindRepository;
     }
 
-    //    @PostConstruct
+    @PostConstruct
     public void init() {
         try {
             scheduler.start();
@@ -40,29 +41,28 @@ public class QuartzService {
             //取得資料庫中所有有效的提醒任務
             List<RemindPO> listRemind = remindRepository.findByValid(CommonConstant.VALID);
             listRemind.forEach(po -> {
-                this.addRemindJob(String.valueOf(po.getId()), po.getUserId(), po.getLabel(), po.getCron());
+                this.addRemindJob(getJobKey(String.valueOf(po.getId())), po.getId(), po.getUserId(), po.getLabel(), po.getCron());
             });
         } catch (Exception e) {
             log.error("Quartz scheduler加載任務列表，失敗! error msg:{}", e.getMessage());
         }
     }
 
-    public JobKey getJobKey(String remindId) {
-        return new JobKey(remindId, JOB_GROUP);
+    public JobKey getJobKey(String key) {
+        return new JobKey(key, JOB_GROUP);
     }
 
     /**
      * 新增line通知提醒排程
      */
-    public void addRemindJob(String remindId, String userId, String label, String cron) {
+    public void addRemindJob(JobKey jobKey, Integer remindId, String userId, String label, String cron) {
         try {
-            JobKey jobKey = getJobKey(remindId);
             if (scheduler.checkExists(jobKey)) {
                 return;
             }
             JobDetail jobDetail = JobBuilder.newJob(RemindJob.class)
                     .withIdentity(jobKey)  //任務ID
-                    .usingJobData("remindId", remindId)
+                    .usingJobData("remindId", remindId) //db remind id
                     .usingJobData("userId", userId)
                     .usingJobData("label", label)
                     .build();

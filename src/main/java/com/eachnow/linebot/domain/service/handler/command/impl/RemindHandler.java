@@ -26,6 +26,7 @@ import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.quartz.JobKey;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
@@ -106,7 +107,8 @@ public class RemindHandler implements CommandHandler {
             remindPO = remindRepository.save(remindPO);
             log.info("新增提醒任務，成功。remindPO:{}", remindPO);
             //新增任務
-            quartzService.addRemindJob(remindPO.getId().toString(), commandPO.getUserId(), label, cron);
+            JobKey jobKey = quartzService.getJobKey(remindPO.getId().toString());
+            quartzService.addRemindJob(jobKey, remindPO.getId(), commandPO.getUserId(), label, cron);
             MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
             return new TextMessage("新增提醒成功。");
         } else if (commandPO.getText().contains(CANCEL)) {

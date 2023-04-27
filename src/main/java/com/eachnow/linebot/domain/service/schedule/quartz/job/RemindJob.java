@@ -3,6 +3,7 @@ package com.eachnow.linebot.domain.service.schedule.quartz.job;
 import com.eachnow.linebot.common.constant.CommonConstant;
 import com.eachnow.linebot.common.db.po.RemindPO;
 import com.eachnow.linebot.common.db.repository.RemindRepository;
+import com.eachnow.linebot.common.util.NumberUtils;
 import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import com.eachnow.linebot.domain.service.line.LineUserService;
@@ -52,15 +53,19 @@ public class RemindJob implements Job {
             }
             lineNotifySender.send(token, label);
         }
-//        Integer remindId = Integer.valueOf(jobExecutionContext.getMergedJobDataMap().get("remindId").toString());
-//        updateValid(remindId);
+        Object remind = jobExecutionContext.getMergedJobDataMap().get("remindId");
+        if (Objects.nonNull(remind) && NumberUtils.isNumber(remind.toString())) {
+            Integer remindId = Integer.valueOf(remind.toString());
+            updateValid(remindId);
+        }
     }
 
     /**
      * 更新DB排程狀態
+     *
      * @param remindId 排程ID
      */
-    private void updateValid(Integer remindId){
+    private void updateValid(Integer remindId) {
         Optional<RemindPO> optional = remindRepository.findById(remindId);
         if (optional.isPresent()) {
             RemindPO remindPO = optional.get();

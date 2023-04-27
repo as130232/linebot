@@ -69,7 +69,7 @@ public class FemasService {
     public void remindPunchOut() {
         ZonedDateTime today = DateUtils.getCurrentDateTime();
         String currentDate = today.format(DateUtils.yyyyMMddDash);
-        JobKey jobKey = quartzService.getJobKey(getRemindId(currentDate));
+        JobKey jobKey = quartzService.getJobKey(getJobKeyStr(currentDate));
         try {
             //檢查是否已經有當天下班提醒排程
             if (scheduler.checkExists(jobKey) || Objects.nonNull(localCacheService.getPunchRecord(currentDate))) {
@@ -98,11 +98,11 @@ public class FemasService {
             //新增下班提醒排程
             String cron = QuartzService.getCron(endDatetime.format(DateUtils.yyyyMMdd), endDatetime.format(DateUtils.hhmmss));
             log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", startDatetimeStr, endDatetimeStr, cron);
-            quartzService.addRemindJob(getRemindId(currentDate), null, "打卡下班囉！ " + endDatetimeStr, cron);
+            quartzService.addRemindJob(jobKey, null, null, "打卡下班囉！ " + endDatetimeStr, cron);
         }
     }
 
-    public String getRemindId(String date) {
+    public String getJobKeyStr(String date) {
         return "PUNCH_" + date;
     }
 

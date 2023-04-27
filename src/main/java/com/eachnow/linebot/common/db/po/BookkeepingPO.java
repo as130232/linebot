@@ -21,7 +21,7 @@ public class BookkeepingPO {
     @Column(length = 33)
     private String userId;
     @Column(length = 30)
-    private String typeName;
+    private String label;
     @Column(length = 10)
     private BigDecimal amount;
     @Column(length = 5)

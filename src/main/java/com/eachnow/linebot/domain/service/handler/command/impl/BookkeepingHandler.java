@@ -87,7 +87,7 @@ public class BookkeepingHandler implements CommandHandler {
             return new TextMessage("請輸入正確格式: 記 {類型} {金額} {幣值}(可省略)，例:記 晚餐 180，注意需空格隔開！");
         }
         if (text.contains(CONFIRM)) {
-            BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).typeName(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
+            BookkeepingPO po = BookkeepingPO.builder().userId(commandPO.getUserId()).label(typeName).amount(new BigDecimal(amount)).currency(currencyEnum.toString())
                     .date(date).createTime(DateUtils.getCurrentTime()).build();
             bookkeepingRepository.save(po);
             MessageHandler.removeUserAndCacheCommand(commandPO.getUserId());    //移除緩存
@@ -248,7 +248,7 @@ public class BookkeepingHandler implements CommandHandler {
                 listBookkeepingSameDate.forEach(po -> {
                     Box typeAndAmount = Box.builder().layout(FlexLayout.HORIZONTAL).contents(Arrays.asList(
                             //類型名稱
-                            Text.builder().text(po.getTypeName()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
+                            Text.builder().text(po.getLabel()).size(FlexFontSize.SM).color("#555555").flex(0).offsetStart(FlexOffsetSize.MD).build(),
                             //金額
                             Text.builder().text(po.getAmount().toString() + " " + po.getCurrency()).size(FlexFontSize.SM).color("#555555").align(FlexAlign.END).build()
                     )).build();
