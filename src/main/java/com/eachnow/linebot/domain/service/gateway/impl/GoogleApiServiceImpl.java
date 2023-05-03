@@ -48,7 +48,6 @@ public class GoogleApiServiceImpl implements GoogleApiService {
             String url = BASE_URL + "?key=" + GOOGLE_API_KEY;
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
             InputTranslationPO inputTranslationPO = InputTranslationPO.builder().q(text).target(lang).build();
             HttpEntity<InputTranslationPO> request = new HttpEntity<>(inputTranslationPO, headers);
             ResponseEntity<OutputTranslationPO> responseEntity = restTemplate.postForEntity(url, request, OutputTranslationPO.class);
