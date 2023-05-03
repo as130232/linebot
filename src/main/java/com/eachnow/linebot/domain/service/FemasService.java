@@ -48,7 +48,7 @@ public class FemasService {
             return null;
         }
         String punchInStr = searchEnd + " " + datePO.getFirst_in();       //2023-04-24 08:52
-        String actualPunchOut = searchEnd + " " + datePO.getFirst_out();
+        String actualPunchOut = Objects.isNull(datePO.getFirst_out()) ? punchInStr : searchEnd + " " + datePO.getFirst_out();
         ZonedDateTime punchIn = DateUtils.parseDateTime(punchInStr, DateUtils.yyyyMMddHHmmDash);
         ZonedDateTime punchOut = punchIn.plusHours(9);
         String punchOutStr = punchOut.format(DateUtils.yyyyMMddHHmmDash);
