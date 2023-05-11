@@ -9,10 +9,9 @@ import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.FemasService;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.crawler.JavdbCrawlerService;
-import com.eachnow.linebot.domain.service.gateway.FemasApiService;
-import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import com.eachnow.linebot.domain.service.gateway.OrderfoodApiService;
 import com.eachnow.linebot.domain.service.gateway.TwseApiService;
+import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +26,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 
-//import org.springframework.scheduling.annotation.SchedulingConfigurer;
-//import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 排程服務
  */
-//@EnableScheduling
 @Slf4j
 @Component
 public class ScheduledService {
@@ -49,6 +45,7 @@ public class ScheduledService {
     private final OrderfoodApiService orderfoodApiService;
 
     private final FemasService femasService;
+
     @Autowired
     public ScheduledService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor crawlerExecutor,
                             LineConfig lineConfig,
@@ -146,9 +143,10 @@ public class ScheduledService {
             return;
         femasService.remindPunchIn();
     }
+
     /**
      * 設置下班提醒
-     * 周一 至 周五 早上09:00 至 12:00，每30分鐘呼叫一次
+     * 周一 至 周五 早上10:00 至 13:00，每30分鐘呼叫一次
      */
     @Scheduled(cron = "0 */30 10-13 ? * MON-FRI")
     public void remindPunchOut() {
