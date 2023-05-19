@@ -94,20 +94,22 @@ public class FemasService {
             if (scheduler.checkExists(jobKey) || Objects.nonNull(localCacheService.getPunchRecord(currentDate))) {
                 return;
             }
-        } catch (SchedulerException e) {
-            log.error("checkExists failed! error mg:{}", e.getMessage());
+
+            //取得當天紀錄
+            FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate);
+            if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
+                FemasPunchRecordPO po = getPunchRecord(searchStart, currentDate);
+                ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
+                //新增下班提醒排程
+                String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
+                log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", po.getPunchIn(), po.getPunchOut(), cron);
+                quartzService.addRemindJob(jobKey, null, null, "打卡下班囉！ " + po.getPunchOut(), cron);
+            }
+            log.info("remindPunchOut success.");
+        } catch (Exception e) {
+            log.error("set remindPunchOut failed! error mg:{}", e.getMessage());
+            lineNotifySender.sendToCharles("set remindPunchOut failed!");
         }
-        //取得當天紀錄
-        FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate);
-        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-            FemasPunchRecordPO po = getPunchRecord(searchStart, currentDate);
-            ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
-            //新增下班提醒排程
-            String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
-            log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", po.getPunchIn(), po.getPunchOut(), cron);
-            quartzService.addRemindJob(jobKey, null, null, "打卡下班囉！ " + po.getPunchOut(), cron);
-        }
-        log.info("remindPunchOut success.");
     }
 
     public String getJobKeyStr(String date) {
