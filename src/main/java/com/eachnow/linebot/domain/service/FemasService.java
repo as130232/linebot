@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +43,7 @@ public class FemasService {
         FemasResultPO femasResultPO = femasApiService.getRecords(searchStart, searchEnd);
         FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);     //取得第一筆當天資訊
         if (datePO.getIs_holiday() || Strings.isEmpty(datePO.getFirst_in())) {  //  若當天放假 或 還未有打卡記錄
-            log.info("remindPunchOut termination. date:{}, isHoliday:{}, firstIn:{}", searchEnd, datePO.getIs_holiday(), datePO.getFirst_in());
+            log.info("remindPunchOut termination. punch in not found. date:{}, isHoliday:{}, firstIn:{}", searchEnd, datePO.getIs_holiday(), datePO.getFirst_in());
             return null;
         }
         String punchInStr = searchEnd + " " + datePO.getFirst_in();       //2023-04-24 08:52
@@ -88,17 +87,19 @@ public class FemasService {
         ZonedDateTime today = DateUtils.getCurrentDateTime();
         String currentDate = today.format(DateUtils.yyyyMMddDash);
         JobKey jobKey = quartzService.getJobKey(getJobKeyStr(currentDate));
-        String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
+        String searchStart = today.minusDays(2).format(DateUtils.yyyyMMddDash); //前三天
         try {
             //檢查是否已經有當天下班提醒排程
             if (scheduler.checkExists(jobKey) || Objects.nonNull(localCacheService.getPunchRecord(currentDate))) {
                 return;
             }
-
             //取得當天紀錄
             FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate);
             if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
                 FemasPunchRecordPO po = getPunchRecord(searchStart, currentDate);
+                if (Objects.isNull(po)) {
+                    return;
+                }
                 ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
                 //新增下班提醒排程
                 String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
