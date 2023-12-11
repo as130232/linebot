@@ -14,8 +14,8 @@ import org.springframework.web.client.RestTemplate;
 public class WeatherApiServiceImpl implements WeatherApiService {
     @Value("${open.weather.auth.code}")
     private String AUTH_CODE;
-    private final String BASE_URL = "https://opendata.cwb.gov.tw/api/v1/rest/datastore/F-C0032-001";
-    private RestTemplate restTemplate;
+    private final String BASE_URL = "https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001";
+    private final RestTemplate restTemplate;
 
 
     @Autowired
