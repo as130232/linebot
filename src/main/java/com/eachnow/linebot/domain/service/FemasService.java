@@ -101,9 +101,9 @@ public class FemasService {
                     return;
                 }
                 ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
-                //若是超過七點下班，表示遲到需要提醒忘刷卡
+                //檢查是否遲到，若是超過七點下班則為超過十點打卡，為遲到需要提醒忘刷卡
                 if (isLate(punchOut)) {
-                    lineNotifySender.sendToCharles("今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單！");
+                    lineNotifySender.sendToCharles("今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！");
                 }
                 //新增下班提醒排程
                 String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
