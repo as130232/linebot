@@ -101,6 +101,10 @@ public class FemasService {
                     return;
                 }
                 ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
+                //若是超過七點下班，表示遲到需要提醒忘刷卡
+                if (isLate(punchOut)) {
+                    lineNotifySender.sendToCharles("今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單！");
+                }
                 //新增下班提醒排程
                 String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
                 log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", po.getPunchIn(), po.getPunchOut(), cron);
@@ -117,4 +121,13 @@ public class FemasService {
         return "PUNCH_" + date;
     }
 
+    /**
+     * 檢查是否遲到，若是超過七點下班，為遲到需要提醒忘刷卡
+     */
+    public boolean isLate(ZonedDateTime punchOut) {
+        //取得晚上7點整時間
+        ZonedDateTime targetTime = ZonedDateTime.now().withZoneSameInstant(DateUtils.CST_ZONE_ID).withHour(19).withMinute(0).withSecond(0).withNano(0);
+        // 判断下班時間是否小於目標時間
+        return !punchOut.isBefore(targetTime);
+    }
 }
