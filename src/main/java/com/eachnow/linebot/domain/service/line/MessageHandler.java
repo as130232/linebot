@@ -48,6 +48,14 @@ public class MessageHandler {
         this.lineUserService = lineUserService;
     }
 
+//    @PostConstruct
+//    private void test() {
+//        String text = "抽 多";
+//        //根據指令取得對應指令處理服務
+//        Message message = executeCommand("test", text, null);
+//        System.out.println(message);
+//    }
+
     public static void setUserAndCacheCommand(String userId, String text) {
         userAndCacheCommand.put(userId, text);
     }

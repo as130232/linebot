@@ -1,10 +1,13 @@
 package com.eachnow.linebot.domain.controller;
 
 import com.eachnow.linebot.common.po.Result;
+import com.eachnow.linebot.common.util.JsonUtils;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
 import com.eachnow.linebot.domain.service.crawler.JavdbCrawlerService;
 import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.linecorp.bot.model.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,9 +42,10 @@ public class TestController {
     }
 
     @GetMapping(value = "/command")
-    public Result<String> testCommand(@RequestParam(value = "text") String text) {
+    public Result<String> testCommand(@RequestParam(value = "text") String text) throws JsonProcessingException {
         Result<String> result = new Result<>();
-        result.setData("test by charles:" + messageHandler.executeCommand(null, text, null));
+        Message message = messageHandler.executeCommand(null, text, null);
+        result.setData(JsonUtils.toJsonString(message));
         return result;
     }
 
