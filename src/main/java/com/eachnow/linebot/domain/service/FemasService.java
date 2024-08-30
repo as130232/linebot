@@ -1,11 +1,13 @@
 package com.eachnow.linebot.domain.service;
 
+import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.po.femas.FemasDataPO;
 import com.eachnow.linebot.common.po.femas.FemasPunchRecordPO;
 import com.eachnow.linebot.common.po.femas.FemasResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.gateway.FemasApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
+import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.schedule.quartz.QuartzService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -13,9 +15,10 @@ import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.time.ZonedDateTime;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -26,21 +29,30 @@ public class FemasService {
     private final QuartzService quartzService;
     private final Scheduler scheduler;
     private final LineNotifySender lineNotifySender;
+    private final LineUserService lineUserService;
+    @Value("${femas.token}")
+    private String FEMAS_TOKEN_CHARLES;
 
     @Autowired
     public FemasService(LocalCacheService localCacheService,
                         FemasApiService femasApiService,
                         QuartzService quartzService, Scheduler scheduler,
-                        LineNotifySender lineNotifySender) {
+                        LineNotifySender lineNotifySender,
+                        LineUserService lineUserService) {
         this.localCacheService = localCacheService;
         this.femasApiService = femasApiService;
         this.quartzService = quartzService;
         this.scheduler = scheduler;
         this.lineNotifySender = lineNotifySender;
+        this.lineUserService = lineUserService;
     }
 
-    public FemasPunchRecordPO getPunchRecord(String searchStart, String searchEnd) {
-        FemasResultPO femasResultPO = femasApiService.getRecords(searchStart, searchEnd);
+    public FemasPunchRecordPO getPunchRecordByCharles(String searchStart, String searchEnd) {
+        return getPunchRecord("charles", FEMAS_TOKEN_CHARLES, searchStart, searchEnd);
+    }
+
+    public FemasPunchRecordPO getPunchRecord(String userName, String femasToken, String searchStart, String searchEnd) {
+        FemasResultPO femasResultPO = femasApiService.getRecords(femasToken, searchStart, searchEnd);
         FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);     //取得第一筆當天資訊
         if (datePO.getIs_holiday() || Strings.isEmpty(datePO.getFirst_in())) {  //  若當天放假 或 還未有打卡記錄
             log.info("remindPunchOut termination. punch in not found. date:{}, isHoliday:{}, firstIn:{}", searchEnd, datePO.getIs_holiday(), datePO.getFirst_in());
@@ -53,7 +65,7 @@ public class FemasService {
         String punchOutStr = punchOut.format(DateUtils.yyyyMMddHHmmDash);
         FemasPunchRecordPO po = FemasPunchRecordPO.builder().date(searchEnd).punchIn(punchInStr)
                 .punchOut(punchOutStr).actualPunchOut(actualPunchOut).build();
-        localCacheService.setPunchRecord(searchEnd, po);
+        localCacheService.setPunchRecord(searchEnd, userName, po);
         return po;
     }
 
@@ -65,9 +77,9 @@ public class FemasService {
         String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
         String searchEnd = today.format(DateUtils.yyyyMMddDash);
         //取得當天打卡紀錄
-        FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(searchEnd);
+        FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(searchEnd, "charles");
         if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-            FemasResultPO femasResultPO = femasApiService.getRecords(searchStart, searchEnd);
+            FemasResultPO femasResultPO = femasApiService.getRecords(FEMAS_TOKEN_CHARLES, searchStart, searchEnd);
             FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);
             if (datePO.getIs_holiday()) { //  若當天放假
                 return;
@@ -86,39 +98,56 @@ public class FemasService {
     public void remindPunchOut() {
         ZonedDateTime today = DateUtils.getCurrentDateTime();
         String currentDate = today.format(DateUtils.yyyyMMddDash);
-        JobKey jobKey = quartzService.getJobKey(getJobKeyStr(currentDate));
         String searchStart = today.minusDays(2).format(DateUtils.yyyyMMddDash); //前三天
+        List<LineUserPO> users = new ArrayList<>();
         try {
-            //檢查是否已經有當天下班提醒排程
-            if (scheduler.checkExists(jobKey) || Objects.nonNull(localCacheService.getPunchRecord(currentDate))) {
-                return;
-            }
-            //取得當天紀錄
-            FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate);
-            if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-                FemasPunchRecordPO po = getPunchRecord(searchStart, currentDate);
-                if (Objects.isNull(po)) {
+            users = lineUserService.listUser();
+        } catch (Exception e) {
+            users.add(LineUserPO.builder().name("charles").femasToken(FEMAS_TOKEN_CHARLES).build());
+            log.error("set remindPunchOut and listUser failed! error mg:{}", e.getMessage());
+            lineNotifySender.sendToCharles("set remindPunchOut and listUser failed!");
+        }
+        for (LineUserPO user : users) {
+            try {
+                String userName = user.getName().toLowerCase();
+                String femasToken = user.getFemasToken();
+                String notifyToken = user.getNotifyToken();
+                if (userName.isEmpty() || femasToken.isEmpty()) {
+                    continue;
+                }
+                JobKey jobKey = quartzService.getJobKey(getJobKeyStr(currentDate, userName));
+                //檢查是否已經有當天下班提醒排程
+                if (scheduler.checkExists(jobKey) || Objects.nonNull(localCacheService.getPunchRecord(currentDate, userName))) {
                     return;
                 }
-                ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
-                //檢查是否遲到，若是超過七點下班則為超過十點打卡，為遲到需要提醒忘刷卡
-                if (isLate(punchOut)) {
-                    lineNotifySender.sendToCharles("今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！");
+                //取得當天紀錄
+                FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
+                if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
+                    FemasPunchRecordPO po = getPunchRecord(userName, femasToken, searchStart, currentDate);
+                    if (Objects.isNull(po)) {
+                        return;
+                    }
+                    ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
+                    //檢查是否遲到，若是超過七點下班則為超過十點打卡，為遲到需要提醒忘刷卡
+                    if (isLate(punchOut) && !notifyToken.isEmpty()) {
+                        lineNotifySender.send(notifyToken, "今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！");
+                    }
+                    //新增下班提醒排程
+                    String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
+                    String label = "打卡下班囉！ " + po.getPunchOut();
+                    quartzService.addRemindJob(jobKey, null, null, label, cron);
+                    log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", po.getPunchIn(), po.getPunchOut(), cron);
                 }
-                //新增下班提醒排程
-                String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
-                log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", po.getPunchIn(), po.getPunchOut(), cron);
-                quartzService.addRemindJob(jobKey, null, null, "打卡下班囉！ " + po.getPunchOut(), cron);
+                log.info("remindPunchOut success.");
+            } catch (Exception e) {
+                log.error("set remindPunchOut failed! error mg:{}", e.getMessage());
+                lineNotifySender.sendToCharles("set remindPunchOut failed!");
             }
-            log.info("remindPunchOut success.");
-        } catch (Exception e) {
-            log.error("set remindPunchOut failed! error mg:{}", e.getMessage());
-            lineNotifySender.sendToCharles("set remindPunchOut failed!");
         }
     }
 
-    public String getJobKeyStr(String date) {
-        return "PUNCH_" + date;
+    public String getJobKeyStr(String date, String userName) {
+        return "PUNCH_" + (date + "_" + userName).toLowerCase();
     }
 
     /**

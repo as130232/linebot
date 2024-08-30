@@ -29,7 +29,7 @@ public class FemasApiServiceImpl implements FemasApiService {
     }
 
     @Override
-    public FemasResultPO getRecords(String searchStart, String searchEnd) {
+    public FemasResultPO getRecords(String token, String searchStart, String searchEnd) {
         try {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);

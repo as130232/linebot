@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -66,12 +67,6 @@ public class LineUserService {
         log.error("找不到該line群組對應用戶! userId:{}, groupId:{}", userId, groupId);
     }
 
-    public String getNotifyToken(String userId) {
-        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
-        return optional.map(LineUserPO::getNotifyToken).orElse(null);
-        //        return lineConfig.getLineNotifyKeyOwn();
-    }
-
     public void updateNotifyToken(String userId, String token) {
         Optional<LineUserPO> optional = lineUserRepository.findById(userId);
         LineUserPO po;
@@ -84,5 +79,20 @@ public class LineUserService {
         po.setNotifyToken(token);
         lineUserRepository.save(po);
         log.info("更新用戶notify token，完成。userId:{}, token:{}", userId, token);
+    }
+
+    public String getNotifyToken(String userId) {
+        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
+        return optional.map(LineUserPO::getNotifyToken).orElse(null);
+        //        return lineConfig.getLineNotifyKeyOwn();
+    }
+
+    public String getName(String userId) {
+        Optional<LineUserPO> optional = lineUserRepository.findById(userId);
+        return optional.map(LineUserPO::getName).orElse(null);
+    }
+
+    public List<LineUserPO> listUser() {
+        return lineUserRepository.findAll();
     }
 }

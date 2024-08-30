@@ -32,7 +32,7 @@ public class FemasController {
         String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
         String searchEnd = today.format(DateUtils.yyyyMMddDash);
         Result<FemasPunchRecordPO> result = new Result<>();
-        result.setData(femasService.getPunchRecord(searchStart, searchEnd));
+        result.setData(femasService.getPunchRecordByCharles(searchStart, searchEnd));
         return result;
     }
 }
