@@ -34,7 +34,7 @@ public class FemasApiServiceImpl implements FemasApiService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
             headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
-            headers.set("Authorization", FEMAS_TOKEN);
+            headers.set("Authorization", token);
             FemasSearchDatePO searchDatePO = FemasSearchDatePO.builder().type("user").searchStart(searchStart).searchEnd(searchEnd).offset(0).build();
             HttpEntity<FemasSearchDatePO> httpEntity = new HttpEntity<>(searchDatePO, headers);
             String url = URL + "/photons/fsapi/V3/att_records.json";
