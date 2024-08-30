@@ -35,18 +35,13 @@ public class FemasHandler implements CommandHandler {
         switch (commandPO.getCommand()) {
             case "打卡":
                 //設置打卡提醒
-                String userName = null;
                 Optional<LineUserPO> optional = lineUserService.getUser(commandPO.getUserId());
-                if (optional.isPresent()) {
-                    LineUserPO user = optional.get();
-                    femasService.remindPunchOutByUser(user);
-                    userName = user.getName();
+                if (!optional.isPresent()) {
+                    return new TextMessage("找不到該用戶，請註冊用戶資料: userId:" + commandPO.getUserId());
                 }
-                //若有給名稱參數，則以名稱參數為主
-                String userNameByParam = commandPO.getParams().get(0);
-                if (userNameByParam == null || userNameByParam.equals("")) {
-                    userName = userNameByParam;
-                }
+                LineUserPO user = optional.get();
+                femasService.remindPunchOutByUser(user);
+                String userName = user.getName();
                 FemasPunchRecordPO po = localCacheService.getPunchRecord(DateUtils.getCurrentDate(), userName);
                 String sb = "上班時間：" + po.getPunchIn() + "\n" +
                         "下班時間：" + po.getPunchOut();
