@@ -117,7 +117,7 @@ public class FemasService {
             String userName = user.getName().toLowerCase();
             String femasToken = user.getFemasToken();
             String notifyToken = user.getNotifyToken();
-            if (userName.isEmpty() || femasToken.isEmpty()) {
+            if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
                 return;
             }
             JobKey jobKey = quartzService.getJobKey(getJobKeyStr(currentDate, userName));
