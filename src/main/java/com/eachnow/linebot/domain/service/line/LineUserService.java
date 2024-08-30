@@ -95,4 +95,8 @@ public class LineUserService {
     public List<LineUserPO> listUser() {
         return lineUserRepository.findAll();
     }
+
+    public Optional<LineUserPO> getUser(String userId) {
+        return lineUserRepository.findById(userId);
+    }
 }

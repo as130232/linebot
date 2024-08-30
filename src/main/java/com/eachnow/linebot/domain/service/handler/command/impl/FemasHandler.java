@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.service.handler.command.impl;
 
 import com.eachnow.linebot.common.annotation.Command;
+import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.femas.FemasPunchRecordPO;
 import com.eachnow.linebot.common.util.DateUtils;
@@ -12,6 +13,8 @@ import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Optional;
 
 @Slf4j
 @Command({"打卡"})
@@ -29,14 +32,21 @@ public class FemasHandler implements CommandHandler {
 
     @Override
     public Message execute(CommandPO commandPO) {
-        String userName = lineUserService.getName(commandPO.getUserId());
-        String userNameByParam = commandPO.getParams().get(0);
-        if (userNameByParam == null || userNameByParam.equals("")) {
-            userName = userNameByParam;
-        }
         switch (commandPO.getCommand()) {
             case "打卡":
-                femasService.remindPunchOut();
+                //設置打卡提醒
+                String userName = null;
+                Optional<LineUserPO> optional = lineUserService.getUser(commandPO.getUserId());
+                if (optional.isPresent()) {
+                    LineUserPO user = optional.get();
+                    femasService.remindPunchOutByUser(user);
+                    userName = user.getName();
+                }
+                //若有給名稱參數，則以名稱參數為主
+                String userNameByParam = commandPO.getParams().get(0);
+                if (userNameByParam == null || userNameByParam.equals("")) {
+                    userName = userNameByParam;
+                }
                 FemasPunchRecordPO po = localCacheService.getPunchRecord(DateUtils.getCurrentDate(), userName);
                 String sb = "上班時間：" + po.getPunchIn() + "\n" +
                         "下班時間：" + po.getPunchOut();
