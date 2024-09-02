@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 
 @Slf4j
-@Command({"打卡"})
+@Command({"打卡", "femas"})
 public class FemasHandler implements CommandHandler {
     private final LocalCacheService localCacheService;
     private final FemasService femasService;
@@ -33,7 +33,7 @@ public class FemasHandler implements CommandHandler {
     @Override
     public Message execute(CommandPO commandPO) {
         switch (commandPO.getCommand()) {
-            case "打卡":
+            case "打卡": {
                 //設置打卡提醒
                 Optional<LineUserPO> optional = lineUserService.getUser(commandPO.getUserId());
                 if (!optional.isPresent()) {
@@ -46,6 +46,11 @@ public class FemasHandler implements CommandHandler {
                 String sb = "上班時間：" + po.getPunchIn() + "\n" +
                         "下班時間：" + po.getPunchOut();
                 return new TextMessage(sb);
+            }
+            case "femas": {
+                String femasToken = commandPO.getParams().get(0);
+                lineUserService.updateFemasToken(commandPO.getUserId(), femasToken);
+            }
         }
         return null;
     }

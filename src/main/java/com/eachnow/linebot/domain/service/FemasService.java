@@ -66,7 +66,7 @@ public class FemasService {
         FemasPunchRecordPO po = FemasPunchRecordPO.builder().date(searchEnd).punchIn(punchInStr)
                 .punchOut(punchOutStr).actualPunchOut(actualPunchOut).build();
         localCacheService.setPunchRecord(searchEnd, userName, po);
-        log.info("getPunchRecord. userName:{}, femasToken:{}, femasResultPO:{}", userName, femasToken, femasResultPO);
+        log.info("setPunchRecord local cache success. userName:{}, punchOut:{}", userName, punchOutStr);
         return po;
     }
 

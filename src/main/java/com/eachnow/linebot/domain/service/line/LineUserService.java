@@ -99,4 +99,13 @@ public class LineUserService {
     public Optional<LineUserPO> getUser(String userId) {
         return lineUserRepository.findById(userId);
     }
+
+    public void updateFemasToken(String userId, String femasToken) {
+        Optional<LineUserPO> optional = getUser(userId);
+        if (optional.isPresent()) {
+            LineUserPO user = optional.get();
+            user.setFemasToken(femasToken);
+            log.info("updateFemasToken success. userId:{}, femasToken:{}", userId, femasToken);
+        }
+    }
 }
