@@ -109,7 +109,12 @@ public class MessageHandler {
         //根據指令取得對應指令處理服務
         return executeCommand(event.getSource().getUserId(), text, null);
     }
-
+    public Message handleTextMessageEvent(String userId, TextMessageContent message) {
+        log.info("userId:{}, message:{}", userId, message);
+        final String text = message.getText();
+        //根據指令取得對應指令處理服務
+        return executeCommand(userId, text, null);
+    }
     /**
      * 處理地區訊息
      */
