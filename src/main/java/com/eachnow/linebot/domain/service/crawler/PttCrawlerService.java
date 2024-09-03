@@ -2,7 +2,6 @@ package com.eachnow.linebot.domain.service.crawler;
 
 import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.PttArticlePO;
-import com.eachnow.linebot.common.po.twse.IndexPO;
 import com.eachnow.linebot.common.util.NumberUtils;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import lombok.extern.slf4j.Slf4j;
@@ -11,12 +10,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StopWatch;
-import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -26,6 +21,7 @@ import java.util.stream.Collectors;
 public class PttCrawlerService {
     private WebDriverFactory webDriverFactory;
     private LineNotifySender lineNotifySender;
+
     @Autowired
     public PttCrawlerService(WebDriverFactory webDriverFactory,
                              LineNotifySender lineNotifySender) {
@@ -200,7 +196,7 @@ public class PttCrawlerService {
         return result;
     }
 
-//    @PostConstruct
+    //    @PostConstruct
     public void init() {
 //        StopWatch sw1 = new StopWatch();
 //        sw1.start();

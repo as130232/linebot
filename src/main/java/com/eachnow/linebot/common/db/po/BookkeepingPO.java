@@ -1,9 +1,9 @@
 package com.eachnow.linebot.common.db.po;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 

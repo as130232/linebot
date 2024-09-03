@@ -1,26 +1,15 @@
 package com.eachnow.linebot.config;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpException;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpRequest;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.routing.HttpRoutePlanner;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultConnectionKeepAliveStrategy;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.DefaultProxyRoutePlanner;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HttpContext;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.SSLContexts;
 import org.apache.http.ssl.TrustStrategy;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -36,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+
 
 @Slf4j
 @Configuration
@@ -62,13 +51,6 @@ public class RestTemplateConfig {
         return restTemplate;
     }
 
-    @Bean("proxy-resttemplate")
-    public RestTemplate proxyRestTemplate(@Qualifier("proxy-factory") ClientHttpRequestFactory factory) {
-        RestTemplate restTemplate = new RestTemplate(factory);
-        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-        return restTemplate;
-    }
-
     /**
      * 若調用沒有證書的https會出現"PKIX path building failed"錯誤
      */
@@ -79,94 +61,88 @@ public class RestTemplateConfig {
         return restTemplate;
     }
 
-    @Bean("proxy-factory")
-    public ClientHttpRequestFactory simpleClientHttpRequestFactoryBet188() {
-        PoolingHttpClientConnectionManager pollingConnectionManager = new PoolingHttpClientConnectionManager(30, TimeUnit.SECONDS);
-        //最大连接数
-        pollingConnectionManager.setMaxTotal(1000);
-        //单路由的并发数
-        pollingConnectionManager.setDefaultMaxPerRoute(1000);
-        HttpClientBuilder httpClientBuilder = HttpClients.custom();
-        httpClientBuilder.setConnectionManager(pollingConnectionManager);
-        // disable expect continue 不然188會回417
-        RequestConfig defaultRequestConfig = RequestConfig.custom().setExpectContinueEnabled(false).build();
-        httpClientBuilder.setDefaultRequestConfig(defaultRequestConfig);
-        // 重试次数2次，并开启
-//        httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(2, true));
-        // 保持长连接配置，需要在头添加Keep-Alive
-        httpClientBuilder.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy());
-        HttpClient httpClient = httpClientBuilder.build();
-        // httpClient连接底层配置clientHttpRequestFactory
-        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-        // 连接超时时长配置
-        clientHttpRequestFactory.setConnectTimeout(5000);
-        // 数据读取超时时长配置
-        clientHttpRequestFactory.setReadTimeout(5000);
-        // 连接不够用的等待时间，不宜过长，必须设置，比如连接不够用时，时间过长将是灾难性的
-        clientHttpRequestFactory.setConnectionRequestTimeout(200);
-        // 缓冲请求数据，默认值是true。通过POST或者PUT大量发送数据时，建议将此属性更改为false，以免耗尽内存。
-        clientHttpRequestFactory.setBufferRequestBody(false);
-        return clientHttpRequestFactory;
-    }
+//    @Bean("proxy-resttemplate")
+//    public RestTemplate proxyRestTemplate(@Qualifier("proxy-factory") ClientHttpRequestFactory factory) {
+//        RestTemplate restTemplate = new RestTemplate(factory);
+//        restTemplate.getMessageConverters().set(1, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+//        return restTemplate;
+//    }
+
+
+//    @Bean("proxy-factory")
+//    public ClientHttpRequestFactory simpleClientHttpRequestFactoryBet188() {
+//        PoolingHttpClientConnectionManager pollingConnectionManager = new PoolingHttpClientConnectionManager(30, TimeUnit.SECONDS);
+//        //最大连接数
+//        pollingConnectionManager.setMaxTotal(1000);
+//        //单路由的并发数
+//        pollingConnectionManager.setDefaultMaxPerRoute(1000);
+//        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+//        httpClientBuilder.setConnectionManager(pollingConnectionManager);
+//        // disable expect continue 不然188會回417
+//        RequestConfig defaultRequestConfig = RequestConfig.custom().setExpectContinueEnabled(false).build();
+//        httpClientBuilder.setDefaultRequestConfig(defaultRequestConfig);
+//        // 重试次数2次，并开启
+////        httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(2, true));
+//        // 保持长连接配置，需要在头添加Keep-Alive
+//        httpClientBuilder.setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy());
+//        HttpClient httpClient = httpClientBuilder.build();
+//        // httpClient连接底层配置clientHttpRequestFactory
+//        HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
+//        // 连接超时时长配置
+//        clientHttpRequestFactory.setConnectTimeout(5000);
+//        // 数据读取超时时长配置
+//        clientHttpRequestFactory.setReadTimeout(5000);
+//        // 连接不够用的等待时间，不宜过长，必须设置，比如连接不够用时，时间过长将是灾难性的
+//        clientHttpRequestFactory.setConnectionRequestTimeout(200);
+//        // 缓冲请求数据，默认值是true。通过POST或者PUT大量发送数据时，建议将此属性更改为false，以免耗尽内存。
+//        clientHttpRequestFactory.setBufferRequestBody(false);
+//        return clientHttpRequestFactory;
+//    }
+
+//    @Bean("https-request-factory")
+//    public HttpComponentsClientHttpRequestFactory generateHttpsRequestFactory() {
+//        try {
+//            TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
+//            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+//            SSLConnectionSocketFactory connectionSocketFactory =
+//                    new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+//
+//            HttpClientBuilder httpClientBuilder = HttpClients.custom();
+//            httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
+//            CloseableHttpClient httpClient = httpClientBuilder.build();
+//            HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+//            factory.setHttpClient(httpClient);
+//            factory.setConnectTimeout(10 * 1000);
+//            factory.setReadTimeout(30 * 1000);
+//            return factory;
+//        } catch (Exception e) {
+//            log.error("generate HttpsRequestFactory failed! error msg:{}", e.getMessage());
+//            throw new RuntimeException();
+//        }
+//    }
 
     @Bean("https-request-factory")
     public HttpComponentsClientHttpRequestFactory generateHttpsRequestFactory() {
         try {
-            TrustStrategy acceptingTrustStrategy = (x509Certificates, authType) -> true;
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-            SSLConnectionSocketFactory connectionSocketFactory =
-                    new SSLConnectionSocketFactory(sslContext, new NoopHostnameVerifier());
+            // 使用 SSLContextBuilder 來建立 SSLContext
+            SSLContext sslContext = SSLContextBuilder.create()
+                    .loadTrustMaterial((chain, authType) -> true) // 信任所有證書
+                    .build();
 
-            HttpClientBuilder httpClientBuilder = HttpClients.custom();
-            httpClientBuilder.setSSLSocketFactory(connectionSocketFactory);
-            CloseableHttpClient httpClient = httpClientBuilder.build();
+            // 建立 HttpClient
+            CloseableHttpClient httpClient = HttpClients.custom()
+                    .setSSLContext(sslContext)
+                    .setSSLHostnameVerifier(NoopHostnameVerifier.INSTANCE) // 不驗證主機名稱
+                    .build();
+
+            // 建立 HttpComponentsClientHttpRequestFactory
             HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-            factory.setHttpClient(httpClient);
             factory.setConnectTimeout(10 * 1000);
-            factory.setReadTimeout(30 * 1000);
+//            factory.setReadTimeout(30 * 1000);
             return factory;
         } catch (Exception e) {
             log.error("generate HttpsRequestFactory failed! error msg:{}", e.getMessage());
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
-    }
-
-    public RestTemplate restTemplateBuilder(String host, int port) {
-        return new RestTemplateBuilder(new RestTemplateCustomizer() {
-            @Override
-            public void customize(RestTemplate restTemplate) {
-                PoolingHttpClientConnectionManager pollingConnectionManager = new PoolingHttpClientConnectionManager(30, TimeUnit.SECONDS);
-                //最大连接数
-                pollingConnectionManager.setMaxTotal(500);
-                //单路由的并发数
-                pollingConnectionManager.setDefaultMaxPerRoute(100);
-                //設定proxy
-                HttpHost proxy = new HttpHost(host, port);
-                HttpRoutePlanner httpRoutePlanner = new DefaultProxyRoutePlanner(proxy) {
-                    @Override
-                    public HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
-                        return super.determineProxy(target, request, context);
-                    }
-                };
-                HttpClient httpClient = HttpClientBuilder.create()
-                        .setRoutePlanner(httpRoutePlanner)
-                        .setConnectionManager(pollingConnectionManager)
-                        // 保持长连接配置，需要在头添加Keep-Alive
-//                        .setKeepAliveStrategy(new DefaultConnectionKeepAliveStrategy())
-                        // disable expect continue 不然188會回417
-//                        .setDefaultRequestConfig(RequestConfig.custom().setExpectContinueEnabled(false).build())
-                        .build();
-                HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
-                // 连接超时时长配置
-                clientHttpRequestFactory.setConnectTimeout(3000);
-                // 数据读取超时时长配置
-                clientHttpRequestFactory.setReadTimeout(3000);
-                // 连接不够用的等待时间，不宜过长，必须设置，比如连接不够用时，时间过长将是灾难性的
-                clientHttpRequestFactory.setConnectionRequestTimeout(200);
-                // 缓冲请求数据，默认值是true。通过POST或者PUT大量发送数据时，建议将此属性更改为false，以免耗尽内存。
-                clientHttpRequestFactory.setBufferRequestBody(false);
-                restTemplate.setRequestFactory(clientHttpRequestFactory);
-            }
-        }).build();
     }
 }

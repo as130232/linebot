@@ -19,7 +19,7 @@ import com.linecorp.bot.spring.boot.annotation.LineMessageHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

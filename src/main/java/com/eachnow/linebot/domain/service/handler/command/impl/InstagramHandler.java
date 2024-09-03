@@ -122,26 +122,26 @@ public class InstagramHandler implements CommandHandler {
 
     //    @PostConstruct
     private void login() {
-        log.info("準備登入IG");
-        WebDriver driver = webDriverFactory.bulidDriver(INSTAGRAM_BASE_URI, false);
-        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.name("username")));
-        WebElement usernameWebElement = driver.findElements(By.name("username")).get(0);
-        WebElement passwordWebElement = driver.findElements(By.name("password")).get(0);
-        usernameWebElement.sendKeys(this.ACCOUNT);
-        passwordWebElement.sendKeys(this.PASSWORD);
-        //登入
-        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")));
-        WebElement loginButton = driver.findElements(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")).get(0);
-        loginButton.click();
-        //不儲存登入資料
-        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/div/div/button")));
-        WebElement storeButton = driver.findElements(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/div/div/button")).get(0);
-        storeButton.click();
-        //不通知視窗
-        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div[4]/div/div/div/div[3]/button[2]")));
-        WebElement notificationButton = driver.findElements(By.xpath("/html/body/div[4]/div/div/div/div[3]/button[2]")).get(0);
-        notificationButton.click();
-        driver.quit();
-        log.info("登入IG完成。");
+//        log.info("準備登入IG");
+//        WebDriver driver = webDriverFactory.bulidDriver(INSTAGRAM_BASE_URI, false);
+//        new WebDriverWait(driver, new 30).until(ExpectedConditions.presenceOfElementLocated(By.name("username")));
+//        WebElement usernameWebElement = driver.findElements(By.name("username")).get(0);
+//        WebElement passwordWebElement = driver.findElements(By.name("password")).get(0);
+//        usernameWebElement.sendKeys(this.ACCOUNT);
+//        passwordWebElement.sendKeys(this.PASSWORD);
+//        //登入
+//        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")));
+//        WebElement loginButton = driver.findElements(By.xpath("//*[@id=\"loginForm\"]/div/div[3]/button/div")).get(0);
+//        loginButton.click();
+//        //不儲存登入資料
+//        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/div/div/button")));
+//        WebElement storeButton = driver.findElements(By.xpath("//*[@id=\"react-root\"]/section/main/div/div/div/div/button")).get(0);
+//        storeButton.click();
+//        //不通知視窗
+//        new WebDriverWait(driver, 30).until(ExpectedConditions.presenceOfElementLocated(By.xpath("/html/body/div[4]/div/div/div/div[3]/button[2]")));
+//        WebElement notificationButton = driver.findElements(By.xpath("/html/body/div[4]/div/div/div/div[3]/button[2]")).get(0);
+//        notificationButton.click();
+//        driver.quit();
+//        log.info("登入IG完成。");
     }
 }

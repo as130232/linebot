@@ -2,8 +2,7 @@ package com.eachnow.linebot.common.db.po;
 
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
