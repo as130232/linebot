@@ -43,6 +43,10 @@
             <artifactId>spring-boot-starter-quartz</artifactId>
             <version>2.3.9.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -68,11 +72,57 @@
 
         </dependency>
         <!-- line start -->
+<!--        <dependency>-->
+<!--            <groupId>com.linecorp.bot</groupId>-->
+<!--            <artifactId>line-bot-spring-boot</artifactId>-->
+<!--            <version>5.0.3</version>-->
+<!--        </dependency>-->
+
+
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-spring-boot-handler</artifactId>
+            <version>8.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-api-client</artifactId>
+            <version>6.0.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-webhook</artifactId>
+            <version>8.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-messaging-api-client</artifactId>
+            <version>8.6.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-servlet</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>com.linecorp.bot</groupId>
+            <artifactId>line-bot-model</artifactId>
+            <version>5.0.0</version>
+        </dependency>
+
         <dependency>
             <groupId>com.linecorp.bot</groupId>
             <artifactId>line-bot-spring-boot</artifactId>
-            <version>5.0.3</version>
+            <version>3.5.0</version>
         </dependency>
+
         <!-- line end -->
 
         <dependency>

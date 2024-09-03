@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 @Configuration
 public class LineConfig {
-    private final boolean enabled = true;
+    public final boolean enabled = true;
     @Value("${line.bot.channel-secret}")
     private String channelSecret;
     @Value("${line.bot.channel-token}")
