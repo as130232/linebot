@@ -35,7 +35,7 @@ public class LinebotController {
     }
 
     @PostMapping(value = "/callback")
-    public Message callback(String payload) throws Exception {
+    public Message callback(@RequestBody String payload) throws Exception {
         log.info("line callback. payload: {}", payload);
         MessageEvent event = JsonUtils.toObject(payload, MessageEvent.class);
         if (event != null && event.getMessage() instanceof TextMessageContent) {
