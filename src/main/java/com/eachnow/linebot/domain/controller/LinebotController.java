@@ -7,6 +7,7 @@ import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.eachnow.linebot.domain.service.line.MessageSender;
 import com.linecorp.bot.model.event.MessageEvent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
+import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,13 @@ public class LinebotController {
     }
 
     @PostMapping(value = "/callback")
-    public void callback(MessageEvent event) throws Exception {
+    public Message callback(MessageEvent event) throws Exception {
         log.info("line callback. event: {}", event);
         if (event.getMessage() instanceof TextMessageContent) {
             TextMessageContent message = (TextMessageContent) event.getMessage();
-            messageHandler.handleTextMessageEvent(event.getSource().getUserId(), message);
+            return messageHandler.handleTextMessageEvent(event.getSource().getUserId(), message);
         }
+        return null;
     }
 
 
