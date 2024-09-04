@@ -5,13 +5,13 @@ import com.eachnow.linebot.common.db.po.RemindPO;
 import com.eachnow.linebot.common.db.repository.RemindRepository;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.schedule.quartz.job.RemindJob;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;

@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class LinebotApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LinebotApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LinebotApplication.class, args);
+    }
 
 }
