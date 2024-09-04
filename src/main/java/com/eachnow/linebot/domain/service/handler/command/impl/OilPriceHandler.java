@@ -16,6 +16,10 @@ import com.linecorp.bot.model.message.flex.container.Bubble;
 import com.linecorp.bot.model.message.flex.container.FlexContainer;
 import com.linecorp.bot.model.message.flex.unit.*;
 import lombok.extern.slf4j.Slf4j;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayInputStream;
@@ -29,7 +33,7 @@ import java.util.List;
 @Command({"中油", "油價"})
 public class OilPriceHandler implements CommandHandler {
     private CpcOilApiService cpcOilApiService;
-//    private SAXReader saxReader;
+    private SAXReader saxReader;
 
     @Autowired
     public OilPriceHandler(CpcOilApiService cpcOilApiService) {
@@ -41,19 +45,19 @@ public class OilPriceHandler implements CommandHandler {
         CpcOilPricePO cpcOilPricePO = cpcOilApiService.getOilPrice();
         if (cpcOilPricePO == null)
             return new TextMessage("找無資料");
-        String content = "";
-//        try {
-//            Document document = saxReader.read(new ByteArrayInputStream(cpcOilPricePO.getUpOrDownHtml().getBytes(StandardCharsets.UTF_8)));
-//            Element root = document.getRootElement();
-//            for (Element element : root.elements()) {
-//                if (element.isTextOnly()) {
-//                    content += element.getText() + " ";
-//                } else {
-//                    content += element.element("i").getText();
-//                }
-//            }
-//        } catch (DocumentException e) {
-//        }
+        StringBuilder content = new StringBuilder();
+        try {
+            Document document = saxReader.read(new ByteArrayInputStream(cpcOilPricePO.getUpOrDownHtml().getBytes(StandardCharsets.UTF_8)));
+            Element root = document.getRootElement();
+            for (Element element : root.elements()) {
+                if (element.isTextOnly()) {
+                    content.append(element.getText()).append(" ");
+                } else {
+                    content.append(element.element("i").getText());
+                }
+            }
+        } catch (DocumentException e) {
+        }
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
                 Text.builder().text("中油即時油價").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).margin(FlexMarginSize.SM).color("#ffffff").align(FlexAlign.CENTER).build()
         )).paddingAll(FlexPaddingSize.MD).backgroundColor("#1889D6").build();
@@ -61,7 +65,7 @@ public class OilPriceHandler implements CommandHandler {
         List<FlexComponent> bodyComponent = new ArrayList<>();
         //本週汽油調整
         Box adjustmentThisWeek = Box.builder().layout(FlexLayout.VERTICAL).contents(
-                Text.builder().text(content).color("#ffffff").size(FlexFontSize.XL).align(FlexAlign.CENTER).gravity(FlexGravity.CENTER).build()
+                Text.builder().text(content.toString()).color("#ffffff").size(FlexFontSize.XL).align(FlexAlign.CENTER).gravity(FlexGravity.CENTER).build()
         ).backgroundColor("#039920").margin(FlexMarginSize.MD).cornerRadius(FlexCornerRadiusSize.MD).build();
         Separator separator = Separator.builder().margin(FlexMarginSize.SM).color("#ffffff").build();
         Box title1 = Box.builder().layout(FlexLayout.HORIZONTAL).contents(

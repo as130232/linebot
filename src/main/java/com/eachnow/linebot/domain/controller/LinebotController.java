@@ -21,6 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @RestController
+@RequestMapping("/line")
 public class LinebotController {
     private MessageSender messageSender;
     private MessageHandler messageHandler;
@@ -38,32 +39,14 @@ public class LinebotController {
         this.lineApiService = lineApiService;
     }
 
-//    @PostMapping(value = "/callback")
-//    public Message callback(@RequestBody LineCallbackPO lineCallbackPO) throws Exception {
-//        log.info("line callback. lineCallback: {}", lineCallbackPO);
-//        if (lineCallbackPO.getEvents() == null) {
-//            return null;
-//        }
-//        MessageEvent event = lineCallbackPO.getEvents().get(0);
-//        if (event != null && event.getMessage() instanceof TextMessageContent) {
-//            MessageEvent<TextMessageContent> textMessageEvent = (MessageEvent<TextMessageContent>) event;
-//            return messageHandler.handleTextMessageEvent(textMessageEvent);
-//        } else if (event != null && event.getMessage() instanceof LocationMessageContent) {
-//            MessageEvent<LocationMessageContent> locationMessageEvent = (MessageEvent<LocationMessageContent>) event;
-//            return messageHandler.handleLocationMessageEvent(locationMessageEvent);
-//        }
-//        return null;
-//    }
-
-
-    @PostMapping(value = "/linebot/message/text/push")
+    @PostMapping(value = "/message/text/push")
     public void messageTextPush(@RequestParam(value = "to", defaultValue = "Uf52a57f7e6ba861c05be8837bfbcf0c6") String to,
                                 @RequestParam(value = "type") String type,
                                 @RequestParam(value = "text") String text) throws Exception {
         messageSender.pushByRest(to, type, text);
     }
 
-    @PostMapping(value = "/linebot/messagePush")
+    @PostMapping(value = "/messagePush")
     public void messagePush(@RequestBody PushMessagePO pushMessagePO) throws Exception {
         messageSender.pushByRest(pushMessagePO);
     }
@@ -71,11 +54,8 @@ public class LinebotController {
     /**
      * Callback-取得授權碼，在根據授權碼取得對應line notify token
      *
-     * @param code
-     * @param state
-     * @throws Exception
      */
-    @PostMapping(value = "/linebot/notify/subscribe")
+    @PostMapping(value = "/notify/subscribe")
     public ModelAndView lineNotifySubscribe(@RequestParam(value = "code") String code, @RequestParam(value = "state") String state) throws Exception {
         log.info("--lineNotifySubscribe--");
         String token = lineApiService.getLineNotifyToken(code);
