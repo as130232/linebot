@@ -1,6 +1,7 @@
 package com.eachnow.linebot.domain.controller;
 
 import com.eachnow.linebot.common.po.PushMessagePO;
+import com.eachnow.linebot.common.util.JsonUtils;
 import com.eachnow.linebot.domain.service.gateway.LineApiService;
 import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
@@ -34,9 +35,10 @@ public class LinebotController {
     }
 
     @PostMapping(value = "/callback")
-    public Message callback(MessageEvent event) throws Exception {
-        log.info("line callback. event: {}", event);
-        if (event.getMessage() instanceof TextMessageContent) {
+    public Message callback(String payload) throws Exception {
+        log.info("line callback. payload: {}", payload);
+        MessageEvent event = JsonUtils.toObject(payload, MessageEvent.class);
+        if (event != null && event.getMessage() instanceof TextMessageContent) {
             TextMessageContent message = (TextMessageContent) event.getMessage();
             return messageHandler.handleTextMessageEvent(event.getSource().getUserId(), message);
         }
