@@ -1,12 +1,16 @@
 package com.eachnow.linebot.domain.controller;
 
 import com.eachnow.linebot.common.po.PushMessagePO;
+import com.eachnow.linebot.common.po.line.LineCallbackPO;
 import com.eachnow.linebot.common.util.JsonUtils;
 import com.eachnow.linebot.domain.service.gateway.LineApiService;
 import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageHandler;
 import com.eachnow.linebot.domain.service.line.MessageSender;
+import com.linecorp.bot.model.event.Event;
 import com.linecorp.bot.model.event.MessageEvent;
+import com.linecorp.bot.model.event.PostbackEvent;
+import com.linecorp.bot.model.event.message.LocationMessageContent;
 import com.linecorp.bot.model.event.message.TextMessageContent;
 import com.linecorp.bot.model.message.Message;
 import com.linecorp.bot.model.message.TextMessage;
@@ -35,12 +39,18 @@ public class LinebotController {
     }
 
     @PostMapping(value = "/callback")
-    public Message callback(@RequestBody String payload) throws Exception {
-        log.info("line callback. payload: {}", payload);
-        MessageEvent event = JsonUtils.toObject(payload, MessageEvent.class);
+    public Message callback(@RequestBody LineCallbackPO lineCallbackPO) throws Exception {
+        log.info("line callback. lineCallback: {}", lineCallbackPO);
+        if (lineCallbackPO.getEvents() == null) {
+            return null;
+        }
+        MessageEvent event = lineCallbackPO.getEvents().get(0);
         if (event != null && event.getMessage() instanceof TextMessageContent) {
-            TextMessageContent message = (TextMessageContent) event.getMessage();
-            return messageHandler.handleTextMessageEvent(event.getSource().getUserId(), message);
+            MessageEvent<TextMessageContent> textMessageEvent = (MessageEvent<TextMessageContent>) event;
+            return messageHandler.handleTextMessageEvent(textMessageEvent);
+        } else if (event != null && event.getMessage() instanceof LocationMessageContent) {
+            MessageEvent<LocationMessageContent> locationMessageEvent = (MessageEvent<LocationMessageContent>) event;
+            return messageHandler.handleLocationMessageEvent(locationMessageEvent);
         }
         return null;
     }
