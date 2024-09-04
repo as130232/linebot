@@ -38,22 +38,22 @@ public class LinebotController {
         this.lineApiService = lineApiService;
     }
 
-    @PostMapping(value = "/callback")
-    public Message callback(@RequestBody LineCallbackPO lineCallbackPO) throws Exception {
-        log.info("line callback. lineCallback: {}", lineCallbackPO);
-        if (lineCallbackPO.getEvents() == null) {
-            return null;
-        }
-        MessageEvent event = lineCallbackPO.getEvents().get(0);
-        if (event != null && event.getMessage() instanceof TextMessageContent) {
-            MessageEvent<TextMessageContent> textMessageEvent = (MessageEvent<TextMessageContent>) event;
-            return messageHandler.handleTextMessageEvent(textMessageEvent);
-        } else if (event != null && event.getMessage() instanceof LocationMessageContent) {
-            MessageEvent<LocationMessageContent> locationMessageEvent = (MessageEvent<LocationMessageContent>) event;
-            return messageHandler.handleLocationMessageEvent(locationMessageEvent);
-        }
-        return null;
-    }
+//    @PostMapping(value = "/callback")
+//    public Message callback(@RequestBody LineCallbackPO lineCallbackPO) throws Exception {
+//        log.info("line callback. lineCallback: {}", lineCallbackPO);
+//        if (lineCallbackPO.getEvents() == null) {
+//            return null;
+//        }
+//        MessageEvent event = lineCallbackPO.getEvents().get(0);
+//        if (event != null && event.getMessage() instanceof TextMessageContent) {
+//            MessageEvent<TextMessageContent> textMessageEvent = (MessageEvent<TextMessageContent>) event;
+//            return messageHandler.handleTextMessageEvent(textMessageEvent);
+//        } else if (event != null && event.getMessage() instanceof LocationMessageContent) {
+//            MessageEvent<LocationMessageContent> locationMessageEvent = (MessageEvent<LocationMessageContent>) event;
+//            return messageHandler.handleLocationMessageEvent(locationMessageEvent);
+//        }
+//        return null;
+//    }
 
 
     @PostMapping(value = "/linebot/message/text/push")
