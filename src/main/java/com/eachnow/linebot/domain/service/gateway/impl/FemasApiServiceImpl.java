@@ -38,7 +38,7 @@ public class FemasApiServiceImpl implements FemasApiService {
             FemasSearchDatePO searchDatePO = FemasSearchDatePO.builder().type("user").searchStart(searchStart).searchEnd(searchEnd).offset(0).build();
             HttpEntity<FemasSearchDatePO> httpEntity = new HttpEntity<>(searchDatePO, headers);
             String url = URL + "/photons/fsapi/V3/att_records.json";
-            ResponseEntity<FemasResultPO> responseEntity = restTemplate.exchange(url, HttpMethod.GET, httpEntity, FemasResultPO.class);
+            ResponseEntity<FemasResultPO> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, FemasResultPO.class);
             return responseEntity.getBody();
         } catch (Exception e) {
             log.error("呼叫取得當周打卡記錄，失敗! error msg:{}", e.getMessage());

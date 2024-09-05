@@ -29,7 +29,7 @@ public class FemasController {
     }
 
     @GetMapping(value = "/punch/record")
-    public Result<Map<String, FemasPunchRecordPO>> switchCron(@RequestParam(value = "date", required = false) String date) {
+    public Result<Map<String, FemasPunchRecordPO>> punchRecord(@RequestParam(value = "date", required = false) String date) {
         date = Objects.isNull(date) ? DateUtils.getCurrentDate() : date;
         ZonedDateTime today = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
         String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
@@ -43,7 +43,7 @@ public class FemasController {
             if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
                 continue;
             }
-            data.put(userName, femasService.getPunchRecord(userName, femasToken, searchStart, searchEnd));
+            data.put(userName, femasService.getPunchRecordAndCache(userName, femasToken, searchStart, searchEnd));
         }
         result.setData(data);
         return result;

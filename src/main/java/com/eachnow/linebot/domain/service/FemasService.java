@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -47,11 +48,11 @@ public class FemasService {
         this.lineUserService = lineUserService;
     }
 
-    public FemasPunchRecordPO getPunchRecordByCharles(String searchStart, String searchEnd) {
-        return getPunchRecord("charles", FEMAS_TOKEN_CHARLES, searchStart, searchEnd);
-    }
+//    public FemasPunchRecordPO getPunchRecordByCharles(String searchStart, String searchEnd) {
+//        return getPunchRecordAndCache("charles", FEMAS_TOKEN_CHARLES, searchStart, searchEnd);
+//    }
 
-    public FemasPunchRecordPO getPunchRecord(String userName, String femasToken, String searchStart, String searchEnd) {
+    public FemasPunchRecordPO getPunchRecordAndCache(String userName, String femasToken, String searchStart, String searchEnd) {
         FemasResultPO femasResultPO = femasApiService.getRecords(femasToken, searchStart, searchEnd);
         FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);     //取得第一筆當天資訊
         if (datePO.getIs_holiday() || Strings.isEmpty(datePO.getFirst_in())) {  //  若當天放假 或 還未有打卡記錄
@@ -129,7 +130,9 @@ public class FemasService {
             //取得當天紀錄
             FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
             if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-                FemasPunchRecordPO po = getPunchRecord(userName, femasToken, searchStart, currentDate);
+
+
+                FemasPunchRecordPO po = getPunchRecordAndCache(userName, femasToken, searchStart, currentDate);
                 if (Objects.isNull(po)) {
                     return;
                 }
@@ -163,5 +166,44 @@ public class FemasService {
         ZonedDateTime targetTime = ZonedDateTime.now().withZoneSameInstant(DateUtils.CST_ZONE_ID).withHour(19).withMinute(0).withSecond(0).withNano(0);
         // 判断下班時間是否小於目標時間
         return !punchOut.isBefore(targetTime);
+    }
+
+    /**
+     * 檢查上個月是否有遲到需要忘刷卡
+     */
+    public void checkWorkLateLastMonth() {
+        ZonedDateTime today = DateUtils.getCurrentDateTime();
+        // API只支援二十天筆數的資料，所以要分兩個日期
+        // 獲取上個月的一號到二十號
+        ZonedDateTime firstDayOfLastMonth = today.minusMonths(1).withDayOfMonth(1);
+        ZonedDateTime twentyDayOfLastMonth = firstDayOfLastMonth.withDayOfMonth(20);
+        ZonedDateTime twentyOneDayOfLastMonth = firstDayOfLastMonth.withDayOfMonth(21);
+        List<LineUserPO> users = lineUserService.listUser();
+        List<String> usernames = new ArrayList<>(users.size());
+        for (LineUserPO user : users) {
+            //上個月一號到二十號
+            FemasResultPO firstDayToTwentyDay = femasApiService.getRecords(user.getFemasToken(),
+                    firstDayOfLastMonth.format(DateUtils.yyyyMMddDash), twentyDayOfLastMonth.format(DateUtils.yyyyMMddDash));
+            //上個月二十一號到今日
+            FemasResultPO twentyOneDayToToday = femasApiService.getRecords(user.getFemasToken(),
+                    twentyOneDayOfLastMonth.format(DateUtils.yyyyMMddDash), today.format(DateUtils.yyyyMMddDash));
+            List<FemasDataPO> dataes = new ArrayList<>();
+            dataes.addAll(firstDayToTwentyDay.getResponse().getDatas());
+            dataes.addAll(twentyOneDayToToday.getResponse().getDatas());
+            for (FemasDataPO data : dataes) {
+                if (data.getIs_holiday()) {
+                    continue;
+                }
+                //若有遲到，則發送提醒
+                if (data.getLate_time() > 0) {
+                    String date = data.getAtt_date();
+                    String inAndOut = data.getFirst_in() + " - " + data.getFirst_out();
+                    String message = date + "，打卡時間：" + inAndOut + "，需提交忘刷單或請假！";
+                    lineNotifySender.send(user.getNotifyToken(), message);
+                }
+            }
+            usernames.add(user.getName());
+        }
+        log.info("checkWorkLateLastMonth. success. check users:{}", usernames);
     }
 }

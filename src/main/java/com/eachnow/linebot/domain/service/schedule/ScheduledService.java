@@ -156,4 +156,13 @@ public class ScheduledService {
         femasService.remindPunchOut();
     }
 
+    /**
+     * 每月一號早上十點，檢查上個月是否有遲到，需提醒送忘刷單或請假
+     */
+    @Scheduled(cron = "0 0 10 1 * ?")
+    public void checkWorkLateLastMonth() {
+        if (!CRON_EXECUTE)
+            return;
+        femasService.checkWorkLateLastMonth();
+    }
 }
