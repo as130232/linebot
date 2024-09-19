@@ -20,31 +20,17 @@ import java.util.*;
 @RequestMapping("/femas")
 public class FemasController {
     private final FemasService femasService;
-    private final LineUserService lineUserService;
 
     @Autowired
-    public FemasController(FemasService femasService, LineUserService lineUserService) {
+    public FemasController(FemasService femasService) {
         this.femasService = femasService;
-        this.lineUserService = lineUserService;
     }
 
     @GetMapping(value = "/punch/record")
     public Result<Map<String, FemasPunchRecordPO>> punchRecord(@RequestParam(value = "date", required = false) String date) {
         date = Objects.isNull(date) ? DateUtils.getCurrentDate() : date;
-        ZonedDateTime today = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
-        String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
-        String searchEnd = today.format(DateUtils.yyyyMMddDash);
         Result<Map<String, FemasPunchRecordPO>> result = new Result<>();
-        Map<String, FemasPunchRecordPO> data = new HashMap<>();
-        List<LineUserPO> users = lineUserService.listUser();
-        for (LineUserPO user : users) {
-            String userName = user.getName();
-            String femasToken = user.getFemasToken();
-            if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
-                continue;
-            }
-            data.put(userName, femasService.getPunchRecordAndCache(userName, femasToken, searchStart, searchEnd));
-        }
+        Map<String, FemasPunchRecordPO> data = femasService.getRecordAndSetRemind(date);
         result.setData(data);
         return result;
     }

@@ -128,11 +128,9 @@ public class FemasService {
             if (scheduler.checkExists(jobKey) || Objects.nonNull(localCacheService.getPunchRecord(currentDate, userName))) {
                 return;
             }
-            //取得當天紀錄
+            //取得當天打卡紀錄
             FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
             if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-
-
                 FemasPunchRecordPO po = getPunchRecordAndCache(userName, femasToken, searchStart, currentDate);
                 if (Objects.isNull(po)) {
                     return;
@@ -205,5 +203,25 @@ public class FemasService {
             usernames.add(user.getName());
         }
         log.info("checkWorkLateLastMonth. success. check users:{}", usernames);
+    }
+
+    public Map<String, FemasPunchRecordPO> getRecordAndSetRemind(String date) {
+        ZonedDateTime today = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
+        String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
+        String searchEnd = today.format(DateUtils.yyyyMMddDash);
+        Map<String, FemasPunchRecordPO> data = new HashMap<>();
+        List<LineUserPO> users = lineUserService.listUser();
+        for (LineUserPO user : users) {
+            String userName = user.getName();
+            String femasToken = user.getFemasToken();
+            if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
+                continue;
+            }
+            FemasPunchRecordPO femasPunchRecordPO = getPunchRecordAndCache(userName, femasToken, searchStart, searchEnd);
+            //設置用戶下班提醒
+            remindPunchOutByUser(user);
+            data.put(userName, femasPunchRecordPO);
+        }
+        return data;
     }
 }
