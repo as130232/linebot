@@ -112,40 +112,45 @@ public class FemasService {
         }
     }
 
+    public FemasPunchRecordPO getFemasPunchRecord(String currentDate, String userName, String femasToken) {
+        ZonedDateTime dateTime = DateUtils.parseDate(currentDate, DateUtils.yyyyMMddDash);
+        String searchStart = dateTime.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
+        FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
+        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
+            currentRecord = getPunchRecordAndCache(userName, femasToken, searchStart, currentDate);
+        }
+        return currentRecord;
+    }
+
     public void remindPunchOutByUser(LineUserPO user) {
         try {
             ZonedDateTime today = DateUtils.getCurrentDateTime();
             String currentDate = today.format(DateUtils.yyyyMMddDash);
-            String searchStart = today.minusDays(2).format(DateUtils.yyyyMMddDash); //前三天
             String userName = user.getName().toLowerCase();
             String femasToken = user.getFemasToken();
             String notifyToken = user.getNotifyToken();
             if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
                 return;
             }
-            JobKey jobKey = quartzService.getJobKey(getJobKeyStr(currentDate, userName));
-            //檢查是否已經有當天下班提醒排程
-            if (scheduler.checkExists(jobKey) || Objects.nonNull(localCacheService.getPunchRecord(currentDate, userName))) {
+            FemasPunchRecordPO po = this.getFemasPunchRecord(currentDate, userName, femasToken);
+            if (Objects.isNull(po)) {
                 return;
             }
-            //取得當天打卡紀錄
-            FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
-            if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-                FemasPunchRecordPO po = getPunchRecordAndCache(userName, femasToken, searchStart, currentDate);
-                if (Objects.isNull(po)) {
-                    return;
-                }
-                ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
-                //檢查是否遲到，若是超過七點下班則為超過十點打卡，為遲到需要提醒忘刷卡
-                if (isLate(punchOut) && !notifyToken.isEmpty()) {
-                    lineNotifySender.send(notifyToken, "今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！");
-                }
-                //新增下班提醒排程
-                String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
-                String label = "打卡下班囉！ " + po.getPunchOut();
-                quartzService.addRemindJob(jobKey, null, user.getId(), label, cron);
-                log.info("set remindPunchOut success. userName:{}, punchIn: {}, punchOut: {}, cron: {}", userName, po.getPunchIn(), po.getPunchOut(), cron);
+            JobKey jobKey = quartzService.getJobKey(getJobKeyStr(currentDate, userName));
+            //檢查是否已經有當天下班提醒排程
+            if (scheduler.checkExists(jobKey)) {
+                return;
             }
+            ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
+            //檢查是否遲到，若是超過七點下班則為超過十點打卡，為遲到需要提醒忘刷卡
+            if (isLate(punchOut) && !notifyToken.isEmpty()) {
+                lineNotifySender.send(notifyToken, "今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！");
+            }
+            //新增下班提醒排程
+            String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
+            String label = "打卡下班囉！ " + po.getPunchOut();
+            quartzService.addRemindJob(jobKey, null, user.getId(), label, cron);
+            log.info("set remindPunchOut success. userName:{}, punchIn: {}, punchOut: {}, cron: {}", userName, po.getPunchIn(), po.getPunchOut(), cron);
         } catch (Exception e) {
             log.error("set remindPunchOut failed! error mg:{}", e.getMessage());
             lineNotifySender.sendToCharles("set remindPunchOut failed!");
