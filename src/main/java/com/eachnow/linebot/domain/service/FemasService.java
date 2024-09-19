@@ -155,7 +155,7 @@ public class FemasService {
         try {
             ZonedDateTime today = DateUtils.getCurrentDateTime();
             String currentDate = today.format(DateUtils.yyyyMMddDash);
-            String userName = user.getName().toLowerCase();
+            String userName = user.getName();
             String femasToken = user.getFemasToken();
             String notifyToken = user.getNotifyToken();
             if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
