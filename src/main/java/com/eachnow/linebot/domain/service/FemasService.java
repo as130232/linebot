@@ -66,9 +66,47 @@ public class FemasService {
         String punchOutStr = punchOut.format(DateUtils.yyyyMMddHHmmDash);
         FemasPunchRecordPO po = FemasPunchRecordPO.builder().date(searchEnd).punchIn(punchInStr)
                 .punchOut(punchOutStr).actualPunchOut(actualPunchOut).build();
-        localCacheService.setPunchRecord(searchEnd, userName, po);
-        log.info("setPunchRecord local cache success. userName:{}, punchOut:{}", userName, punchOutStr);
+        if (localCacheService.isRecordExist(searchEnd, userName)) {
+            localCacheService.setPunchRecord(searchEnd, userName, po);
+            log.info("setPunchRecord local cache success. userName:{}, punchOut:{}", userName, punchOutStr);
+        }
         return po;
+    }
+
+    /**
+     * 取得該天、用戶打卡記錄，若緩存沒有則重新呼叫API
+     */
+    public FemasPunchRecordPO getFemasPunchRecord(String currentDate, String userName, String femasToken) {
+        ZonedDateTime dateTime = DateUtils.parseDate(currentDate, DateUtils.yyyyMMddDash);
+        String searchStart = dateTime.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
+        FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
+        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
+            currentRecord = getPunchRecordAndCache(userName, femasToken, searchStart, currentDate);
+        }
+        return currentRecord;
+    }
+
+    /**
+     * 取得該天對應所有用戶的打卡記錄，並設置提醒
+     */
+    public Map<String, FemasPunchRecordPO> getRecordAndSetRemind(String date) {
+        ZonedDateTime today = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
+        String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
+        String searchEnd = today.format(DateUtils.yyyyMMddDash);
+        Map<String, FemasPunchRecordPO> data = new HashMap<>();
+        List<LineUserPO> users = lineUserService.listUser();
+        for (LineUserPO user : users) {
+            String userName = user.getName();
+            String femasToken = user.getFemasToken();
+            if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
+                continue;
+            }
+            FemasPunchRecordPO femasPunchRecordPO = getPunchRecordAndCache(userName, femasToken, searchStart, searchEnd);
+            //設置用戶下班提醒
+            remindPunchOutByUser(user);
+            data.put(userName, femasPunchRecordPO);
+        }
+        return data;
     }
 
     /**
@@ -112,15 +150,6 @@ public class FemasService {
         }
     }
 
-    public FemasPunchRecordPO getFemasPunchRecord(String currentDate, String userName, String femasToken) {
-        ZonedDateTime dateTime = DateUtils.parseDate(currentDate, DateUtils.yyyyMMddDash);
-        String searchStart = dateTime.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
-        FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
-        if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-            currentRecord = getPunchRecordAndCache(userName, femasToken, searchStart, currentDate);
-        }
-        return currentRecord;
-    }
 
     public void remindPunchOutByUser(LineUserPO user) {
         try {
@@ -208,25 +237,5 @@ public class FemasService {
             usernames.add(user.getName());
         }
         log.info("checkWorkLateLastMonth. success. check users:{}", usernames);
-    }
-
-    public Map<String, FemasPunchRecordPO> getRecordAndSetRemind(String date) {
-        ZonedDateTime today = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
-        String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
-        String searchEnd = today.format(DateUtils.yyyyMMddDash);
-        Map<String, FemasPunchRecordPO> data = new HashMap<>();
-        List<LineUserPO> users = lineUserService.listUser();
-        for (LineUserPO user : users) {
-            String userName = user.getName();
-            String femasToken = user.getFemasToken();
-            if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
-                continue;
-            }
-            FemasPunchRecordPO femasPunchRecordPO = getPunchRecordAndCache(userName, femasToken, searchStart, searchEnd);
-            //設置用戶下班提醒
-            remindPunchOutByUser(user);
-            data.put(userName, femasPunchRecordPO);
-        }
-        return data;
     }
 }

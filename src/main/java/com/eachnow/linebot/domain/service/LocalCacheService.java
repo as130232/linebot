@@ -32,6 +32,7 @@ public class LocalCacheService {
     }
 
     private String getKey(String date, String userName) {
+        userName = userName.toLowerCase();
         return (date + "_" + userName).toLowerCase();
     }
 
