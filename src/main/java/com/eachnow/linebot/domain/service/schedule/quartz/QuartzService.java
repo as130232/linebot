@@ -5,7 +5,9 @@ import com.eachnow.linebot.common.db.po.RemindPO;
 import com.eachnow.linebot.common.db.repository.RemindRepository;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.schedule.quartz.job.RemindJob;
+
 import javax.annotation.PostConstruct;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.quartz.*;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -67,9 +70,13 @@ public class QuartzService {
                     .usingJobData("label", label)
                     .build();
             CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(cron).inTimeZone(TimeZone.getTimeZone(DateUtils.CST_ZONE_ID));
-            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("CRON_TRIGGER_" + remindId, TRIGGER_GROUP).withSchedule(scheduleBuilder).build();
+            String remindKey = UUID.randomUUID().toString().substring(0, 8);   // 八位數隨機值
+            if (remindId != null) {
+                remindKey = remindId.toString();
+            }
+            CronTrigger trigger = TriggerBuilder.newTrigger().withIdentity("CRON_TRIGGER_" + remindKey, TRIGGER_GROUP).withSchedule(scheduleBuilder).build();
             scheduler.scheduleJob(jobDetail, trigger);
-            log.info("Quartz scheduler add Job success. remindId:{}, label:{}, cron:{}, userId:{}", remindId, label, cron, userId);
+            log.info("Quartz scheduler add Job success. remindKey:{}, label:{}, cron:{}, userId:{}", remindKey, label, cron, userId);
         } catch (Exception e) {
             log.error("addJob failed! error msg:{}", e.getMessage());
         }
