@@ -106,6 +106,7 @@ public class FemasService {
             log.error("set remindPunchOut and listUser failed! error mg:{}", e.getMessage());
             lineNotifySender.sendToCharles("set remindPunchOut and listUser failed!");
         }
+        log.info("remindPunchOut success.");
         for (LineUserPO user : users) {
             remindPunchOutByUser(user);
         }
@@ -144,10 +145,9 @@ public class FemasService {
                 //新增下班提醒排程
                 String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
                 String label = "打卡下班囉！ " + po.getPunchOut();
-                quartzService.addRemindJob(jobKey, null, null, label, cron);
-                log.info("set remindPunchOut punchIn: {}, punchOut: {}, cron: {}", po.getPunchIn(), po.getPunchOut(), cron);
+                quartzService.addRemindJob(jobKey, null, user.getId(), label, cron);
+                log.info("set remindPunchOut success. userName:{}, punchIn: {}, punchOut: {}, cron: {}", userName, po.getPunchIn(), po.getPunchOut(), cron);
             }
-            log.info("remindPunchOut success.");
         } catch (Exception e) {
             log.error("set remindPunchOut failed! error mg:{}", e.getMessage());
             lineNotifySender.sendToCharles("set remindPunchOut failed!");
