@@ -14,6 +14,7 @@ import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 @Slf4j
@@ -42,7 +43,13 @@ public class FemasHandler implements CommandHandler {
                 LineUserPO user = optional.get();
                 femasService.remindPunchOutByUser(user);
                 String userName = user.getName();
-                FemasPunchRecordPO po = localCacheService.getPunchRecord(DateUtils.getCurrentDate(), userName);
+                ZonedDateTime today = DateUtils.parseDate(DateUtils.getCurrentDate(), DateUtils.yyyyMMddDash);
+                String searchStart = today.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
+                String searchEnd = today.format(DateUtils.yyyyMMddDash);
+                FemasPunchRecordPO po = femasService.getPunchRecordAndCache(userName, user.getFemasToken(), searchStart, searchEnd);
+                if (po == null) {
+                    return new TextMessage("未有打卡記錄。");
+                }
                 String sb = "上班時間：" + po.getPunchIn() + "\n" +
                         "下班時間：" + po.getPunchOut();
                 return new TextMessage(sb);

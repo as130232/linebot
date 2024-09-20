@@ -91,7 +91,7 @@ public class FemasService {
      */
     public Map<String, FemasPunchRecordPO> getRecordAndSetRemind(String date) {
         ZonedDateTime today = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
-        String searchStart = today.minusDays(3).format(DateUtils.yyyyMMddDash); //前三天
+        String searchStart = today.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
         String searchEnd = today.format(DateUtils.yyyyMMddDash);
         Map<String, FemasPunchRecordPO> data = new HashMap<>();
         List<LineUserPO> users = lineUserService.listUser();
