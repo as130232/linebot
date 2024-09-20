@@ -21,7 +21,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j
 @RestController
-@RequestMapping("/line")
+@RequestMapping("/linebot")
 public class LinebotController {
     private MessageSender messageSender;
     private MessageHandler messageHandler;
