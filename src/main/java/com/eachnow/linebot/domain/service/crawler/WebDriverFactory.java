@@ -17,7 +17,7 @@ public class WebDriverFactory {
     private WebDriver driver;
 
     public WebDriver bulidDriver(String url, boolean headless) {
-        System.setProperty("webdriver.chrome.driver", CHROMEDRIVER_PATH);
+        System.setProperty("webDriver.chrome.driver", CHROMEDRIVER_PATH);
         log.info("CHROMEDRIVER_PATH:{}", CHROMEDRIVER_PATH);
         ChromeOptions options = new ChromeOptions();
         if (headless) {
@@ -35,7 +35,7 @@ public class WebDriverFactory {
         }
         driver = new ChromeDriver(options);
         driver.get(url);
-        log.info("webdriver連線 url:{}, headless:{}", url, headless);
+        log.info("webDriver連線 url:{}, headless:{}", url, headless);
         return driver;
     }
 

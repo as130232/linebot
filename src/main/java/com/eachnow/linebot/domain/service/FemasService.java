@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.annotation.PostConstruct;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -52,7 +51,7 @@ public class FemasService {
 //        return getPunchRecordAndCache("charles", FEMAS_TOKEN_CHARLES, searchStart, searchEnd);
 //    }
 
-    public FemasPunchRecordPO getPunchRecordAndCache(String userName, String femasToken, String searchStart, String searchEnd) {
+    public FemasPunchRecordPO getPunchRecordAndSetCache(String userName, String femasToken, String searchStart, String searchEnd) {
         FemasResultPO femasResultPO = femasApiService.getRecords(femasToken, searchStart, searchEnd);
         FemasDataPO datePO = femasResultPO.getResponse().getDatas().get(0);     //取得第一筆當天資訊
         if (datePO.getIs_holiday() || Strings.isEmpty(datePO.getFirst_in())) {  //  若當天放假 或 還未有打卡記錄
@@ -81,7 +80,7 @@ public class FemasService {
         String searchStart = dateTime.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
         FemasPunchRecordPO currentRecord = localCacheService.getPunchRecord(currentDate, userName);
         if (Objects.isNull(currentRecord) || Objects.isNull(currentRecord.getPunchIn())) {
-            currentRecord = getPunchRecordAndCache(userName, femasToken, searchStart, currentDate);
+            currentRecord = getPunchRecordAndSetCache(userName, femasToken, searchStart, currentDate);
         }
         return currentRecord;
     }
@@ -101,7 +100,7 @@ public class FemasService {
             if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
                 continue;
             }
-            FemasPunchRecordPO femasPunchRecordPO = getPunchRecordAndCache(userName, femasToken, searchStart, searchEnd);
+            FemasPunchRecordPO femasPunchRecordPO = getPunchRecordAndSetCache(userName, femasToken, searchStart, searchEnd);
             //設置用戶下班提醒
             remindPunchOutByUser(user);
             data.put(userName, femasPunchRecordPO);

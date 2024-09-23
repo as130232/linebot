@@ -46,7 +46,7 @@ public class FemasHandler implements CommandHandler {
                 ZonedDateTime today = DateUtils.parseDate(DateUtils.getCurrentDate(), DateUtils.yyyyMMddDash);
                 String searchStart = today.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
                 String searchEnd = today.format(DateUtils.yyyyMMddDash);
-                FemasPunchRecordPO po = femasService.getPunchRecordAndCache(userName, user.getFemasToken(), searchStart, searchEnd);
+                FemasPunchRecordPO po = femasService.getPunchRecordAndSetCache(userName, user.getFemasToken(), searchStart, searchEnd);
                 if (po == null) {
                     return new TextMessage("未有打卡記錄。");
                 }

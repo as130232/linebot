@@ -3,7 +3,6 @@ package com.eachnow.linebot.domain.service.crawler;
 import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.PttArticlePO;
 import com.eachnow.linebot.common.util.NumberUtils;
-import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -19,14 +18,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class PttCrawlerService {
-    private WebDriverFactory webDriverFactory;
-    private LineNotifySender lineNotifySender;
+    private final WebDriverFactory webDriverFactory;
 
     @Autowired
-    public PttCrawlerService(WebDriverFactory webDriverFactory,
-                             LineNotifySender lineNotifySender) {
+    public PttCrawlerService(WebDriverFactory webDriverFactory) {
         this.webDriverFactory = webDriverFactory;
-        this.lineNotifySender = lineNotifySender;
     }
 
     /**
@@ -38,7 +34,7 @@ public class PttCrawlerService {
      */
     public List<PttArticlePO> crawler(PttEnum pttEnum, int pageSize, Integer sourceType) {
         List<PttArticlePO> result = new ArrayList<>(300);
-        String url = pttEnum.getUrl(pttEnum);
+        String url = PttEnum.getUrl(pttEnum);
         log.info("準備，爬取PTT版，url:{}, pageSize:{}", url, pageSize);
         WebDriver driver = webDriverFactory.bulidDriver(url, true);
         driver.findElement(By.xpath("//button[@value=\"yes\"]")).click();
@@ -133,9 +129,9 @@ public class PttCrawlerService {
         if (NumberUtils.isNumber(popularityStr)) {
             return Integer.valueOf(popularityStr);
         }
-        Integer popularity = 0;
+        int popularity = 0;
         if (popularityStr != null && popularityStr.toUpperCase(Locale.ROOT).contains("X")) {
-            popularity = -100 * (Integer.valueOf(popularityStr.replace("X", "")));
+            popularity = -100 * (Integer.parseInt(popularityStr.replace("X", "")));
         } else if (popularityStr != null && popularityStr.contains("爆")) {
             popularity = 1000;
         }
@@ -150,7 +146,7 @@ public class PttCrawlerService {
      */
     public List<PttArticlePO> crawlerByDisp(PttEnum pttEnum, int pageSize) {
         List<PttArticlePO> result = new ArrayList<>(300);
-        String url = pttEnum.getUrlByDisp(pttEnum);
+        String url = PttEnum.getUrlByDisp(pttEnum);
         log.info("準備，爬取PTT版(DISP)，url:{}, pageSize:{}", url, pageSize);
         WebDriver driver = webDriverFactory.bulidDriver(url, true);
         driver.navigate().refresh();
@@ -197,7 +193,7 @@ public class PttCrawlerService {
     }
 
     //    @PostConstruct
-    public void init() {
+//    public void init() {
 //        StopWatch sw1 = new StopWatch();
 //        sw1.start();
 //        List<PttArticlePO> list1 = crawler(PttEnum.GOSSIPING, 1, PttEnum.TYPE_ARTICLE);
@@ -208,9 +204,9 @@ public class PttCrawlerService {
 //        sw2.stop();
 //        log.info("list1:{}, sw1:{}, list2:{}, sw2:{}", list1.size(), sw1.getTotalTimeMillis(), list2.size(), sw2.getTotalTimeMillis());
 //        System.out.println("a");
-        List<PttArticlePO> list2 = crawlerByDisp(PttEnum.GOSSIPING, 1);
-        System.out.println(list2);
-    }
+//        List<PttArticlePO> list2 = crawlerByDisp(PttEnum.GOSSIPING, 1);
+//        System.out.println(list2);
+//    }
 
 
 }

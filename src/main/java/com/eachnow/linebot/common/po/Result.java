@@ -17,8 +17,9 @@ public class Result<T> implements Serializable {
     public static final String SUCCESS_MSG = "OK";
     public static final int FAILED_CODE = 1;
     public static final String FAILED_MSG = "failed";
-    public static final int SUCCESS = 200;
+
     public static final int BAD_REQUEST = 400;
+    public static final int NOT_FOUND = 404;
     public static final int ENCRYPT_ERR = 500;
     public static final int DECRYPT_ERR = 501;
     public static final int DECRYPT__METHOD_ERR = 502;
