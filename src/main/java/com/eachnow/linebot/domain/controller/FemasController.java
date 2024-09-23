@@ -47,6 +47,10 @@ public class FemasController {
         }
         LineUserPO user = optional.get();
         FemasPunchRecordPO po = femasService.getFemasPunchRecord(date, user.getName(), user.getFemasToken());
+        if (po == null) {
+            result.setCode(Result.NOT_FOUND);
+            return result;
+        }
         result.setData(po);
         return result;
     }
