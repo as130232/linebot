@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class FemasDataPO {
+public class FemasPunchDataPO {
     private String att_date;
     private String state_event;
     private Boolean is_holiday;

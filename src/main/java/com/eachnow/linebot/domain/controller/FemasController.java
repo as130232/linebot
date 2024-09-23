@@ -2,6 +2,7 @@ package com.eachnow.linebot.domain.controller;
 
 import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.po.Result;
+import com.eachnow.linebot.common.po.femas.FemasPayResultPO;
 import com.eachnow.linebot.common.po.femas.FemasPunchRecordPO;
 import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.FemasService;
@@ -27,7 +28,7 @@ public class FemasController {
     }
 
     @GetMapping(value = "/punch/records")
-    public Result<Map<String, FemasPunchRecordPO>> punchRecords(@RequestParam(value = "date", required = false) String date) {
+    public Result<Map<String, FemasPunchRecordPO>> getPunchRecords(@RequestParam(value = "date", required = false) String date) {
         date = Objects.isNull(date) ? DateUtils.getCurrentDate() : date;
         Result<Map<String, FemasPunchRecordPO>> result = new Result<>();
         Map<String, FemasPunchRecordPO> data = femasService.getRecordAndSetRemind(date);
@@ -36,19 +37,44 @@ public class FemasController {
     }
 
     @GetMapping(value = "/punch/record")
-    public Result<FemasPunchRecordPO> punchRecord(@RequestParam(value = "date", required = false) String date,
-                                                  @RequestParam(value = "lineId") String lineId) {
+    public Result<FemasPunchRecordPO> getPunchRecord(@RequestParam(value = "date", required = false) String date,
+                                                     @RequestParam(value = "lineId") String lineId) {
         date = Objects.isNull(date) ? DateUtils.getCurrentDate() : date;
         Result<FemasPunchRecordPO> result = new Result<>();
         Optional<LineUserPO> optional = lineUserService.getUser(lineId);
         if (!optional.isPresent()) {
             result.setCode(Result.NOT_FOUND);
+            result.setMsg("找不到該用戶");
             return result;
         }
         LineUserPO user = optional.get();
-        FemasPunchRecordPO po = femasService.getFemasPunchRecord(date, user.getName(), user.getFemasToken());
+        FemasPunchRecordPO po = femasService.getPunchRecord(user.getName(), user.getFemasToken(), date);
         if (po == null) {
             result.setCode(Result.NOT_FOUND);
+            result.setMsg("找不到打卡記錄");
+            return result;
+        }
+        result.setData(po);
+        return result;
+    }
+
+
+    @GetMapping(value = "/payroll/record")
+    public Result<FemasPayResultPO> getPayrollRecord(@RequestParam(value = "month", required = false) String month,
+                                                     @RequestParam(value = "lineId") String lineId) {
+        month = Objects.isNull(month) ? DateUtils.getCurrentMonth() : month;
+        Result<FemasPayResultPO> result = new Result<>();
+        Optional<LineUserPO> optional = lineUserService.getUser(lineId);
+        if (!optional.isPresent()) {
+            result.setCode(Result.NOT_FOUND);
+            result.setMsg("找不到該用戶");
+            return result;
+        }
+        LineUserPO user = optional.get();
+        FemasPayResultPO po = femasService.getPayrollRecord(user.getFemasToken(), month);
+        if (po == null) {
+            result.setCode(Result.NOT_FOUND);
+            result.setMsg("找不到薪資記錄");
             return result;
         }
         result.setData(po);

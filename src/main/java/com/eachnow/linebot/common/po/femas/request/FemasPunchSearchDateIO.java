@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FemasSearchDatePO {
+public class FemasPunchSearchDateIO {
     private String type;
     private String searchStart;
     private String searchEnd;

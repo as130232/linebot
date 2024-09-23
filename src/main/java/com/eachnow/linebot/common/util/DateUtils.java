@@ -83,7 +83,7 @@ public class DateUtils {
     }
 
     /**
-     * 取得台北現在日期格式
+     * 取得台北當天日期
      *
      * @return yyyy-MM-dd
      */
@@ -102,6 +102,16 @@ public class DateUtils {
      */
     public static long getCurrentEpochMilli() {
         return ZonedDateTime.now(CST_ZONE_ID).toInstant().toEpochMilli();
+    }
+
+
+    /**
+     * 取得台北當月
+     *
+     * @return yyyy-MM
+     */
+    public static String getCurrentMonth() {
+        return ZonedDateTime.now(CST_ZONE_ID).format(yyyyMMDash);
     }
 
     public static Timestamp getCurrentTime() {

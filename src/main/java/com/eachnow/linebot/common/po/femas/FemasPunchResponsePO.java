@@ -1,8 +1,6 @@
 package com.eachnow.linebot.common.po.femas;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class FemasResponsePO {
+public class FemasPunchResponsePO {
     private String status;
     private String err_msg;
     private Boolean force_change_password;
@@ -24,5 +22,5 @@ public class FemasResponsePO {
     private Integer limit;
     private Boolean offset;
     private Boolean datas_count;
-    private List<FemasDataPO> datas;
+    private List<FemasPunchDataPO> datas;
 }
