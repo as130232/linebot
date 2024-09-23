@@ -60,9 +60,9 @@ public class FemasController {
 
 
     @GetMapping(value = "/payroll/record")
-    public Result<FemasPayResultPO> getPayrollRecord(@RequestParam(value = "month", required = false) String month,
+    public Result<FemasPayResultPO> getPayrollRecord(@RequestParam(value = "yearMonth", required = false) String yearMonth,
                                                      @RequestParam(value = "lineId") String lineId) {
-        month = Objects.isNull(month) ? DateUtils.getCurrentMonth() : month;
+        yearMonth = Objects.isNull(yearMonth) ? DateUtils.getLastMonth() : yearMonth;
         Result<FemasPayResultPO> result = new Result<>();
         Optional<LineUserPO> optional = lineUserService.getUser(lineId);
         if (!optional.isPresent()) {
@@ -71,7 +71,7 @@ public class FemasController {
             return result;
         }
         LineUserPO user = optional.get();
-        FemasPayResultPO po = femasService.getPayrollRecord(user.getFemasToken(), month);
+        FemasPayResultPO po = femasService.getPayrollRecord(user.getFemasToken(), yearMonth);
         if (po == null) {
             result.setCode(Result.NOT_FOUND);
             result.setMsg("找不到薪資記錄");

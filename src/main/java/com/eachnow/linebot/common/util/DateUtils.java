@@ -77,7 +77,7 @@ public class DateUtils {
         return localDate.atTime(LocalTime.MAX).atZone(CST_ZONE_ID).toInstant().toEpochMilli();
     }
 
-    public static LocalDate parseByMinguo(String date){
+    public static LocalDate parseByMinguo(String date) {
         ChronoLocalDate d1 = chronoByMinguo.date(minguo.parse(date));
         return LocalDate.from(d1);
     }
@@ -112,6 +112,15 @@ public class DateUtils {
      */
     public static String getCurrentMonth() {
         return ZonedDateTime.now(CST_ZONE_ID).format(yyyyMMDash);
+    }
+
+    /**
+     * 取得台北上個月
+     *
+     * @return yyyy-MM
+     */
+    public static String getLastMonth() {
+        return ZonedDateTime.now(CST_ZONE_ID).minusMonths(1).format(yyyyMMDash);
     }
 
     public static Timestamp getCurrentTime() {

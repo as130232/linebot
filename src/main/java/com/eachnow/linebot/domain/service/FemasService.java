@@ -18,7 +18,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Slf4j
@@ -240,6 +243,18 @@ public class FemasService {
     }
 
     public FemasPayResultPO getPayrollRecord(String femasToken, String yearMonth) {
+        // 檢查日期格式是否符合 "yyyy/MM/dd"，則轉為yyyy-MM
+        if (yearMonth.matches("\\d{4}/\\d{1,2}/\\d{1,2}")) {
+            try {
+                // 解析日期字串
+                LocalDate date = LocalDate.parse(yearMonth, DateUtils.yyyyMMddSlash);
+                // 格式化為所需的格式
+                yearMonth = date.format(DateUtils.yyyyMMDash);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format: " + e.getMessage());
+            }
+        }
         return femasApiService.getPayrollRecords(femasToken, yearMonth);
     }
+
 }
