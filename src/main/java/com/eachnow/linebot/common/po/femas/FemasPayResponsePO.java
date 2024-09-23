@@ -13,9 +13,4 @@ public class FemasPayResponsePO {
     private boolean force_change_password;
     private List<FemasPayDataPO> datas;
     private Integer total;
-
-    private Integer getTotal() {
-        return datas.stream().mapToInt(data -> Integer.parseInt(data.getReceived().replace(",", "")))
-                .sum();
-    }
 }

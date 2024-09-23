@@ -58,7 +58,12 @@ public class FemasApiServiceImpl implements FemasApiService {
             HttpEntity<FemasPayRecordIO> httpEntity = new HttpEntity<>(io, headers);
             String url = URL + "/photons/fsapi/V3/payroll_records.json";
             ResponseEntity<FemasPayResultPO> responseEntity = restTemplate.exchange(url, HttpMethod.POST, httpEntity, FemasPayResultPO.class);
-            return responseEntity.getBody();
+            FemasPayResultPO result = responseEntity.getBody();
+            assert result != null;
+            Integer total = result.getResponse().getDatas().stream().mapToInt(data -> Integer.parseInt(data.getReceived().replace(",", "")))
+                    .sum();
+            result.getResponse().setTotal(total);
+            return result;
         } catch (Exception e) {
             log.error("呼叫取得當月薪資記錄，失敗! error msg:{}", e.getMessage());
         }
