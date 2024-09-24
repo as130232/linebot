@@ -18,24 +18,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 public class PttApiServiceImp implements PttApiService {
-    private final String LINK = "https://disp.cc/b/";
-    private RestTemplate restTemplate;
+    private final String DOMAIN = "https://disp.cc";
+    private final String LINK = DOMAIN + "/b/";
+    private final RestTemplate restTemplate;
 
     @Autowired
     public PttApiServiceImp(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    //    @PostConstruct
-//    private void test() {
-//        getPttInfoPO(PttEnum.GOSSIPING, 60);
-//    }
+    @PostConstruct
+    private void test() {
+        listPicture("https://disp.cc/b/Beauty/h9ee");
+    }
 
     @Override
     public PttInfoPO getPttInfoPO(PttEnum pttEnum, int size) {
@@ -54,11 +56,44 @@ public class PttApiServiceImp implements PttApiService {
             url = pttInfoPO.getPageUpLink();
         }
         List<PttArticlePO> articles = pttArticleMap.keySet().stream().map(key -> pttArticleMap.get(key)).collect(Collectors.toList());
+        assert pttInfoPO != null;
         pttInfoPO.setArticles(articles);
         pttInfoPO.setPttEnum(pttEnum);
         return pttInfoPO;
     }
 
+    /**
+     * 取得該文章內對應圖片列表
+     */
+    @Override
+    public Set<String> listPicture(String url) {
+        Set<String> result = new HashSet<>();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
+        String response = responseEntity.getBody();
+        try {
+            assert response != null;
+            Document doc = Jsoup.parse(response);
+            Elements textCssDiv = doc.select("div[class~=text_css]");
+            Elements imgDivs = textCssDiv.select("div.img");
+            for (Element imgDiv : imgDivs) {
+                Element img = imgDiv.selectFirst("img[data-src]");
+                if (img != null) {
+                    String pictureUrl = img.attr("data-src");
+                    result.add(pictureUrl);
+                }
+            }
+        } catch (Exception e) {
+            log.error("呼叫取得PTT文章，失敗! url:{}, error msg:{}", url, e.getMessage());
+        }
+        return result;
+    }
+
+    /**
+     * 取得該版(八卦、表特..)文章列表
+     */
     private PttInfoPO getPttInfoPO(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
@@ -67,6 +102,7 @@ public class PttApiServiceImp implements PttApiService {
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
         String response = responseEntity.getBody();
         try {
+            assert response != null;
             Document doc = Jsoup.parse(response);
             List<PttArticlePO> list = new ArrayList<>(20);
             Integer boardPopularity = 0;
@@ -91,14 +127,14 @@ public class PttApiServiceImp implements PttApiService {
                 if (popularityArr.length > 1)
                     popularityStr = popularityArr[1];
                 Integer popularity = parsePopularity(popularityStr);
-                String link = LINK + element.select("span[class~=listTitle]").select("a").attr("href");
+                String link = DOMAIN + element.select("span[class~=listTitle]").select("a").attr("href");
                 String date = element.select("span[class~=L12]").attr("title");
                 String author = element.select("span[class~=L18]").text().replace("(", "").replace(".)", "");
                 list.add(PttArticlePO.builder().title(title).webUrl(link).author(author).date(date).popularity(popularity).build());
             }
             return PttInfoPO.builder().link(url).pageUpLink(pageUpLink).boardPopularity(boardPopularity).articles(list).build();
         } catch (Exception e) {
-            log.error("呼叫取得PTT文章，失敗! url:{}, error msg:{}", url, e.getMessage());
+            log.error("呼叫取得PTT該版，失敗! url:{}, error msg:{}", url, e.getMessage());
         }
         return null;
     }
@@ -107,9 +143,9 @@ public class PttApiServiceImp implements PttApiService {
         if (NumberUtils.isNumber(popularityStr)) {
             return Integer.valueOf(popularityStr);
         }
-        Integer popularity = 0;
+        int popularity = 0;
         if (popularityStr != null && popularityStr.toUpperCase(Locale.ROOT).contains("X")) {
-            popularity = -100 * (Integer.valueOf(popularityStr.replace("X", "")));
+            popularity = -100 * (Integer.parseInt(popularityStr.replace("X", "")));
         } else if (popularityStr != null && popularityStr.contains("爆")) {
             popularity = 1000;
         }

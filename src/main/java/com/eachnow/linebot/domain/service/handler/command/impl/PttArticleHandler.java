@@ -35,15 +35,12 @@ import java.util.stream.Collectors;
 @Command({"文章", "熱門", "topten"})
 public class PttArticleHandler implements CommandHandler {
     private final ThreadPoolExecutor pttCrawlerExecutor;
-    private PttCrawlerService pttCrawlerService;
-    private PttApiService pttApiService;
+    private final PttApiService pttApiService;
 
     @Autowired
     public PttArticleHandler(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor pttCrawlerExecutor,
-                             PttCrawlerService pttCrawlerService,
                              PttApiService pttApiService) {
         this.pttCrawlerExecutor = pttCrawlerExecutor;
-        this.pttCrawlerService = pttCrawlerService;
         this.pttApiService = pttApiService;
     }
 

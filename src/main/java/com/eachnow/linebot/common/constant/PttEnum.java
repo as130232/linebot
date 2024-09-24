@@ -59,4 +59,12 @@ public enum PttEnum {
         return PttEnum.GOSSIPING;
     }
 
+    public static PttEnum getPttEnumByValue(String value) {
+        for (PttEnum pttEnum : PttEnum.values()) {
+            if (pttEnum.getValue().equalsIgnoreCase(value)) {
+                return pttEnum;
+            }
+        }
+        return PttEnum.GOSSIPING;
+    }
 }
