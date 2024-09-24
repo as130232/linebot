@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.po.PttInfoPO;
 import com.eachnow.linebot.common.util.NumberUtils;
 import com.eachnow.linebot.domain.service.gateway.PttApiService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -122,11 +123,16 @@ public class PttApiServiceImp implements PttApiService {
                 String title = element.select("span[class~=listTitle]").text();
                 if (title.contains("[公告]") || title.contains("[刪除]") || title.contains("···"))
                     continue;
-                String popularityStr = element.select("span[class~=R0 bgB]").text();
-                String[] popularityArr = popularityStr.split("/");
-                if (popularityArr.length > 1)
-                    popularityStr = popularityArr[1];
-                Integer popularity = parsePopularity(popularityStr);
+                Integer popularity = 0;
+                Elements popularityElements = element.select("span[class~=fg]");
+                for (Element popularityElement : popularityElements) {
+                    String popularityTitle = popularityElement.attr("title");
+                    if (!Strings.isEmpty(popularityTitle) && popularityTitle.contains("累積人氣:")) {
+                        String popularityStr = popularityTitle.replace("累積人氣:", "");
+                        popularity = parsePopularity(popularityStr);
+                        break;
+                    }
+                }
                 String link = DOMAIN + element.select("span[class~=listTitle]").select("a").attr("href");
                 String date = element.select("span[class~=L12]").attr("title");
                 String author = element.select("span[class~=L18]").text().replace("(", "").replace(".)", "");
@@ -140,13 +146,14 @@ public class PttApiServiceImp implements PttApiService {
     }
 
     private Integer parsePopularity(String popularityStr) {
+        popularityStr = popularityStr.trim();
         if (NumberUtils.isNumber(popularityStr)) {
             return Integer.valueOf(popularityStr);
         }
         int popularity = 0;
-        if (popularityStr != null && popularityStr.toUpperCase(Locale.ROOT).contains("X")) {
+        if (popularityStr.toUpperCase(Locale.ROOT).contains("X")) {
             popularity = -100 * (Integer.parseInt(popularityStr.replace("X", "")));
-        } else if (popularityStr != null && popularityStr.contains("爆")) {
+        } else if (popularityStr.contains("爆")) {
             popularity = 1000;
         }
         return popularity;
