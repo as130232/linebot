@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,7 +50,10 @@ public class PttApiServiceImp implements PttApiService {
             }
             url = pttInfoPO.getPageUpLink();
         }
-        List<PttArticlePO> articles = pttArticleMap.keySet().stream().map(key -> pttArticleMap.get(key)).collect(Collectors.toList());
+        List<PttArticlePO> articles = pttArticleMap.keySet().stream().map(pttArticleMap::get)
+                .sorted(Comparator.comparing(PttArticlePO::getPopularity).reversed())
+                .collect(Collectors.toList());
+        //根據熱門排序
         assert pttInfoPO != null;
         pttInfoPO.setArticles(articles);
         pttInfoPO.setPttEnum(pttEnum);
@@ -132,8 +134,6 @@ public class PttApiServiceImp implements PttApiService {
                 String author = element.select("span[class~=L18]").text().replace("(", "").replace(".)", "");
                 list.add(PttArticlePO.builder().title(title).webUrl(link).author(author).date(date).popularity(popularity).build());
             }
-            //根據熱門排序
-            list.sort(Comparator.comparing(PttArticlePO::getPopularity).reversed());
             return PttInfoPO.builder().link(url).pageUpLink(pageUpLink).boardPopularity(boardPopularity).articles(list).build();
         } catch (Exception e) {
             log.error("呼叫取得PTT該版，失敗! url:{}, error msg:{}", url, e.getMessage());
