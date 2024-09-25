@@ -93,7 +93,6 @@ public class PttApiServiceImp implements PttApiService {
     private PttInfoPO getPttInfoPO(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
         HttpEntity<Void> request = new HttpEntity<>(headers);
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
         String response = responseEntity.getBody();
@@ -101,7 +100,7 @@ public class PttApiServiceImp implements PttApiService {
             assert response != null;
             Document doc = Jsoup.parse(response);
             List<PttArticlePO> list = new ArrayList<>(20);
-            Integer boardPopularity = 0;
+            int boardPopularity = 0;
             if (doc.select("div[class~=topRight]").text().contains("進入看板")) {
                 return PttInfoPO.builder().link(url).pageUpLink(LINK + doc.select("div[class~=topRight]").select("a").attr("href")).boardPopularity(boardPopularity).articles(list).build();
             }
@@ -109,13 +108,13 @@ public class PttApiServiceImp implements PttApiService {
             String name = doc.select("span[id~=board_div]").text();       //看版
             if (doc.select("span[class~=R0]").size() > 0) {
                 String boardPopularityStr = doc.select("span[class~=R0]").get(0).text();    //看板人氣:845 本日:102K 累積:987M
-                boardPopularity = Integer.valueOf(boardPopularityStr.split(" ")[0].replace("看板人氣:", ""));
+                boardPopularity = Integer.parseInt(boardPopularityStr.split(" ")[0].replace("看板人氣:", ""));
             }
             //取得上一頁連結
             String pageUpLink = LINK + doc.select("div[class~=topRight]").select("a").get(2).select("a").attr("href");
             //上一頁網址
             for (Element element : elements) {
-                String title = element.select("span[class~=listTitle]").text();
+                String title = element.select("span[class~=listTitle]").text().replace("■ ", "");
                 if (title.contains("[公告]") || title.contains("[刪除]") || title.contains("···"))
                     continue;
                 Integer popularity = 0;
