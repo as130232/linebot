@@ -29,7 +29,6 @@ public class FemasController {
 
     @GetMapping(value = "/punch/records")
     public Result<Map<String, FemasPunchRecordPO>> getPunchRecords(@RequestParam(value = "date", required = false) String date) {
-        date = Objects.isNull(date) ? DateUtils.getCurrentDate() : date;
         Result<Map<String, FemasPunchRecordPO>> result = new Result<>();
         Map<String, FemasPunchRecordPO> data = femasService.getRecordAndSetRemind(date);
         result.setData(data);

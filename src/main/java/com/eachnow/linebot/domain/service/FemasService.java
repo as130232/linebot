@@ -51,9 +51,10 @@ public class FemasService {
         this.lineUserService = lineUserService;
     }
 
-//    public FemasPunchRecordPO getPunchRecordByCharles(String searchStart, String searchEnd) {
-//        return getPunchRecordAndCache("charles", FEMAS_TOKEN_CHARLES, searchStart, searchEnd);
-//    }
+    @PostConstruct
+    private void init() {
+        getRecordAndSetRemind(null);
+    }
 
     public FemasPunchRecordPO getPunchRecordAndSetCache(String userName, String femasToken, String searchStart, String searchEnd) {
         FemasPunchResultPO femasPunchResultPO = femasApiService.getPunchRecords(femasToken, searchStart, searchEnd);
@@ -93,6 +94,7 @@ public class FemasService {
      * 取得該天對應所有用戶的打卡記錄，並設置提醒
      */
     public Map<String, FemasPunchRecordPO> getRecordAndSetRemind(String date) {
+        date = Objects.isNull(date) ? DateUtils.getCurrentDate() : date;
         ZonedDateTime today = DateUtils.parseDate(date, DateUtils.yyyyMMddDash);
         String searchStart = today.minusDays(1).format(DateUtils.yyyyMMddDash); //前一天
         String searchEnd = today.format(DateUtils.yyyyMMddDash);

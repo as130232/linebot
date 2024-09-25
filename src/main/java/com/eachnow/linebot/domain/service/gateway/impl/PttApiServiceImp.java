@@ -35,11 +35,6 @@ public class PttApiServiceImp implements PttApiService {
         this.restTemplate = restTemplate;
     }
 
-    @PostConstruct
-    private void test() {
-        listPicture("https://disp.cc/b/Beauty/h9ee");
-    }
-
     @Override
     public PttInfoPO getPttInfoPO(PttEnum pttEnum, int size) {
         String url = PttEnum.getUrlByDisp(pttEnum);
@@ -98,7 +93,7 @@ public class PttApiServiceImp implements PttApiService {
     private PttInfoPO getPttInfoPO(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-//            headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
+        headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
         HttpEntity<Void> request = new HttpEntity<>(headers);
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(url, request, String.class);
         String response = responseEntity.getBody();
@@ -138,6 +133,8 @@ public class PttApiServiceImp implements PttApiService {
                 String author = element.select("span[class~=L18]").text().replace("(", "").replace(".)", "");
                 list.add(PttArticlePO.builder().title(title).webUrl(link).author(author).date(date).popularity(popularity).build());
             }
+            //根據熱門排序
+            list.sort(Comparator.comparing(PttArticlePO::getPopularity).reversed());
             return PttInfoPO.builder().link(url).pageUpLink(pageUpLink).boardPopularity(boardPopularity).articles(list).build();
         } catch (Exception e) {
             log.error("呼叫取得PTT該版，失敗! url:{}, error msg:{}", url, e.getMessage());
