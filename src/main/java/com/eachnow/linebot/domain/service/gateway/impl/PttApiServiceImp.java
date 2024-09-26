@@ -75,9 +75,22 @@ public class PttApiServiceImp implements PttApiService {
             assert response != null;
             Document doc = Jsoup.parse(response);
             Elements textCssDiv = doc.select("div[class~=text_css]");
-            Elements imgDivs = textCssDiv.select("div.img");
-            for (Element imgDiv : imgDivs) {
-                Element img = imgDiv.selectFirst("img[data-src]");
+//            Elements imgDivs = textCssDiv.select("div.img");
+//            for (Element imgDiv : imgDivs) {
+//                Element img = imgDiv.selectFirst("img[data-src]");
+//                if (img != null) {
+//                    String pictureUrl = img.attr("data-src");
+//                    result.add(pictureUrl);
+//                }
+//            }
+            Elements divs = textCssDiv.select("div");
+            for (Element div : divs) {
+                String className = div.className();
+                //過濾推文的圖片
+                if ("push_row".equals(className) || "ptt-push-group".equals(className)) {
+                    break;
+                }
+                Element img = div.selectFirst("img[data-src]");
                 if (img != null) {
                     String pictureUrl = img.attr("data-src");
                     result.add(pictureUrl);
