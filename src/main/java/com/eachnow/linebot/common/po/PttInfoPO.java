@@ -9,7 +9,7 @@ import java.util.List;
 @Data
 @Builder
 public class PttInfoPO {
-    private PttEnum pttEnum;
+    private String board;
     private String name;
     private String link;
     private String pageUpLink;

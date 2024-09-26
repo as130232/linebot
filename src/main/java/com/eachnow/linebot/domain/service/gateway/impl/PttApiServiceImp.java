@@ -35,8 +35,8 @@ public class PttApiServiceImp implements PttApiService {
     }
 
     @Override
-    public PttInfoPO getPttInfoPO(PttEnum pttEnum, int size) {
-        String url = PttEnum.getUrlByDisp(pttEnum);
+    public PttInfoPO getPttInfoPO(String board, int size) {
+        String url = PttEnum.getUrl(board);
         Map<String, PttArticlePO> pttArticleMap = new HashMap<>(size);
         PttInfoPO pttInfoPO = null;
         while (pttArticleMap.size() < size) {
@@ -56,7 +56,7 @@ public class PttApiServiceImp implements PttApiService {
         //根據熱門排序
         assert pttInfoPO != null;
         pttInfoPO.setArticles(articles);
-        pttInfoPO.setPttEnum(pttEnum);
+        pttInfoPO.setBoard(board);
         return pttInfoPO;
     }
 

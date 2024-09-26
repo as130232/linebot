@@ -34,7 +34,7 @@ public class PttCrawlerService {
      */
     public List<PttArticlePO> crawler(PttEnum pttEnum, int pageSize, Integer sourceType) {
         List<PttArticlePO> result = new ArrayList<>(300);
-        String url = PttEnum.getUrl(pttEnum);
+        String url = PttEnum.getUrlByBbs(pttEnum);
         log.info("準備，爬取PTT版，url:{}, pageSize:{}", url, pageSize);
         WebDriver driver = webDriverFactory.bulidDriver(url, true);
         driver.findElement(By.xpath("//button[@value=\"yes\"]")).click();

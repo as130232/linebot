@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface PttApiService {
-    PttInfoPO getPttInfoPO(PttEnum pttEnum, int size);
+    PttInfoPO getPttInfoPO(String board, int size);
 
     Set<String> listPicture(String url);
 }

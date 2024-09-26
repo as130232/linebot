@@ -44,8 +44,7 @@ public class PttController {
     @GetMapping(value = "/article")
     public Result<PttInfoPO> getPttArticle(@RequestParam(value = "board", defaultValue = "beauty") String board,
                                            @RequestParam(value = "size", defaultValue = "10") int size) {
-        PttEnum pttEnum = PttEnum.getPttEnumByValue(board);
-        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(pttEnum, size);
+        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(board, size);
         Result<PttInfoPO> result = new Result<>();
         result.setData(pttInfoPO);
         return result;
