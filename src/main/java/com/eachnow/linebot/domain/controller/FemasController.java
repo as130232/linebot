@@ -79,4 +79,11 @@ public class FemasController {
         result.setData(po);
         return result;
     }
+
+    @GetMapping(value = "/checkWorkLateLastMonth")
+    public Result checkWorkLateLastMonth() {
+        femasService.checkWorkLateLastMonth();
+        return Result.getDefaultResponse();
+    }
+
 }
