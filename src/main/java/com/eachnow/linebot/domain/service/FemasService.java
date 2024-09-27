@@ -15,8 +15,8 @@ import org.apache.logging.log4j.util.Strings;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDate;
@@ -210,9 +210,14 @@ public class FemasService {
      */
     public void checkWorkLateLastMonth() {
         ZonedDateTime today = DateUtils.getCurrentDateTime();
+        ZonedDateTime currentOrBeforeMonth = today;
+        // 取得當前的日期，若是一號～五號，則取得上個月，若是五號到三十號則取得該月
+        if (today.getDayOfMonth() <= 5) {
+            currentOrBeforeMonth = today.minusMonths(1);
+        }
         // API只支援二十天筆數的資料，所以要分兩個日期
-        // 獲取上個月的一號到二十號
-        ZonedDateTime firstDayOfLastMonth = today.minusMonths(1).withDayOfMonth(1);
+        // 獲取該月的一號到二十號
+        ZonedDateTime firstDayOfLastMonth = currentOrBeforeMonth.withDayOfMonth(1);
         ZonedDateTime twentyDayOfLastMonth = firstDayOfLastMonth.withDayOfMonth(20);
         ZonedDateTime twentyOneDayOfLastMonth = firstDayOfLastMonth.withDayOfMonth(21);
         List<LineUserPO> users = lineUserService.listUser();
@@ -231,11 +236,28 @@ public class FemasService {
                 if (data.getIs_holiday()) {
                     continue;
                 }
-                //若有遲到，則發送提醒
+                String reason = "";
+                //工時是否足夠(一日八小時)
+                boolean isWorkingHoursSufficient = true;
+                if (data.getRated_time() != null && data.getReal_eff_att_time() != null) {
+                    // 將字串轉換為 double
+                    double ratedTime = Double.parseDouble(data.getRated_time());
+                    double realEffAttTime = Double.parseDouble(data.getReal_eff_att_time());
+                    if (realEffAttTime < ratedTime && !DateUtils.getCurrentDate().equals(data.getAtt_date())) {
+                        isWorkingHoursSufficient = false;
+                        reason = "工時不足八小時";
+                    }
+                }
+                boolean isLate = false;
                 if (data.getLate_time() > 0) {
+                    isLate = true;
+                    reason = "遲到";
+                }
+                //若有遲到，或是工時不足八小時，則發送提醒
+                if (isLate || !isWorkingHoursSufficient) {
                     String date = data.getAtt_date();
                     String inAndOut = data.getFirst_in() + " - " + data.getFirst_out();
-                    String message = date + "，打卡時間：" + inAndOut + "，需提交忘刷單或請假！";
+                    String message = date + "，打卡時間：" + inAndOut + "，原因：" + reason + "，需提交忘刷單或請假！";
                     lineNotifySender.send(user.getNotifyToken(), message);
                 }
             }
