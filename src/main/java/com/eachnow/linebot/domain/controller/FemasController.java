@@ -8,10 +8,7 @@ import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.FemasService;
 import com.eachnow.linebot.domain.service.line.LineUserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -80,10 +77,9 @@ public class FemasController {
         return result;
     }
 
-    @GetMapping(value = "/checkWorkLateLastMonth")
+    @PutMapping(value = "/checkWorkLateLastMonth")
     public Result checkWorkLateLastMonth() {
         femasService.checkWorkLateLastMonth();
         return Result.getDefaultResponse();
     }
-
 }

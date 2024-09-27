@@ -49,11 +49,6 @@ public class TestController {
         return result;
     }
 
-    @GetMapping(value = "/picture")
-    public String randomPicture() {
-        return beautyCrawlerService.randomPicture().getPictureUrl();
-    }
-
     @GetMapping(value = "/insertUser")
     public String insertUser() {
         String uuid = UUID.randomUUID().toString().substring(0, 33);
@@ -65,5 +60,5 @@ public class TestController {
     public void crawlerRankings() {
         javdbCrawlerService.crawlerRankings(JavdbCrawlerService.TYPE_DAILY);
     }
-    
+
 }
