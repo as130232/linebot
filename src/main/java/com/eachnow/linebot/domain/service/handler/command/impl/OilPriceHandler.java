@@ -32,14 +32,12 @@ import java.util.List;
 @Slf4j
 @Command({"中油", "油價"})
 public class OilPriceHandler implements CommandHandler {
-    private final CpcOilApiService cpcOilApiService;
-    private final SAXReader saxReader;
+    private CpcOilApiService cpcOilApiService;
+    private SAXReader saxReader;
 
     @Autowired
-    public OilPriceHandler(CpcOilApiService cpcOilApiService,
-                           SAXReader saxReader) {
+    public OilPriceHandler(CpcOilApiService cpcOilApiService) {
         this.cpcOilApiService = cpcOilApiService;
-        this.saxReader = saxReader;
     }
 
     @Override
