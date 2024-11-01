@@ -233,17 +233,20 @@ public class FemasService {
             dataes.addAll(firstDayToTwentyDay.getResponse().getDatas());
             dataes.addAll(twentyOneDayToToday.getResponse().getDatas());
             for (FemasPunchDataPO data : dataes) {
-                if (data.getIs_holiday()) {
+                if (data.getIs_holiday()) { // 若是假日/颱風假
+                    continue;
+                }
+                if ( data.getLeave_records().contains("特別休假") || data.getLeave_records().contains("全薪病假")) { //若是特休/全薪病假
                     continue;
                 }
                 String reason = "";
                 //工時是否足夠(一日八小時)
                 boolean isWorkingHoursSufficient = true;
-                if (data.getRated_time() != null && data.getReal_eff_att_time() != null) {
+                if (data.getRated_time() != null && data.getEff_att_time() != null) {
                     // 將字串轉換為 double
                     double ratedTime = Double.parseDouble(data.getRated_time());
-                    double realEffAttTime = Double.parseDouble(data.getReal_eff_att_time());
-                    if (realEffAttTime < ratedTime && !DateUtils.getCurrentDate().equals(data.getAtt_date())) {
+                    double effAttTime = Double.parseDouble(data.getEff_att_time());
+                    if (effAttTime < ratedTime && !DateUtils.getCurrentDate().equals(data.getAtt_date())) {
                         isWorkingHoursSufficient = false;
                         reason = "工時不足八小時";
                     }
