@@ -7,6 +7,7 @@ import com.eachnow.linebot.config.LineConfig;
 import com.linecorp.bot.client.LineMessagingClient;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import com.linecorp.bot.model.response.BotApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,21 @@ public class MessageSender {
 //        System.out.println(botApiResponse);
 //    }
 
-    public BotApiResponse push(String to, List<Message> messages){
+    public BotApiResponse push(String to, List<Message> messages) {
+        PushMessage pushMessage = new PushMessage(to, messages);
+        try {
+            return client.pushMessage(pushMessage).get();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("發送訊息，失敗! to:{}, messages:{}, error msg:{}", to, messages, e.getMessage());
+            return null;
+        }
+    }
+
+    public BotApiResponse pushToCharles(String sendMessage) {
+        String to = lineConfig.getLineUserIdOwn();
+        Message message = new TextMessage(sendMessage);
+        List<Message> messages = new ArrayList<>();
+        messages.add(message);
         PushMessage pushMessage = new PushMessage(to, messages);
         try {
             return client.pushMessage(pushMessage).get();
@@ -56,7 +71,7 @@ public class MessageSender {
     }
 
     /**
-     * @param to line token
+     * @param to    line token
      * @param type: text, sticker, image..(com.linecorp.bot.model.message.Message.@Type)
      */
     public void pushByRest(String to, String type, String text) {

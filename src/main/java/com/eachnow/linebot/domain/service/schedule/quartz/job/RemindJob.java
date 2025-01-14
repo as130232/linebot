@@ -8,12 +8,16 @@ import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import com.eachnow.linebot.domain.service.line.LineUserService;
 import com.eachnow.linebot.domain.service.line.MessageSender;
+import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,14 +48,19 @@ public class RemindJob implements Job {
         String label = "『提醒』 " + jobExecutionContext.getMergedJobDataMap().get("label").toString();
         Object userIdObj = jobExecutionContext.getMergedJobDataMap().get("userId");
         if (Objects.isNull(userIdObj)) {
-            lineNotifySender.sendToCharles(label);
+//            lineNotifySender.sendToCharles(label);
+            messageSender.pushToCharles(label);
         } else {
             String userId = userIdObj.toString();
             String token = lineUserService.getNotifyToken(userId);
             if (Strings.isEmpty(token)) {
                 return;
             }
-            lineNotifySender.send(token, label);
+//            lineNotifySender.send(token, label);
+            Message message = new TextMessage(label);
+            List<Message> messages = new ArrayList<>();
+            messages.add(message);
+            messageSender.push(userId, messages);
         }
         Object remind = jobExecutionContext.getMergedJobDataMap().get("remindId");
         if (Objects.nonNull(remind) && NumberUtils.isNumber(remind.toString())) {

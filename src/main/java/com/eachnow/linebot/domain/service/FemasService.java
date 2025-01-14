@@ -9,7 +9,10 @@ import com.eachnow.linebot.common.util.DateUtils;
 import com.eachnow.linebot.domain.service.gateway.FemasApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import com.eachnow.linebot.domain.service.line.LineUserService;
+import com.eachnow.linebot.domain.service.line.MessageSender;
 import com.eachnow.linebot.domain.service.schedule.quartz.QuartzService;
+import com.linecorp.bot.model.message.Message;
+import com.linecorp.bot.model.message.TextMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.quartz.JobKey;
@@ -34,6 +37,7 @@ public class FemasService {
     private final Scheduler scheduler;
     private final LineNotifySender lineNotifySender;
     private final LineUserService lineUserService;
+    private final MessageSender messageSender;
     @Value("${femas.token}")
     private String FEMAS_TOKEN_CHARLES;
 
@@ -42,13 +46,14 @@ public class FemasService {
                         FemasApiService femasApiService,
                         QuartzService quartzService, Scheduler scheduler,
                         LineNotifySender lineNotifySender,
-                        LineUserService lineUserService) {
+                        LineUserService lineUserService, MessageSender messageSender) {
         this.localCacheService = localCacheService;
         this.femasApiService = femasApiService;
         this.quartzService = quartzService;
         this.scheduler = scheduler;
         this.lineNotifySender = lineNotifySender;
         this.lineUserService = lineUserService;
+        this.messageSender = messageSender;
     }
 
     @PostConstruct
@@ -131,7 +136,9 @@ public class FemasService {
             }
             // 還未有打卡記錄則提醒
             if (Strings.isEmpty(datePO.getFirst_in())) {
-                lineNotifySender.sendToCharles("偵測到未打卡，剩十分鐘請趕緊打卡！");
+                String message = "偵測到未打卡，剩十分鐘請趕緊打卡！";
+//                lineNotifySender.sendToCharles(message);
+                messageSender.pushToCharles(message);
             }
         }
         log.info("remindPunchIn success.");
@@ -141,15 +148,7 @@ public class FemasService {
      * 紀錄上班時間，並新增排程下班時提醒打卡
      */
     public void remindPunchOut() {
-        List<LineUserPO> users = new ArrayList<>();
-        try {
-            users = lineUserService.listUser();
-        } catch (Exception e) {
-            users.add(LineUserPO.builder().name("charles").femasToken(FEMAS_TOKEN_CHARLES).build());
-            log.error("set remindPunchOut and listUser failed! error mg:{}", e.getMessage());
-            lineNotifySender.sendToCharles("set remindPunchOut and listUser failed!");
-        }
-        log.info("remindPunchOut success.");
+        List<LineUserPO> users = lineUserService.listUser();
         for (LineUserPO user : users) {
             remindPunchOutByUser(user);
         }
@@ -178,7 +177,12 @@ public class FemasService {
             ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
             //檢查是否遲到，若是超過七點下班則為超過十點打卡，為遲到需要提醒忘刷卡
             if (isLate(punchOut) && !notifyToken.isEmpty()) {
-                lineNotifySender.send(notifyToken, "今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！");
+                String sendMessage = "今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！";
+//                lineNotifySender.send(notifyToken, sendMessage);
+                Message message = new TextMessage(sendMessage);
+                List<Message> messages = new ArrayList<>();
+                messages.add(message);
+                messageSender.push(user.getId(), messages);
             }
             //新增下班提醒排程
             String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
@@ -186,8 +190,10 @@ public class FemasService {
             quartzService.addRemindJob(jobKey, null, user.getId(), label, cron);
             log.info("set remindPunchOut success. userName:{}, punchIn: {}, punchOut: {}, cron: {}", userName, po.getPunchIn(), po.getPunchOut(), cron);
         } catch (Exception e) {
-            log.error("set remindPunchOut failed! error mg:{}", e.getMessage());
-            lineNotifySender.sendToCharles("set remindPunchOut failed!");
+            String errorMsg = "set remindPunchOut failed!";
+            log.error("{}! error mg:{}", errorMsg, e.getMessage());
+//            lineNotifySender.sendToCharles(errorMsg);
+            messageSender.pushToCharles(errorMsg);
         }
     }
 
@@ -236,7 +242,7 @@ public class FemasService {
                 if (data.getIs_holiday()) { // 若是假日/颱風假
                     continue;
                 }
-                if ( data.getLeave_records().contains("特別休假") || data.getLeave_records().contains("全薪病假")) { //若是特休/全薪病假
+                if (data.getLeave_records().contains("特別休假") || data.getLeave_records().contains("全薪病假")) { //若是特休/全薪病假
                     continue;
                 }
                 String reason = "";
@@ -260,8 +266,12 @@ public class FemasService {
                 if (isLate || !isWorkingHoursSufficient) {
                     String date = data.getAtt_date();
                     String inAndOut = data.getFirst_in() + " - " + data.getFirst_out();
-                    String message = date + "，打卡時間：" + inAndOut + "，原因：" + reason + "，需提交忘刷單或請假！";
-                    lineNotifySender.send(user.getNotifyToken(), message);
+                    String sendMessage = date + "，打卡時間：" + inAndOut + "，原因：" + reason + "，需提交忘刷單或請假！";
+//                    lineNotifySender.send(user.getNotifyToken(), sendMessage);
+                    Message message = new TextMessage(sendMessage);
+                    List<Message> messages = new ArrayList<>();
+                    messages.add(message);
+                    messageSender.push(user.getId(), messages);
                 }
             }
             usernames.add(user.getName());

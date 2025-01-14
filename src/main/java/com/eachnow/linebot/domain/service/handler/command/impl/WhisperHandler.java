@@ -53,14 +53,10 @@ public class WhisperHandler implements CommandHandler {
             lineUserPO = optional.get();
             userMap.put(code, lineUserPO);
         }
-        if (TYPE_LINEBOT.equals(getType())) {
-            Message message = new TextMessage(sendMessage);
-            List<Message> messages = new ArrayList<>();
-            messages.add(message);
-            messageSender.push(lineUserPO.getId(), messages);
-        } else {
-            lineNotifySender.send(lineUserPO.getNotifyToken(), sendMessage);
-        }
+        Message message = new TextMessage(sendMessage);
+        List<Message> messages = new ArrayList<>();
+        messages.add(message);
+        messageSender.push(lineUserPO.getId(), messages);
         return new TextMessage("send success.");
     }
 }

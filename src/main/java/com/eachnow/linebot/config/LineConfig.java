@@ -13,6 +13,9 @@ public class LineConfig {
     private String channelSecret;
     @Value("${line.bot.channel-token}")
     private String channelToken;
+
+    @Value("${line.user.id.own}")
+    private String lineUserIdOwn;    //charles user id
     @Value("${line.notify.key.own}")
     private String lineNotifyKeyOwn;    //charles notify token
     @Value("${line.notify.key.group}")

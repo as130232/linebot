@@ -13,6 +13,7 @@ import com.eachnow.linebot.domain.service.gateway.OrderfoodApiService;
 import com.eachnow.linebot.domain.service.gateway.TwseApiService;
 import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
+import com.eachnow.linebot.domain.service.line.MessageSender;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -20,7 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;;
+;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -44,8 +45,8 @@ public class ScheduledService {
     private final TwseApiService twseApiService;
     private final JavdbCrawlerService javdbCrawlerService;
     private final OrderfoodApiService orderfoodApiService;
-
     private final FemasService femasService;
+    private final MessageSender messageSender;
 
     @Autowired
     public ScheduledService(@Qualifier("ptt-crawler-executor") ThreadPoolExecutor crawlerExecutor,
@@ -56,7 +57,7 @@ public class ScheduledService {
                             TwseApiService twseApiService,
                             JavdbCrawlerService javdbCrawlerService,
                             OrderfoodApiService orderfoodApiService,
-                            FemasService femasService) {
+                            FemasService femasService, MessageSender messageSender) {
         this.crawlerExecutor = crawlerExecutor;
         this.lineConfig = lineConfig;
         this.lineNotifySender = lineNotifySender;
@@ -66,6 +67,7 @@ public class ScheduledService {
         this.javdbCrawlerService = javdbCrawlerService;
         this.orderfoodApiService = orderfoodApiService;
         this.femasService = femasService;
+        this.messageSender = messageSender;
     }
 
     public void switchCron(boolean isOpen) {
@@ -100,7 +102,9 @@ public class ScheduledService {
                 if (unit >= 70) {
                     String start = DateUtils.parseDateTime(timePO.getStartTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmSlash);
                     String end = (DateUtils.parseDateTime(timePO.getEndTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmSlash)).split(" ")[1];
-                    lineNotifySender.sendToCharles(start + " - " + end + "，降雨機率為: {unit}%，出門請帶傘。".replace("{unit}", Integer.toString(unit)));
+                    String message = start + " - " + end + "，降雨機率為: {unit}%，出門請帶傘。".replace("{unit}", Integer.toString(unit));
+//                    lineNotifySender.sendToCharles(message);
+                    messageSender.pushToCharles(message);
                 }
             }
         }

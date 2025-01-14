@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 /**
+ * 2025/3/31 line notify 結束服務公告，改由message API
  * 藉由line notify發送訊息
  * 免費，且沒有訊息限制
  */

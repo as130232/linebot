@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Objects;
+
 @Slf4j
 @Component
 public class LineApiServiceImpl implements LineApiService {
@@ -36,7 +38,7 @@ public class LineApiServiceImpl implements LineApiService {
             headers.set("User-Agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Mobile Safari/537.36");
             HttpEntity<Void> request = new HttpEntity<>(headers);
             ResponseEntity<LineNotifyTokenPO> responseEntity = restTemplate.postForEntity(url, request, LineNotifyTokenPO.class);
-            String result = responseEntity.getBody().getAccessToken();
+            String result = Objects.requireNonNull(responseEntity.getBody()).getAccessToken();
             log.info("取得line notify token 成功。token:{}", result);
             return result;
         } catch (Exception e) {
