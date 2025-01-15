@@ -85,7 +85,7 @@ public class ActressHandler implements CommandHandler {
         }
         if (actressCrawlerService.articleMap.size() == 0) {
             actressCrawlerService.crawler(3);
-            return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
+//            return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
         String pictureUrl = actressCrawlerService.randomPicture();
         currentPicture = pictureUrl;

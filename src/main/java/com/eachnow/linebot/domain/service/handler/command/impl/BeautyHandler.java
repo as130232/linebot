@@ -94,8 +94,8 @@ public class BeautyHandler implements CommandHandler {
         if (text.contains("refresh"))
             beautyCrawlerService.crawler(10); //重新取得圖片資源
         if (beautyCrawlerService.articleMap.size() == 0) {
-            beautyCrawlerService.crawler(3);
-            return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
+            beautyCrawlerService.crawler(2);
+//            return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
         String pictureUrl = beautyCrawlerService.randomPicture();
         currentPicture = pictureUrl;    //紀錄當前圖片
