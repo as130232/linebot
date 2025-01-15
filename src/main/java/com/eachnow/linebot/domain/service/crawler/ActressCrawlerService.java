@@ -35,26 +35,15 @@ public class ActressCrawlerService {
         if (pttInfoPO == null) {
             return;
         }
-        this.setPttArticles(pttInfoPO.getArticles());
         for (PttArticlePO article : pttInfoPO.getArticles()) {
             //取得對應文章中所有圖片列表
             Set<String> listPicture = pttApiService.listPicture(article.getWebUrl());
             pictures.addAll(listPicture);
+            //更新對應文章內的圖片
+            article.setPictures(listPicture);
+            articleMap.put(article.getWebUrl(), article);
         }
         log.info("crawler ptt beauty success. pictures size:{}", pictures.size());
-    }
-
-    private void setPttArticles(List<PttArticlePO> listPicture) {
-        for (PttArticlePO po : listPicture) {
-            articleMap.put(po.getWebUrl(), po);
-        }
-        if (articleMap.size() > MAX_SIZE) {
-            int i = 0;
-            while (articleMap.size() > MAX_SIZE) {
-                articleMap.remove(i);
-                i++;
-            }
-        }
     }
 
     public static PttArticlePO getRandomValue(Map<String, PttArticlePO> map) {

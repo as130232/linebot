@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 public class BeautyHandler implements CommandHandler {
     private BeautyCrawlerService beautyCrawlerService;
     private String currentPicture;
+    public static final String DefaultImage = "https://i.imgur.com/ht8dxBm.jpg";
 
     @Autowired
     public BeautyHandler(BeautyCrawlerService beautyCrawlerService) {
@@ -43,7 +44,7 @@ public class BeautyHandler implements CommandHandler {
         commands.add(DescriptionCommandPO.builder().explain("隨機抽取表特版圖片").command("抽").postback("抽").build());
         commands.add(DescriptionCommandPO.builder().explain("隨機精選十張表特版圖片").command("抽 多").postback("抽 多").build());
         return DescriptionPO.builder().title("表特").description("爬取PTT表特版圖片資源。")
-                .commands(commands).imageUrl("https://i.imgur.com/ht8dxBm.jpg").build();
+                .commands(commands).imageUrl(DefaultImage).build();
     }
 
     @Override
@@ -75,7 +76,10 @@ public class BeautyHandler implements CommandHandler {
                         .cornerRadius("20px").offsetTop("18px").offsetStart("18px").height("25px").width("53px").contents(Arrays.asList(
                                 Text.builder().text("文章").color("#ffffff").align(FlexAlign.CENTER).size(FlexFontSize.XS).offsetTop("3px").build()
                         )).action(new URIAction("URL", articleUri, new URIAction.AltUri(articleUri))).build();
-                String picture = po.getPictureUrl();
+                String picture = DefaultImage;
+                if (!po.getPictures().isEmpty()) {
+                    picture = po.getPictures().iterator().next();
+                }
                 URI uri = URI.create(picture);
                 List<FlexComponent> bodyContents = Arrays.asList(
                         Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7)
