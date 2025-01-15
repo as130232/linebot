@@ -35,12 +35,12 @@ public class BeautyCrawlerService {
         this.pttApiService = pttApiService;
     }
 
-    @PostConstruct
-    public void init() {
-        Set<PttArticlePO> list = listArticle(10);
-        String pic = randomPicture();
-        log.info(pic);
-    }
+//    @PostConstruct
+//    public void init() {
+//        Set<PttArticlePO> list = listArticle(10);
+//        String pic = randomPicture();
+//        log.info(pic);
+//    }
 
     /**
      * 容易造成heroku oom將改用api取得對應圖片

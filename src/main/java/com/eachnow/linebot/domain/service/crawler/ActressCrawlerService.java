@@ -27,11 +27,19 @@ public class ActressCrawlerService {
         this.pttApiService = pttApiService;
     }
 
+
+//    @PostConstruct
+//    public void init() {
+//        Set<PttArticlePO> list = listArticle(10);
+//        String pic = randomPicture();
+//        log.info(pic);
+//    }
+
     /**
      * 根據api爬取表特版圖片
      */
     public void crawler(int size) {
-        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(PttEnum.JAPANAVGIRLS.getValue(), size);
+        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(PttEnum.SEX.getValue(), size);
         if (pttInfoPO == null) {
             return;
         }
