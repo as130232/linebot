@@ -54,19 +54,19 @@ public class BeautyHandler implements CommandHandler {
             //return new TextMessage("儲存成功。");
         }
         if (text.contains("size")) {
-            return new TextMessage("圖片資源size:" + beautyCrawlerService.listPicture.size());
+            return new TextMessage("圖片資源size:" + beautyCrawlerService.listArticle.size());
         }
         if (text.contains("上一張") && currentPicture != null) {
             URI uri = URI.create(currentPicture);
             return new ImageMessage(uri, uri);
         }
         if (text.contains("爬")) {
-            beautyCrawlerService.crawler(1);
+            beautyCrawlerService.crawler(3);
         }
         if (text.contains("多") || text.contains("more")) {
-            Set<PttArticlePO> pictures = randomListPicture(10);
+            Set<PttArticlePO> pictures = listArticle(10);
             if (pictures.size() == 0) {
-                beautyCrawlerService.crawler(2);
+                beautyCrawlerService.crawler(3);
                 return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
             }
             List<Bubble> listBubble = pictures.stream().map(po -> {
@@ -88,21 +88,21 @@ public class BeautyHandler implements CommandHandler {
             return new FlexMessage("表特精選", contents);
         }
         if (text.contains("refresh"))
-            beautyCrawlerService.init(); //重新取得圖片資源
-        if (beautyCrawlerService.listPicture.size() == 0) {
-            beautyCrawlerService.crawler(2);
+            beautyCrawlerService.crawler(10); //重新取得圖片資源
+        if (beautyCrawlerService.listArticle.size() == 0) {
+            beautyCrawlerService.crawler(3);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
-        String pictureUrl = beautyCrawlerService.randomPicture().getPictureUrl();
+        String pictureUrl = beautyCrawlerService.randomPicture();
         currentPicture = pictureUrl;    //紀錄當前圖片
         URI uri = URI.create(pictureUrl);
         return new ImageMessage(uri, uri);
     }
 
-    private Set<PttArticlePO> randomListPicture(int size) {
+    private Set<PttArticlePO> listArticle(int size) {
         Set<PttArticlePO> result = new HashSet<>(size);
-        while (result.size() != size && beautyCrawlerService.listPicture.size() > size)
-            result.add(beautyCrawlerService.randomPicture());
+        while (result.size() != size && beautyCrawlerService.listArticle.size() > size)
+            result.add(beautyCrawlerService.randomArticle());
         return result;
     }
 }

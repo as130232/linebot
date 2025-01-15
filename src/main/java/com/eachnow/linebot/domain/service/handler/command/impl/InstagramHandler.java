@@ -36,9 +36,9 @@ import java.util.Iterator;
 public class InstagramHandler implements CommandHandler {
     private static final String INSTAGRAM_BASE_URI = "https://www.instagram.com/";
     private WebDriverFactory webDriverFactory;
-    @Value("${ig.account}")
+    @Value("${ig.account:}")
     private String ACCOUNT;
-    @Value("${ig.password}")
+    @Value("${ig.password:}")
     private String PASSWORD;
 
     @Autowired

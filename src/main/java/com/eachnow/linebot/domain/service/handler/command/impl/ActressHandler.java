@@ -54,12 +54,12 @@ public class ActressHandler implements CommandHandler {
             return new ImageMessage(uri, uri);
         }
         if (text.contains("爬")) {
-            actressCrawlerService.crawler(1);
+            actressCrawlerService.crawler(3);
         }
         if (text.contains("多") || text.contains("more")) {
             Set<PttArticlePO> pictures = randomListPicture(10);
             if (pictures.size() == 0) {
-                actressCrawlerService.crawler(2);
+                actressCrawlerService.crawler(3);
                 return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
             }
             List<Bubble> listBubble = pictures.stream().map(po -> {
@@ -81,13 +81,13 @@ public class ActressHandler implements CommandHandler {
             return new FlexMessage("女優版精選", contents);
         }
         if (text.contains("refresh")) {
-            actressCrawlerService.init(); //重新取得圖片資源
+            actressCrawlerService.crawler(10); //重新取得圖片資源
         }
         if (actressCrawlerService.listPicture.size() == 0) {
-            actressCrawlerService.crawler(2);
+            actressCrawlerService.crawler(3);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
-        String pictureUrl = actressCrawlerService.randomPicture().getPictureUrl();
+        String pictureUrl = actressCrawlerService.randomPicture();
         currentPicture = pictureUrl;
         URI uri = URI.create(pictureUrl);
         return new ImageMessage(uri, uri);
@@ -96,7 +96,7 @@ public class ActressHandler implements CommandHandler {
     private Set<PttArticlePO> randomListPicture(int size) {
         Set<PttArticlePO> result = new HashSet<>(size);
         while (result.size() != size && actressCrawlerService.listPicture.size() > size)
-            result.add(actressCrawlerService.randomPicture());
+            result.add(actressCrawlerService.randomArticle());
         return result;
     }
 }

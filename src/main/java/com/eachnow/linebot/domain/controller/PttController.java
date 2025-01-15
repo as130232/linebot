@@ -1,6 +1,5 @@
 package com.eachnow.linebot.domain.controller;
 
-import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.PttInfoPO;
 import com.eachnow.linebot.common.po.Result;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -30,12 +28,12 @@ public class PttController {
     @GetMapping(value = "/beauty/url")
     public Result<String> getBeautyUrl() {
         Result<String> result = new Result<>();
-        if (beautyCrawlerService.listPicture.size() == 0) {
+        if (beautyCrawlerService.listArticle.size() == 0) {
             beautyCrawlerService.crawler(1);
             result.setCode(Result.NOT_FOUND);
             result.setData("找不到資料");
         } else {
-            String pictureUrl = beautyCrawlerService.randomPicture().getPictureUrl();
+            String pictureUrl = beautyCrawlerService.randomPicture();
             result.setData(pictureUrl);
         }
         return result;

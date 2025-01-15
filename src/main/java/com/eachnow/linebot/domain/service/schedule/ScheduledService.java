@@ -82,7 +82,7 @@ public class ScheduledService {
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
             return;
-        beautyCrawlerService.crawler(2);
+        beautyCrawlerService.crawler(10);
         log.info("[schedule] 爬取表特版，完成。");
     }
 
