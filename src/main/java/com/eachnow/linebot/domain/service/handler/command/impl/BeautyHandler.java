@@ -54,7 +54,7 @@ public class BeautyHandler implements CommandHandler {
             //return new TextMessage("儲存成功。");
         }
         if (text.contains("size")) {
-            return new TextMessage("圖片資源size:" + beautyCrawlerService.listArticle.size());
+            return new TextMessage("圖片資源size:" + beautyCrawlerService.articleMap.size());
         }
         if (text.contains("上一張") && currentPicture != null) {
             URI uri = URI.create(currentPicture);
@@ -64,9 +64,9 @@ public class BeautyHandler implements CommandHandler {
             beautyCrawlerService.crawler(3);
         }
         if (text.contains("多") || text.contains("more")) {
-            Set<PttArticlePO> pictures = listArticle(10);
+            Set<PttArticlePO> pictures = beautyCrawlerService.listArticle(10);
             if (pictures.size() == 0) {
-                beautyCrawlerService.crawler(3);
+                beautyCrawlerService.crawler(10);
                 return new TextMessage("圖片為空，重新取得圖片資源中，請稍後(一分鐘)。");
             }
             List<Bubble> listBubble = pictures.stream().map(po -> {
@@ -89,7 +89,7 @@ public class BeautyHandler implements CommandHandler {
         }
         if (text.contains("refresh"))
             beautyCrawlerService.crawler(10); //重新取得圖片資源
-        if (beautyCrawlerService.listArticle.size() == 0) {
+        if (beautyCrawlerService.articleMap.size() == 0) {
             beautyCrawlerService.crawler(3);
             return new TextMessage("重新取得圖片資源中，請稍後(一分鐘)。");
         }
@@ -99,10 +99,4 @@ public class BeautyHandler implements CommandHandler {
         return new ImageMessage(uri, uri);
     }
 
-    private Set<PttArticlePO> listArticle(int size) {
-        Set<PttArticlePO> result = new HashSet<>(size);
-        while (result.size() != size && beautyCrawlerService.listArticle.size() > size)
-            result.add(beautyCrawlerService.randomArticle());
-        return result;
-    }
 }

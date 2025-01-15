@@ -6,11 +6,9 @@ import com.eachnow.linebot.common.po.PttInfoPO;
 import com.eachnow.linebot.domain.service.gateway.PttApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
-import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * 爬取資源服務
@@ -21,8 +19,9 @@ public class ActressCrawlerService {
 
     private final PttApiService pttApiService;
     public final Integer MAX_SIZE = 500;
-    public List<PttArticlePO> listPicture = new ArrayList<>(MAX_SIZE);
+    public Map<String, PttArticlePO> articleMap = new HashMap<>(MAX_SIZE);
     public Set<String> pictures = new HashSet<>(MAX_SIZE);
+
     @Autowired
     public ActressCrawlerService(PttApiService pttApiService) {
         this.pttApiService = pttApiService;
@@ -45,24 +44,36 @@ public class ActressCrawlerService {
         log.info("crawler ptt beauty success. pictures size:{}", pictures.size());
     }
 
-    private void setPttArticles(List<PttArticlePO> listPictureOnPage) {
-        listPicture.addAll(listPictureOnPage);
-        if (listPicture.size() > MAX_SIZE) {
+    private void setPttArticles(List<PttArticlePO> listPicture) {
+        for (PttArticlePO po : listPicture) {
+            articleMap.put(po.getWebUrl(), po);
+        }
+        if (articleMap.size() > MAX_SIZE) {
             int i = 0;
-            while (listPicture.size() > MAX_SIZE) {
-                listPicture.remove(i);
+            while (articleMap.size() > MAX_SIZE) {
+                articleMap.remove(i);
                 i++;
             }
         }
+    }
+
+    public static PttArticlePO getRandomValue(Map<String, PttArticlePO> map) {
+        // 將 HashMap 的值轉換為數組
+        PttArticlePO[] values = map.values().toArray(new PttArticlePO[0]);
+        // 使用 Random 類生成隨機索引
+        Random random = new Random();
+        int randomIndex = random.nextInt(values.length);
+        // 返回隨機選擇的值
+        return values[randomIndex];
     }
 
     /**
      * 取得隨機一篇文章
      */
     public PttArticlePO randomArticle() {
-        int item = new Random().nextInt(listPicture.size());
-        return listPicture.get(item);
+        return getRandomValue(articleMap);
     }
+
     /**
      * 取得隨機一張圖片
      */
@@ -77,5 +88,15 @@ public class ActressCrawlerService {
         int randomIndex = random.nextInt(array.length);
         // 返回隨機選擇的元素
         return array[randomIndex];
+    }
+
+    public Set<PttArticlePO> listArticle(int size) {
+        if (size > articleMap.size()) {
+            crawler(size);
+        }
+        Set<PttArticlePO> result = new HashSet<>(size);
+        while (result.size() != size && articleMap.size() >= size)
+            result.add(randomArticle());
+        return result;
     }
 }

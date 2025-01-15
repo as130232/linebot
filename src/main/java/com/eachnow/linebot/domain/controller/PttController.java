@@ -28,7 +28,7 @@ public class PttController {
     @GetMapping(value = "/beauty/url")
     public Result<String> getBeautyUrl() {
         Result<String> result = new Result<>();
-        if (beautyCrawlerService.listArticle.size() == 0) {
+        if (beautyCrawlerService.articleMap.size() == 0) {
             beautyCrawlerService.crawler(1);
             result.setCode(Result.NOT_FOUND);
             result.setData("找不到資料");

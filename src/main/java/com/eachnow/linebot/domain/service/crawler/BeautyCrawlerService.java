@@ -24,7 +24,7 @@ public class BeautyCrawlerService {
     private final PttApiService pttApiService;
 
     public final Integer MAX_SIZE = 500;
-    public List<PttArticlePO> listArticle = new ArrayList<>(MAX_SIZE);
+    public Map<String, PttArticlePO> articleMap = new HashMap<>(MAX_SIZE);
     public Set<String> pictures = new HashSet<>(MAX_SIZE);
 
     @Autowired
@@ -37,7 +37,7 @@ public class BeautyCrawlerService {
 
 //    @PostConstruct
 //    public void init() {
-//        crawler(10);
+//        Set<PttArticlePO> list = listArticle(10);
 //        String pic = randomPicture();
 //        log.info(pic);
 //    }
@@ -73,23 +73,34 @@ public class BeautyCrawlerService {
         log.info("crawler ptt beauty success. pictures size:{}", pictures.size());
     }
 
-    private void setPttArticles(List<PttArticlePO> listPictureOnPage) {
-        listArticle.addAll(listPictureOnPage);
-        if (listArticle.size() > MAX_SIZE) {
+    private void setPttArticles(List<PttArticlePO> listPicture) {
+        for (PttArticlePO po : listPicture) {
+            articleMap.put(po.getWebUrl(), po);
+        }
+        if (articleMap.size() > MAX_SIZE) {
             int i = 0;
-            while (listArticle.size() > MAX_SIZE) {
-                listArticle.remove(i);
+            while (articleMap.size() > MAX_SIZE) {
+                articleMap.remove(i);
                 i++;
             }
         }
+    }
+
+    public static PttArticlePO getRandomValue(Map<String, PttArticlePO> map) {
+        // 將 HashMap 的值轉換為數組
+        PttArticlePO[] values = map.values().toArray(new PttArticlePO[0]);
+        // 使用 Random 類生成隨機索引
+        Random random = new Random();
+        int randomIndex = random.nextInt(values.length);
+        // 返回隨機選擇的值
+        return values[randomIndex];
     }
 
     /**
      * 取得隨機一篇文章
      */
     public PttArticlePO randomArticle() {
-        int item = new Random().nextInt(listArticle.size());
-        return listArticle.get(item);
+        return getRandomValue(articleMap);
     }
 
     /**
@@ -108,4 +119,13 @@ public class BeautyCrawlerService {
         return array[randomIndex];
     }
 
+    public Set<PttArticlePO> listArticle(int size) {
+        if (size > articleMap.size()) {
+            crawler(size);
+        }
+        Set<PttArticlePO> result = new HashSet<>(size);
+        while (result.size() != size && articleMap.size() >= size)
+            result.add(randomArticle());
+        return result;
+    }
 }
