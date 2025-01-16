@@ -35,12 +35,12 @@ public class PttApiServiceImp implements PttApiService {
     }
 
     @Override
-    public PttInfoPO getPttInfoPO(String board, int size) {
-        String url = PttEnum.getUrl(board);
+    public PttInfoPO getPttInfoPO(PttEnum pttEnum, int size) {
+        String url = PttEnum.getUrlByDisp(pttEnum);
         Map<String, PttArticlePO> pttArticleMap = new HashMap<>(size);
         PttInfoPO pttInfoPO = null;
         while (pttArticleMap.size() < size) {
-            pttInfoPO = getPttInfoPO(url);
+            pttInfoPO = getPttInfoByDisp(url);
             if (pttInfoPO == null)
                 return null;
             for (PttArticlePO pttArticlePO : pttInfoPO.getArticles()) {
@@ -56,9 +56,10 @@ public class PttApiServiceImp implements PttApiService {
         //根據熱門排序
         assert pttInfoPO != null;
         pttInfoPO.setArticles(articles);
-        pttInfoPO.setBoard(board);
+        pttInfoPO.setBoard(pttEnum.getValue());
         return pttInfoPO;
     }
+
 
     /**
      * 取得該文章內對應圖片列表
@@ -105,7 +106,7 @@ public class PttApiServiceImp implements PttApiService {
     /**
      * 取得該版(八卦、表特..)文章列表
      */
-    private PttInfoPO getPttInfoPO(String url) {
+    private PttInfoPO getPttInfoByDisp(String url) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
         HttpEntity<Void> request = new HttpEntity<>(headers);
@@ -119,7 +120,6 @@ public class PttApiServiceImp implements PttApiService {
             if (doc.select("div[class~=topRight]").text().contains("進入看板")) {
                 return PttInfoPO.builder().link(url).pageUpLink(LINK + doc.select("div[class~=topRight]").select("a").attr("href")).boardPopularity(boardPopularity).articles(list).build();
             }
-            Elements elements = doc.select("div[class~=row2]");
             String name = doc.select("span[id~=board_div]").text();       //看版
             if (doc.select("span[class~=R0]").size() > 0) {
                 String boardPopularityStr = doc.select("span[class~=R0]").get(0).text();    //看板人氣:845 本日:102K 累積:987M
@@ -127,7 +127,7 @@ public class PttApiServiceImp implements PttApiService {
             }
             //取得上一頁連結
             String pageUpLink = LINK + doc.select("div[class~=topRight]").select("a").get(2).select("a").attr("href");
-            //上一頁網址
+            Elements elements = doc.select("div[class~=row2]");
             for (Element element : elements) {
                 String title = element.select("span[class~=listTitle]").text().replace("■ ", "");
                 if (title.contains("[公告]") || title.contains("[刪除]") || title.contains("···"))

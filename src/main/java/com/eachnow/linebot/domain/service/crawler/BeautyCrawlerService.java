@@ -60,7 +60,7 @@ public class BeautyCrawlerService {
      * 根據api爬取表特版圖片
      */
     public void crawler(int size) {
-        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(PttEnum.BEAUTY.getValue(), size);
+        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(PttEnum.BEAUTY, size);
         if (pttInfoPO == null) {
             return;
         }

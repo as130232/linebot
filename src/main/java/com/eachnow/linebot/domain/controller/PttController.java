@@ -1,5 +1,6 @@
 package com.eachnow.linebot.domain.controller;
 
+import com.eachnow.linebot.common.constant.PttEnum;
 import com.eachnow.linebot.common.po.PttInfoPO;
 import com.eachnow.linebot.common.po.Result;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
@@ -42,7 +43,8 @@ public class PttController {
     @GetMapping(value = "/article")
     public Result<PttInfoPO> getPttArticle(@RequestParam(value = "board", defaultValue = "beauty") String board,
                                            @RequestParam(value = "size", defaultValue = "10") int size) {
-        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(board, size);
+        PttEnum pttEnum = PttEnum.getPttEnum(board);
+        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(pttEnum, size);
         Result<PttInfoPO> result = new Result<>();
         result.setData(pttInfoPO);
         return result;

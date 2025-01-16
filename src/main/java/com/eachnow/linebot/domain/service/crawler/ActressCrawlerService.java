@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 
 /**
@@ -28,18 +29,18 @@ public class ActressCrawlerService {
     }
 
 
-//    @PostConstruct
-//    public void init() {
-//        Set<PttArticlePO> list = listArticle(10);
-//        String pic = randomPicture();
-//        log.info(pic);
-//    }
+    @PostConstruct
+    public void init() {
+        Set<PttArticlePO> list = listArticle(10);
+        String pic = randomPicture();
+        log.info(pic);
+    }
 
     /**
      * 根據api爬取表特版圖片
      */
     public void crawler(int size) {
-        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(PttEnum.SEX.getValue(), size);
+        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(PttEnum.SEX, size);
         if (pttInfoPO == null) {
             return;
         }

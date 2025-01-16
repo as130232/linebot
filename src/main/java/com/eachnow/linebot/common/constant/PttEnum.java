@@ -40,11 +40,6 @@ public enum PttEnum {
         this.name = name;
     }
 
-    public static String getUrl(String board) {
-        String dispUrl = "https://disp.cc/b/%s";
-        return String.format(dispUrl, board);
-    }
-
     public static String getUrlByBbs(PttEnum pttEnum) {
         String bbsUrl = "https://www.ptt.cc/bbs/%s/index.html";
         return String.format(bbsUrl, pttEnum.getValue());

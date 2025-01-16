@@ -85,8 +85,7 @@ public class BeautyHandler implements CommandHandler {
                         Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7)
                                 .url(uri).action(new URIAction("URL", uri, new URIAction.AltUri(uri))).build(), article);
                 Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.NONE).build();
-                Bubble bubble = Bubble.builder().header(null).hero(null).body(body).footer(null).build();
-                return bubble;
+                return Bubble.builder().header(null).hero(null).body(body).footer(null).build();
             }).collect(Collectors.toList());
             FlexContainer contents = Carousel.builder().contents(listBubble).build();
             return new FlexMessage("表特精選", contents);

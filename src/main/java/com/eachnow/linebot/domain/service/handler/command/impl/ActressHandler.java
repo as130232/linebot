@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 public class ActressHandler implements CommandHandler {
     private ActressCrawlerService actressCrawlerService;
     private String currentPicture;
-
+    public static final String DefaultImage = "https://i.imgur.com/ht8dxBm.jpg";
     @Autowired
     public ActressHandler(ActressCrawlerService actressCrawlerService) {
         this.actressCrawlerService = actressCrawlerService;
@@ -68,14 +68,16 @@ public class ActressHandler implements CommandHandler {
                         .cornerRadius("20px").offsetTop("18px").offsetStart("18px").height("25px").width("53px").contents(Arrays.asList(
                                 Text.builder().text("文章").color("#ffffff").align(FlexAlign.CENTER).size(FlexFontSize.XS).offsetTop("3px").build()
                         )).action(new URIAction("URL", articleUri, new URIAction.AltUri(articleUri))).build();
-                String picture = po.getPictureUrl();
+                String picture = DefaultImage;
+                if (!po.getPictures().isEmpty()) {
+                    picture = po.getPictures().iterator().next();
+                }
                 URI uri = URI.create(picture);
                 List<FlexComponent> bodyContents = Arrays.asList(
                         Image.builder().size(Image.ImageSize.FULL_WIDTH).aspectMode(Image.ImageAspectMode.Cover).aspectRatio(5, 7)
                                 .url(uri).action(new URIAction("URL", uri, new URIAction.AltUri(uri))).build(), article);
                 Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.NONE).build();
-                Bubble bubble = Bubble.builder().header(null).hero(null).body(body).footer(null).build();
-                return bubble;
+                return Bubble.builder().header(null).hero(null).body(body).footer(null).build();
             }).collect(Collectors.toList());
             FlexContainer contents = Carousel.builder().contents(listBubble).build();
             return new FlexMessage("女優版精選", contents);

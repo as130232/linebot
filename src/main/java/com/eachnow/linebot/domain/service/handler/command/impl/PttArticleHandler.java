@@ -49,7 +49,7 @@ public class PttArticleHandler implements CommandHandler {
         List<String> params = commandPO.getParams();
         String name = ParamterUtils.getValueByIndex(params, 0);
         PttEnum pttEnum = PttEnum.getPttEnum(name);
-        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(pttEnum.getValue(), 20);
+        PttInfoPO pttInfoPO = pttApiService.getPttInfoPO(pttEnum, 20);
         if (pttInfoPO == null)
             return new TextMessage("查無資訊");
         List<PttArticlePO> listPttArticle = pttInfoPO.getArticles();
