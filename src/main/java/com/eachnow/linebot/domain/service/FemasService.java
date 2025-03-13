@@ -184,9 +184,11 @@ public class FemasService {
                 messages.add(message);
                 messageSender.push(user.getId(), messages);
             }
+            //減少五分鐘，讓下班前五分鐘就觸發提醒
+            ZonedDateTime minus5Minutes = punchOut.minusMinutes(5);
             //新增下班提醒排程
-            String cron = QuartzService.getCron(punchOut.format(DateUtils.yyyyMMdd), punchOut.format(DateUtils.hhmmss));
-            String label = "打卡下班囉！ " + po.getPunchOut();
+            String cron = QuartzService.getCron(minus5Minutes.format(DateUtils.yyyyMMdd), minus5Minutes.format(DateUtils.hhmmss));
+            String label = "倒數五分鐘，準備打卡下班囉！ " + po.getPunchOut();
             quartzService.addRemindJob(jobKey, null, user.getId(), label, cron);
             log.info("set remindPunchOut success. userName:{}, punchIn: {}, punchOut: {}, cron: {}", userName, po.getPunchIn(), po.getPunchOut(), cron);
         } catch (Exception e) {
