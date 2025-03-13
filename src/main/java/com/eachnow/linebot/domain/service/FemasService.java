@@ -183,7 +183,6 @@ public class FemasService {
                 List<Message> messages = new ArrayList<>();
                 messages.add(message);
                 messageSender.push(user.getId(), messages);
-                return; // 若遲到就不需要提醒打下班卡
             }
             //減少五分鐘，讓下班前五分鐘就觸發提醒
             ZonedDateTime minus5Minutes = punchOut.minusMinutes(5);
