@@ -305,7 +305,6 @@ public class FemasService {
 
     public boolean isUserInValid(String userName, String femasToken, Integer isValid) {
         if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken) || CommonConstant.INVALID.equals(isValid)) {
-            log.info("userName:{}, femasToken:{}, isValid:{}", userName, femasToken, isValid);
             return true;
         }
         return false;
