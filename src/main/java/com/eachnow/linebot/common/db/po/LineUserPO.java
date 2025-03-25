@@ -29,4 +29,6 @@ public class LineUserPO {
     private String notifyToken;
     @Column
     private String femasToken;
+    @Column
+    private Integer isValid;
 }

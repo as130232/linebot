@@ -1,5 +1,6 @@
 package com.eachnow.linebot.domain.service;
 
+import com.eachnow.linebot.common.constant.CommonConstant;
 import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.po.femas.FemasPayResultPO;
 import com.eachnow.linebot.common.po.femas.FemasPunchDataPO;
@@ -108,7 +109,7 @@ public class FemasService {
         for (LineUserPO user : users) {
             String userName = user.getName();
             String femasToken = user.getFemasToken();
-            if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
+            if (isUserInValid(userName, femasToken, user.getIsValid())) {
                 continue;
             }
             FemasPunchRecordPO femasPunchRecordPO = getPunchRecordAndSetCache(userName, femasToken, searchStart, searchEnd);
@@ -162,7 +163,7 @@ public class FemasService {
             String userName = user.getName();
             String femasToken = user.getFemasToken();
             String notifyToken = user.getNotifyToken();
-            if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken)) {
+            if (isUserInValid(userName, femasToken, user.getIsValid())) {
                 return;
             }
             FemasPunchRecordPO po = this.getPunchRecord(userName, femasToken, currentDate);
@@ -231,16 +232,22 @@ public class FemasService {
         List<LineUserPO> users = lineUserService.listUser();
         List<String> usernames = new ArrayList<>(users.size());
         for (LineUserPO user : users) {
+            String userName = user.getName();
+            String femasToken = user.getFemasToken();
+            if (isUserInValid(userName, femasToken, user.getIsValid())) {
+                continue;
+            }
+
             //上個月一號到二十號
-            FemasPunchResultPO firstDayToTwentyDay = femasApiService.getPunchRecords(user.getFemasToken(),
+            FemasPunchResultPO firstDayToTwentyDay = femasApiService.getPunchRecords(femasToken,
                     firstDayOfLastMonth.format(DateUtils.yyyyMMddDash), twentyDayOfLastMonth.format(DateUtils.yyyyMMddDash));
             //上個月二十一號到今日
-            FemasPunchResultPO twentyOneDayToToday = femasApiService.getPunchRecords(user.getFemasToken(),
+            FemasPunchResultPO twentyOneDayToToday = femasApiService.getPunchRecords(femasToken,
                     twentyOneDayOfLastMonth.format(DateUtils.yyyyMMddDash), today.format(DateUtils.yyyyMMddDash));
-            List<FemasPunchDataPO> dataes = new ArrayList<>();
-            dataes.addAll(firstDayToTwentyDay.getResponse().getDatas());
-            dataes.addAll(twentyOneDayToToday.getResponse().getDatas());
-            for (FemasPunchDataPO data : dataes) {
+            List<FemasPunchDataPO> listData = new ArrayList<>();
+            listData.addAll(firstDayToTwentyDay.getResponse().getDatas());
+            listData.addAll(twentyOneDayToToday.getResponse().getDatas());
+            for (FemasPunchDataPO data : listData) {
                 if (data.getIs_holiday()) { // 若是假日/颱風假
                     continue;
                 }
@@ -296,4 +303,10 @@ public class FemasService {
         return femasApiService.getPayrollRecords(femasToken, yearMonth);
     }
 
+    public boolean isUserInValid(String userName, String femasToken, Integer isValid) {
+        if (Strings.isEmpty(userName) || Strings.isEmpty(femasToken) || CommonConstant.INVALID.equals(isValid)) {
+            return true;
+        }
+        return false;
+    }
 }
