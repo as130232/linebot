@@ -105,6 +105,7 @@ public class LineUserService {
         if (optional.isPresent()) {
             LineUserPO user = optional.get();
             user.setFemasToken(femasToken);
+            lineUserRepository.save(user);
             log.info("updateFemasToken success. userId:{}, femasToken:{}", userId, femasToken);
         }
     }
