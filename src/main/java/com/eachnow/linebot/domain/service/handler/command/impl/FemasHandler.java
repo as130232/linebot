@@ -5,6 +5,7 @@ import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.femas.FemasPunchRecordPO;
 import com.eachnow.linebot.common.util.DateUtils;
+import com.eachnow.linebot.common.util.LineTemplateUtils;
 import com.eachnow.linebot.domain.service.FemasService;
 import com.eachnow.linebot.domain.service.LocalCacheService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -57,7 +58,7 @@ public class FemasHandler implements CommandHandler {
             case "femas": {
                 String femasToken = commandPO.getParams().get(0);
                 lineUserService.updateFemasToken(commandPO.getUserId(), femasToken);
-                return new TextMessage("新增用戶femas Token成功");
+                return LineTemplateUtils.getCancelTemplate("更新用戶 femas Token 成功");
             }
         }
         return null;

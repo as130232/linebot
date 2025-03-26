@@ -19,6 +19,13 @@ import java.util.List;
 
 public class LineTemplateUtils {
 
+    public static Message getSuccessTemplate(String label) {
+        List<FlexComponent> headerContents = Arrays.asList(Text.builder().text(label).size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
+        Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#4cc844").build();
+        FlexContainer contents = Bubble.builder().header(header).hero(null).body(null).footer(null).build();
+        return FlexMessage.builder().altText(label).contents(contents).build();
+    }
+
     public static Message getCancelTemplate(String label) {
         List<FlexComponent> headerContents = Arrays.asList(Text.builder().text(label).size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
         Box header = Box.builder().layout(FlexLayout.VERTICAL).contents(headerContents).paddingAll(FlexPaddingSize.MD).backgroundColor("#FF6B6E").build();
