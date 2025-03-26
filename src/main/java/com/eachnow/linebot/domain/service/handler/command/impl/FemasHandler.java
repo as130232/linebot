@@ -58,7 +58,7 @@ public class FemasHandler implements CommandHandler {
             case "femas": {
                 String femasToken = commandPO.getParams().get(0);
                 lineUserService.updateFemasToken(commandPO.getUserId(), femasToken);
-                return LineTemplateUtils.getCancelTemplate("更新用戶 femas Token 成功");
+                return LineTemplateUtils.getSuccessTemplate("更新用戶 femas Token 成功");
             }
         }
         return null;
