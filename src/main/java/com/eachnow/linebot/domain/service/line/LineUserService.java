@@ -1,5 +1,6 @@
 package com.eachnow.linebot.domain.service.line;
 
+import com.eachnow.linebot.common.constant.CommonConstant;
 import com.eachnow.linebot.common.db.po.LineGroupUserPO;
 import com.eachnow.linebot.common.db.po.LineUserPO;
 import com.eachnow.linebot.common.db.repository.LineGroupUserRepository;
@@ -44,7 +45,7 @@ public class LineUserService {
             log.error("該line用戶已存在! userId:{}", userId);
             return;
         }
-        lineUserRepository.save(LineUserPO.builder().id(userId).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
+        lineUserRepository.save(LineUserPO.builder().id(userId).isValid(CommonConstant.VALID).createTime(new Timestamp(Instant.now().toEpochMilli())).build());
         log.info("新增line user，成功。userId:{}", userId);
     }
 
