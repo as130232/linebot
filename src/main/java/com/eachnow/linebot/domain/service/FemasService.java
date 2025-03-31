@@ -193,8 +193,8 @@ public class FemasService {
             quartzService.addRemindJob(jobKey, null, user.getId(), label, cron);
             log.info("set remindPunchOut success. userName:{}, punchIn: {}, punchOut: {}, cron: {}", userName, po.getPunchIn(), po.getPunchOut(), cron);
         } catch (Exception e) {
-            String errorMsg = "set remindPunchOut failed!";
-            log.error("{}! error mg:{}", errorMsg, e.getMessage());
+            String errorMsg = "set remindPunchOut failed! error msg:" + e.getMessage();
+            log.error("{}", errorMsg);
 //            lineNotifySender.sendToCharles(errorMsg);
             messageSender.pushToCharles(errorMsg);
         }
@@ -209,7 +209,7 @@ public class FemasService {
      */
     public boolean isLate(ZonedDateTime punchOut) {
         //取得晚上7點整時間
-        ZonedDateTime targetTime = ZonedDateTime.now().withZoneSameInstant(DateUtils.CST_ZONE_ID).withHour(19).withMinute(0).withSecond(0).withNano(0);
+        ZonedDateTime targetTime = ZonedDateTime.now().withZoneSameInstant(DateUtils.CST_ZONE_ID).withHour(19).withMinute(1).withSecond(0).withNano(0);
         // 判断下班時間是否小於目標時間
         return !punchOut.isBefore(targetTime);
     }
