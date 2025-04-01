@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 ;
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,9 +88,10 @@ public class ScheduledService {
     }
 
     /**
-     * 下雨警報
+     * 下雨警報 v1 純文字版本，較費流量次數
+     * 暫時不用
      */
-    @Scheduled(cron = "0 0 23 * * ?")
+//    @Scheduled(cron = "0 0 23 * * ?")
     public void rainAlarm() {
         if (!CRON_EXECUTE)
             return;
@@ -108,6 +110,18 @@ public class ScheduledService {
                 }
             }
         }
+    }
+
+    /**
+     * 下雨警報 v2 天氣圖卡，且較省流量次數
+     */
+    @Scheduled(cron = "0 0 23 * * ?")
+    public void rainAlarm2() {
+        if (!CRON_EXECUTE)
+            return;
+        String loactionName = "臺北市";
+        WeatherResultPO po = weatherApiService.getWeatherInfo(loactionName, null);
+        messageSender.pushWeatherCardToCharles(po);
     }
 
     @Scheduled(cron = "0 0 15 * * ?")

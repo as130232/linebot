@@ -51,7 +51,7 @@ public class WeatherHandler implements CommandHandler {
                 sb.append("　【" + WeatherElementEnum.getName(weatherElementPO.getElementName()) + "】");
                 sb.append("\n");
                 weatherElementPO.getTime().forEach(timePO -> {
-                    sb.append(parseDate(timePO.getStartTime()) + "-" + parseDate(timePO.getEndTime()));
+                    sb.append(DateUtils.parseDateTime(timePO.getStartTime()) + "-" + DateUtils.parseDateTime(timePO.getEndTime()));
                     sb.append("　" + timePO.getParameter().getParameterName());
                     if (timePO.getParameter().getParameterUnit() != null) {  //單位
                         sb.append("({unit})".replace("{unit}", parseUnit(timePO.getParameter().getParameterUnit())));
@@ -66,11 +66,6 @@ public class WeatherHandler implements CommandHandler {
 
     private String parseUnit(String parameterUnit) {
         return parameterUnit.replace("百分比", "%");
-    }
-
-    private String parseDate(String time) {
-        ZonedDateTime zonetime = ZonedDateTime.parse(time, DateUtils.yyyyMMddHHmmssDash);
-        return zonetime.format(DateUtils.yyyyMMddHHmmSlash);
     }
 
 }

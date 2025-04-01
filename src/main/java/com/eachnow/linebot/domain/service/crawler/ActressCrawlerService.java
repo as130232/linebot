@@ -29,7 +29,7 @@ public class ActressCrawlerService {
     }
 
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         Set<PttArticlePO> list = listArticle(10);
         String pic = randomPicture();

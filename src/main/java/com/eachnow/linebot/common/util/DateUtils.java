@@ -9,6 +9,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DecimalStyle;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class DateUtils {
     //    public static final ZoneId DEFAULT_ZONE_ID = ZoneId.of("UTC-4");    //美東
@@ -44,6 +45,19 @@ public class DateUtils {
     public static String parseDate(String date, DateTimeFormatter from, DateTimeFormatter to) {
         LocalDate localDate = LocalDate.parse(date, from);
         return localDate.format(to);
+    }
+
+    /**
+     * "2025-03-31 12:00:00" > "2025-03-31"
+     */
+    public static String parseDate(String time) {
+        ZonedDateTime zonetime = ZonedDateTime.parse(time, DateUtils.yyyyMMddHHmmssDash);
+        return zonetime.format(DateUtils.yyyyMMddDash);
+    }
+
+    public static String parseDateTime(String time) {
+        ZonedDateTime zonetime = ZonedDateTime.parse(time, DateUtils.yyyyMMddHHmmssDash);
+        return zonetime.format(DateUtils.yyyyMMddHHmmSlash);
     }
 
     public static ZonedDateTime parseDateTime(String dateTime, DateTimeFormatter from) {
@@ -131,17 +145,14 @@ public class DateUtils {
         return ZonedDateTime.now(CST_ZONE_ID);
     }
 
-    private static String checkDateStrAndPares(String date) {
-        switch (date) {
-            case "今天":
-                break;
-            case "昨天":
-                break;
-            case "明天":
-                break;
-            default:
-                break;
-        }
-        return date;
+    /**
+     * 判斷是否為今天
+     */
+    public static boolean isToday(long matchTimestamp) {
+        long nowTimestamp = DateUtils.getCurrentEpochMilli();
+        long diff = matchTimestamp - nowTimestamp;
+        long dayTimestamp = TimeUnit.DAYS.toMillis(1L);
+        return diff <= dayTimestamp;
     }
+
 }

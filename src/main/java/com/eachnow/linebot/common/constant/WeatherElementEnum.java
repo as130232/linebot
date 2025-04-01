@@ -40,7 +40,7 @@ public enum WeatherElementEnum {
 
     public static String getName(String element) {
         if (Strings.isEmpty(element))
-        return null;
+            return null;
         Optional<WeatherElementEnum> optional = Arrays.stream(WeatherElementEnum.values())
                 .filter(langEnum -> langEnum.getElement().contains(element)).findFirst();
         if (optional.isPresent()) {
@@ -49,4 +49,17 @@ public enum WeatherElementEnum {
         return WeatherElementEnum.WX.getName(); //default
     }
 
+    public static String getRainIcon(int unit) {
+        if (unit > 0 && unit <= 30) {
+            return "⛅️";
+        } else if (unit > 30 && unit <= 50) {
+            return "🌦️";
+        } else if (unit > 50 && unit <= 70) {
+            return "🌧";
+        } else if (unit > 70 && unit <= 100) {
+            return "⛈️️";
+        } else {
+            return "☀️";
+        }
+    }
 }
