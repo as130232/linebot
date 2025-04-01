@@ -255,7 +255,7 @@ public class MessageSender {
         Box timePeriodBox = Box.builder().layout(FlexLayout.HORIZONTAL).contents(endTimePeriodContents).spacing(FlexMarginSize.LG).paddingAll(FlexPaddingSize.XS).build();
         bodyContents.add(timePeriodBox);
 
-        
+
         Box footer = null;
         if (rainAlert) {
             footer = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(

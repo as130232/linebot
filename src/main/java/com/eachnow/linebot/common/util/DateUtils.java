@@ -48,11 +48,11 @@ public class DateUtils {
     }
 
     /**
-     * "2025-03-31 12:00:00" > "2025-03-31"
+     * "2025-03-31 12:00:00" > "2025/03/31"
      */
     public static String parseDate(String time) {
         ZonedDateTime zonetime = ZonedDateTime.parse(time, DateUtils.yyyyMMddHHmmssDash);
-        return zonetime.format(DateUtils.yyyyMMddDash);
+        return zonetime.format(DateUtils.yyyyMMddSlash);
     }
 
     public static String parseDateTime(String time) {
