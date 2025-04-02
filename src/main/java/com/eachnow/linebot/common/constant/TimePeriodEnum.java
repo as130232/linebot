@@ -9,7 +9,6 @@ public enum TimePeriodEnum {
     MORNING("早上", "06:00"),
     NOON("中午", "12:00"),
     EVENING("傍晚", "18:00"),
-    NEXT_DAY("翌日", "00:00"),
 
     ;
     private String name;
@@ -27,16 +26,10 @@ public enum TimePeriodEnum {
      */
     public static TimePeriodEnum getTimePeriod(String startTime) {
         if (startTime.contains("00:00:00")) {
-            //凌晨或是翌日時間段一樣，檢查是今日日期或明天
-            if (DateUtils.isToday(DateUtils.parseDateTimeToMilli(startTime))) {
-                return EARLY_MORNING;
-            } else {
-                return NEXT_DAY;
-            }
+            return EARLY_MORNING;
         }
         for (TimePeriodEnum periodEnum : TimePeriodEnum.values()) {
-            if (!periodEnum.equals(EARLY_MORNING) && !periodEnum.equals(NEXT_DAY) &&
-                    startTime.contains(periodEnum.getPeriod())) {
+            if (!periodEnum.equals(EARLY_MORNING) && startTime.contains(periodEnum.getPeriod())) {
                 return periodEnum;
             }
         }

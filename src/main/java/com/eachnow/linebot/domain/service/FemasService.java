@@ -139,7 +139,7 @@ public class FemasService {
             if (Strings.isEmpty(datePO.getFirst_in())) {
                 String message = "偵測到未打卡，剩十分鐘請趕緊打卡！";
 //                lineNotifySender.sendToCharles(message);
-                messageSender.pushToCharles(message);
+                messageSender.pushTextToCharles(message);
             }
         }
         log.info("remindPunchIn success.");
@@ -196,7 +196,7 @@ public class FemasService {
             String errorMsg = "set remindPunchOut failed! error msg:" + e.getMessage();
             log.error("{}", errorMsg);
 //            lineNotifySender.sendToCharles(errorMsg);
-            messageSender.pushToCharles(errorMsg);
+            messageSender.pushTextToCharles(errorMsg);
         }
     }
 

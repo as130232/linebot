@@ -49,7 +49,7 @@ public class RemindJob implements Job {
         Object userIdObj = jobExecutionContext.getMergedJobDataMap().get("userId");
         if (Objects.isNull(userIdObj)) {
 //            lineNotifySender.sendToCharles(label);
-            messageSender.pushToCharles(label);
+            messageSender.pushTextToCharles(label);
         } else {
             String userId = userIdObj.toString();
             String token = lineUserService.getNotifyToken(userId);

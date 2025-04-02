@@ -5,6 +5,7 @@ import com.eachnow.linebot.common.po.openweather.TimePO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
+import com.eachnow.linebot.common.util.FlexMessageUtils;
 import com.eachnow.linebot.config.LineConfig;
 import com.eachnow.linebot.domain.service.FemasService;
 import com.eachnow.linebot.domain.service.crawler.BeautyCrawlerService;
@@ -14,6 +15,7 @@ import com.eachnow.linebot.domain.service.gateway.TwseApiService;
 import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import com.eachnow.linebot.domain.service.line.LineNotifySender;
 import com.eachnow.linebot.domain.service.line.MessageSender;
+import com.linecorp.bot.model.message.Message;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -106,14 +108,14 @@ public class ScheduledService {
                     String end = (DateUtils.parseDateTime(timePO.getEndTime(), DateUtils.yyyyMMddHHmmssDash, DateUtils.yyyyMMddHHmmSlash)).split(" ")[1];
                     String message = start + " - " + end + "，降雨機率為: {unit}%，出門請帶傘。".replace("{unit}", Integer.toString(unit));
 //                    lineNotifySender.sendToCharles(message);
-                    messageSender.pushToCharles(message);
+                    messageSender.pushTextToCharles(message);
                 }
             }
         }
     }
 
     /**
-     * 下雨警報 v2 天氣圖卡，且較省流量次數
+     * 下雨警報 v2 天氣圖卡，較省流量次數
      */
     @Scheduled(cron = "0 0 23 * * ?")
     public void rainAlarm2() {
@@ -121,7 +123,13 @@ public class ScheduledService {
             return;
         String loactionName = "臺北市";
         WeatherResultPO po = weatherApiService.getWeatherInfo(loactionName, null);
-        messageSender.pushWeatherCardToCharles(po);
+        Message message = FlexMessageUtils.getWeatherCard(po);
+        if (message == null) {
+            return;
+        }
+        List<Message> messages = new ArrayList<>();
+        messages.add(message);
+        messageSender.push(lineConfig.getLineUserIdOwn(), messages);
     }
 
     @Scheduled(cron = "0 0 15 * * ?")

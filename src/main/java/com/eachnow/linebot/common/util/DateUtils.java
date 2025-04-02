@@ -149,10 +149,14 @@ public class DateUtils {
      * 判斷是否為今天
      */
     public static boolean isToday(long matchTimestamp) {
-        long nowTimestamp = DateUtils.getCurrentEpochMilli();
-        long diff = matchTimestamp - nowTimestamp;
-        long dayTimestamp = TimeUnit.DAYS.toMillis(1L);
-        return diff <= dayTimestamp;
+        // 獲取當前時間的 ZonedDateTime
+        ZonedDateTime now = ZonedDateTime.now();
+        // 獲取明天的日期
+        LocalDate tomorrow = now.toLocalDate().plusDays(1);
+        // 設置時間為 00:00:00
+        ZonedDateTime tomorrowAtMidnight = tomorrow.atStartOfDay(now.getZone());
+        // 判斷時間是否小於明天整點
+        return matchTimestamp < tomorrowAtMidnight.toInstant().toEpochMilli();
     }
 
 }

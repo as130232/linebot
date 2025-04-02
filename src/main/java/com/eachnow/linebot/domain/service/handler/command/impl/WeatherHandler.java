@@ -6,6 +6,7 @@ import com.eachnow.linebot.common.po.CommandPO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
 import com.eachnow.linebot.common.util.DateUtils;
+import com.eachnow.linebot.common.util.FlexMessageUtils;
 import com.eachnow.linebot.common.util.ParamterUtils;
 import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import com.eachnow.linebot.domain.service.handler.command.CommandHandler;
@@ -40,6 +41,15 @@ public class WeatherHandler implements CommandHandler {
         WeatherResultPO weatherResultPO = weatherApiService.getWeatherInfo(locationName, elementName);
         if (weatherResultPO.getRecords().getLocation().size() == 0)
             return new TextMessage("查無此地:" + locationName);
+//        return new TextMessage(getWeatherInfo(weatherResultPO));
+        return FlexMessageUtils.getWeatherCard(weatherResultPO);
+    }
+
+    private String parseUnit(String parameterUnit) {
+        return parameterUnit.replace("百分比", "%");
+    }
+
+    private String getWeatherInfo(WeatherResultPO weatherResultPO) {
         StringBuilder sb = new StringBuilder();
         sb.append(" - " + weatherResultPO.getRecords().getDatasetDescription() + " - ");
         sb.append("\n");
@@ -61,11 +71,6 @@ public class WeatherHandler implements CommandHandler {
                 sb.append("\n");
             });
         });
-        return new TextMessage(sb.toString());
+        return sb.toString();
     }
-
-    private String parseUnit(String parameterUnit) {
-        return parameterUnit.replace("百分比", "%");
-    }
-
 }
