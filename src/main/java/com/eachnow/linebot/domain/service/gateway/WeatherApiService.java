@@ -7,4 +7,6 @@ public interface WeatherApiService {
      * 取得天氣資訊
      */
     public WeatherResultPO getWeatherInfo(String locationName, String elementName);
+
+    public boolean isRain(WeatherResultPO po);
 }

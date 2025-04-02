@@ -1,5 +1,7 @@
 package com.eachnow.linebot.domain.service.gateway.impl;
 
+import com.eachnow.linebot.common.po.openweather.TimePO;
+import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
 import com.eachnow.linebot.domain.service.gateway.WeatherApiService;
 import lombok.extern.slf4j.Slf4j;
@@ -38,5 +40,18 @@ public class WeatherApiServiceImpl implements WeatherApiService {
             log.error("取得天氣資訊，失敗! url:{}, error msg:{}", url, e.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public boolean isRain(WeatherResultPO po) {
+        for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
+            for (TimePO timePO : weatherElementPO.getTime()) {
+                int unit = Integer.parseInt(timePO.getParameter().getParameterName());
+                if (unit >= 70) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

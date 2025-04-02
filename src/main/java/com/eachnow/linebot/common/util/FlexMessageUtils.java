@@ -192,9 +192,6 @@ public class FlexMessageUtils {
             footer = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
                     Text.builder().text("☔️ 明日白天下雨，出門請帶傘 ☔️").color("#ffffff").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).build()
             )).spacing(FlexMarginSize.MD).paddingAll(FlexPaddingSize.MD).backgroundColor("#e82665").build();
-        } else {
-            //因為line有限制主動發送訊息次數，現階段有下雨才發送，沒下雨就不送
-            return null;
         }
         //標頭
         List<FlexComponent> headerContents = Collections.singletonList(Text.builder().text("天氣卡").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());

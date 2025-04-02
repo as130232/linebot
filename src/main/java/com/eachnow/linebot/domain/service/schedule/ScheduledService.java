@@ -77,10 +77,6 @@ public class ScheduledService {
         CRON_EXECUTE = isOpen;
     }
 
-    public boolean getCron() {
-        return CRON_EXECUTE;
-    }
-
     @Scheduled(cron = "0 0 8,14,20 * * ?")
     public void beautyCrawler() {
         if (!CRON_EXECUTE)
@@ -97,8 +93,8 @@ public class ScheduledService {
     public void rainAlarm() {
         if (!CRON_EXECUTE)
             return;
-        String loactionName = "臺北市";
-        WeatherResultPO po = weatherApiService.getWeatherInfo(loactionName, WeatherElementEnum.POP.getElement());
+        String locationName = "臺北市";
+        WeatherResultPO po = weatherApiService.getWeatherInfo(locationName, WeatherElementEnum.POP.getElement());
         for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
             for (TimePO timePO : weatherElementPO.getTime()) {   //取得隔天早上06:00 ~ 18:00 的機率
                 int unit = Integer.parseInt(timePO.getParameter().getParameterName());
@@ -121,12 +117,13 @@ public class ScheduledService {
     public void rainAlarm2() {
         if (!CRON_EXECUTE)
             return;
-        String loactionName = "臺北市";
-        WeatherResultPO po = weatherApiService.getWeatherInfo(loactionName, null);
-        Message message = FlexMessageUtils.getWeatherCard(po);
-        if (message == null) {
+        String locationName = "臺北市";
+        WeatherResultPO po = weatherApiService.getWeatherInfo(locationName, null);
+        //因為line有限制主動發送訊息次數，現階段有下雨才發送，沒下雨就不送
+        if (!weatherApiService.isRain(po)) {
             return;
         }
+        Message message = FlexMessageUtils.getWeatherCard(po);
         List<Message> messages = new ArrayList<>();
         messages.add(message);
         messageSender.push(lineConfig.getLineUserIdOwn(), messages);
@@ -140,7 +137,10 @@ public class ScheduledService {
         log.info("[schedule] 爬取最新股價，完成。");
     }
 
-    //    @Scheduled(cron = "0 0 5 * * ?")
+    /**
+     * 爬取javDB
+     */
+//    @Scheduled(cron = "0 0 5 * * ?")
     public void javdbCrawler() {
         if (!CRON_EXECUTE)
             return;
