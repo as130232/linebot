@@ -23,13 +23,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-;
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
+
+;
 
 
 /**
@@ -90,7 +90,7 @@ public class ScheduledService {
      * 暫時不用
      */
 //    @Scheduled(cron = "0 0 23 * * ?")
-    public void rainAlarm() {
+    public void rainAlarmForText() {
         if (!CRON_EXECUTE)
             return;
         String locationName = "臺北市";
@@ -114,13 +114,15 @@ public class ScheduledService {
      * 下雨警報 v2 天氣圖卡，較省流量次數
      */
     @Scheduled(cron = "0 0 23 * * ?")
-    public void rainAlarm2() {
+    public void rainAlarm() {
         if (!CRON_EXECUTE)
             return;
         String locationName = "臺北市";
         WeatherResultPO po = weatherApiService.getWeatherInfo(locationName, null);
         //因為line有限制主動發送訊息次數，現階段有下雨才發送，沒下雨就不送
-        if (!weatherApiService.isRain(po)) {
+        boolean isRain = weatherApiService.isRain(po);
+        log.info("ready to rainAlarm, isRain:{}", isRain);
+        if (!isRain) {
             return;
         }
         Message message = FlexMessageUtils.getWeatherCard(po);
@@ -156,7 +158,7 @@ public class ScheduledService {
             );
             futureList.add(future);
         }
-        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[futureList.size()])).join();
+        CompletableFuture.allOf(futureList.toArray(new CompletableFuture[0])).join();
         log.info("[schedule] 爬取javdb，完成。");
     }
 

@@ -188,10 +188,12 @@ public class FlexMessageUtils {
 
 
         Box footer = null;
+        String altText = "天氣卡";
         if (rainAlert) {
             footer = Box.builder().layout(FlexLayout.VERTICAL).contents(Collections.singletonList(
                     Text.builder().text("☔️ 明日白天下雨，出門請帶傘 ☔️").color("#ffffff").size(FlexFontSize.Md).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).build()
             )).spacing(FlexMarginSize.MD).paddingAll(FlexPaddingSize.MD).backgroundColor("#e82665").build();
+            altText = "下雨警報";
         }
         //標頭
         List<FlexComponent> headerContents = Collections.singletonList(Text.builder().text("天氣卡").size(FlexFontSize.LG).weight(Text.TextWeight.BOLD).align(FlexAlign.CENTER).color("#ffffff").build());
@@ -199,6 +201,6 @@ public class FlexMessageUtils {
         Box body = Box.builder().layout(FlexLayout.VERTICAL).contents(bodyContents).paddingAll(FlexPaddingSize.LG).build();
 
         FlexContainer contents = Bubble.builder().size(Bubble.BubbleSize.MEGA).header(header).hero(null).body(body).footer(footer).build();
-        return FlexMessage.builder().altText("天氣卡").contents(contents).build();
+        return FlexMessage.builder().altText(altText).contents(contents).build();
     }
 }

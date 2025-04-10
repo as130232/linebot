@@ -34,8 +34,7 @@ public class WeatherApiServiceImpl implements WeatherApiService {
             url = url + "&elementName=" + elementName;
         try {
             ResponseEntity<WeatherResultPO> responseEntity = restTemplate.getForEntity(url, WeatherResultPO.class);
-            WeatherResultPO weatherResultPO = responseEntity.getBody();
-            return weatherResultPO;
+            return responseEntity.getBody();
         } catch (Exception e) {
             log.error("取得天氣資訊，失敗! url:{}, error msg:{}", url, e.getMessage());
         }
@@ -44,6 +43,9 @@ public class WeatherApiServiceImpl implements WeatherApiService {
 
     @Override
     public boolean isRain(WeatherResultPO po) {
+        if (po == null) {
+            return false;
+        }
         for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
             for (TimePO timePO : weatherElementPO.getTime()) {
                 int unit = Integer.parseInt(timePO.getParameter().getParameterName());
