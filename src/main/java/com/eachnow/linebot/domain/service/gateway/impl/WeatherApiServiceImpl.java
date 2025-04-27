@@ -1,5 +1,6 @@
 package com.eachnow.linebot.domain.service.gateway.impl;
 
+import com.eachnow.linebot.common.constant.WeatherElementEnum;
 import com.eachnow.linebot.common.po.openweather.TimePO;
 import com.eachnow.linebot.common.po.openweather.WeatherElementPO;
 import com.eachnow.linebot.common.po.openweather.WeatherResultPO;
@@ -47,6 +48,9 @@ public class WeatherApiServiceImpl implements WeatherApiService {
             return false;
         }
         for (WeatherElementPO weatherElementPO : po.getRecords().getLocation().get(0).getWeatherElement()) {
+            if (!WeatherElementEnum.POP.getElement().equals(weatherElementPO.getElementName())) {
+                continue;
+            }
             for (TimePO timePO : weatherElementPO.getTime()) {
                 int unit = Integer.parseInt(timePO.getParameter().getParameterName());
                 if (unit >= 70) {
