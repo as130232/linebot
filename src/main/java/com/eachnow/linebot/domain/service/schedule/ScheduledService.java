@@ -114,7 +114,6 @@ public class ScheduledService {
     /**
      * 下雨警報 v2 天氣圖卡，較省流量次數
      */
-    @PostConstruct
     @Scheduled(cron = "0 0 23 * * ?")
     public void rainAlarm() {
         if (!CRON_EXECUTE)
