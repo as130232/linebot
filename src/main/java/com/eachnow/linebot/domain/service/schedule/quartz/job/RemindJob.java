@@ -52,15 +52,18 @@ public class RemindJob implements Job {
             messageSender.pushTextToCharles(label);
         } else {
             String userId = userIdObj.toString();
-            String token = lineUserService.getNotifyToken(userId);
-            if (Strings.isEmpty(token)) {
-                return;
-            }
+//            String token = lineUserService.getNotifyToken(userId);
+//            if (Strings.isEmpty(token)) {
+//                return;
+//            }
 //            lineNotifySender.send(token, label);
             Message message = new TextMessage(label);
             List<Message> messages = new ArrayList<>();
             messages.add(message);
-            messageSender.push(userId, messages);
+            //當日非遲到才推送下班打卡提醒
+            if (!label.contains("[Delay]")) {
+                messageSender.push(userId, messages);
+            }
         }
         Object remind = jobExecutionContext.getMergedJobDataMap().get("remindId");
         if (Objects.nonNull(remind) && NumberUtils.isNumber(remind.toString())) {

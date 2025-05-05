@@ -176,8 +176,9 @@ public class FemasService {
                 return;
             }
             ZonedDateTime punchOut = DateUtils.parseDateTime(po.getPunchOut(), DateUtils.yyyyMMddHHmmDash);
+            boolean isLate = isLate(punchOut);
             //檢查是否遲到，若是超過七點下班則為超過十點打卡，為遲到需要提醒忘刷卡
-            if (isLate(punchOut) && !notifyToken.isEmpty()) {
+            if (isLate && !notifyToken.isEmpty()) {
                 String sendMessage = "今日打卡時間為：" + po.getPunchOut() + "，需提交忘刷單或請假！";
 //                lineNotifySender.send(notifyToken, sendMessage);
                 Message message = new TextMessage(sendMessage);
@@ -189,7 +190,8 @@ public class FemasService {
             ZonedDateTime minus5Minutes = punchOut.minusMinutes(5);
             //新增下班提醒排程
             String cron = QuartzService.getCron(minus5Minutes.format(DateUtils.yyyyMMdd), minus5Minutes.format(DateUtils.hhmmss));
-            String label = "倒數五分鐘，準備打卡下班囉！ " + po.getPunchOut();
+            String prefix = isLate ? "[Delay]" : "倒數五分鐘，準備打卡下班囉！";
+            String label = prefix + " " + po.getPunchOut();
             quartzService.addRemindJob(jobKey, null, user.getId(), label, cron);
             log.info("set remindPunchOut success. userName:{}, punchIn: {}, punchOut: {}, cron: {}", userName, po.getPunchIn(), po.getPunchOut(), cron);
         } catch (Exception e) {
